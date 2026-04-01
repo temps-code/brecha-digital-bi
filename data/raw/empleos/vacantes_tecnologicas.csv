@@ -1,0 +1,51 @@
+id,title,location,salary_min,category,description,created
+adz-1000,BI Developer,{'display_name': 'Remote'},871,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1001,Data Engineer,{'display_name': 'Tarija'},929,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1002,Python Developer,{'display_name': 'Tarija'},1368,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1003,Python Developer,{'display_name': 'Remote'},991,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1004,Python Developer,{'display_name': 'Tarija'},1083,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1005,SQL Specialist,{'display_name': 'Tarija'},898,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1006,Python Developer,{'display_name': 'Remote'},1311,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1007,Data Analyst,{'display_name': 'La Paz'},1365,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1008,Python Developer,{'display_name': 'Tarija'},1236,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1009,SQL Specialist,{'display_name': 'La Paz'},1213,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1010,Data Engineer,{'display_name': 'Santa Cruz'},1120,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1011,Data Analyst,{'display_name': 'Remote'},1117,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1012,BI Developer,{'display_name': 'La Paz'},996,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1013,Data Engineer,{'display_name': 'Remote'},969,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1014,Data Analyst,{'display_name': 'Remote'},1213,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1015,Python Developer,{'display_name': 'Remote'},828,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1016,Python Developer,{'display_name': 'Tarija'},963,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1017,SQL Specialist,{'display_name': 'Tarija'},984,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1018,SQL Specialist,{'display_name': 'Remote'},1071,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1019,Data Engineer,{'display_name': 'La Paz'},1442,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1020,Data Analyst,{'display_name': 'Santa Cruz'},914,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1021,BI Developer,{'display_name': 'Remote'},1337,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1022,Data Analyst,{'display_name': 'Tarija'},1044,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1023,Data Engineer,{'display_name': 'Remote'},1310,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1024,BI Developer,{'display_name': 'Santa Cruz'},1435,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1025,SQL Specialist,{'display_name': 'Tarija'},1163,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1026,Python Developer,{'display_name': 'Tarija'},1123,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1027,SQL Specialist,{'display_name': 'Santa Cruz'},1037,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1028,Data Engineer,{'display_name': 'Tarija'},1188,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1029,BI Developer,{'display_name': 'La Paz'},1187,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1030,SQL Specialist,{'display_name': 'Tarija'},919,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1031,BI Developer,{'display_name': 'La Paz'},873,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1032,BI Developer,{'display_name': 'La Paz'},1003,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1033,BI Developer,{'display_name': 'Tarija'},1148,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1034,SQL Specialist,{'display_name': 'La Paz'},888,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1035,SQL Specialist,{'display_name': 'Santa Cruz'},965,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1036,Data Engineer,{'display_name': 'Remote'},1350,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1037,BI Developer,{'display_name': 'La Paz'},1388,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1038,SQL Specialist,{'display_name': 'Santa Cruz'},1118,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1039,BI Developer,{'display_name': 'Remote'},1440,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1040,Data Analyst,{'display_name': 'Remote'},994,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1041,Data Engineer,{'display_name': 'Remote'},941,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1042,Data Engineer,{'display_name': 'La Paz'},1116,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1043,Python Developer,{'display_name': 'La Paz'},1487,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1044,Data Engineer,{'display_name': 'La Paz'},1033,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1045,SQL Specialist,{'display_name': 'Tarija'},1268,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1046,Data Engineer,{'display_name': 'La Paz'},1223,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1047,BI Developer,{'display_name': 'Remote'},1500,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1048,BI Developer,{'display_name': 'Tarija'},1304,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
+adz-1049,Data Analyst,{'display_name': 'La Paz'},1296,{'label': 'IT Jobs'},"Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.",2026-03-28T12:00:00Z
