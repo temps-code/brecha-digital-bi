@@ -152,7 +152,7 @@ Full schema documentation: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_niev
 | Abraham Flores Barrionuevo | Data Ingestion | [@AFB-9898](https://github.com/AFB-9898) |
 | Juan Nicolás Flores Delgado | Data Transformation | [@Juan7139nf](https://github.com/Juan7139nf) |
 | Micaela Pérez Vásquez | Schema Design | — |
-| Mayra Villca Méndez | Analysis & KPIs | — |
+| Mayra Villca Méndez | Analysis & KPIs | [@MayVillca](https://github.com/MayVillca) |
 | Diego Vargas Urzagaste | Dashboard & Integration | [@temps-code](https://github.com/temps-code) |
 
 ---

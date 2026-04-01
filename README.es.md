@@ -152,7 +152,7 @@ Documentación completa del esquema: [`docs/esquema_copo_nieve.md`](docs/esquema
 | Abraham Flores Barrionuevo | Ingesta de Datos | [@AFB-9898](https://github.com/AFB-9898) |
 | Juan Nicolás Flores Delgado | Transformación de Datos | [@Juan7139nf](https://github.com/Juan7139nf) |
 | Micaela Pérez Vásquez | Diseño del Esquema | — |
-| Mayra Villca Méndez | Análisis y KPIs | — |
+| Mayra Villca Méndez | Análisis y KPIs | [@MayVillca](https://github.com/MayVillca) |
 | Diego Vargas Urzagaste | Dashboard e Integración | [@temps-code](https://github.com/temps-code) |
 
 ---
