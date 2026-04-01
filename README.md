@@ -185,17 +185,17 @@ All team progress is tracked on the [GitHub Kanban Board](https://github.com/use
 
 | Column | When to use |
 |---|---|
-| Por Hacer | Task not yet started |
-| En Progreso | You are actively working on it |
-| En Revisión | Work done — waiting for the Lead to review |
-| Finalizado | Lead approved — task complete |
+| Todo | Task not yet started |
+| In Progress | You are actively working on it |
+| Testing/Review | Work done — waiting for the Lead to review |
+| Done | Lead approved — task complete |
 
-> The Lead for each phase is the only one who moves a card to **Finalizado**. Never close your own task — wait for review.
+> The Lead for each phase is the only one who moves a card to **Done**. Never close your own task — wait for review.
 
 ### Day-to-day workflow
 
 1. Open your issue from the [Issues tab](https://github.com/temps-code/brecha-digital-bi/issues)
-2. Move your card to **En Progreso** on the board
+2. Move your card to **In Progress** on the board
 3. Create your working branch:
 
    ```bash
@@ -212,7 +212,7 @@ All team progress is tracked on the [GitHub Kanban Board](https://github.com/use
    git push origin feature/your-phase
    ```
 
-5. When finished: move card to **En Revisión** and notify Diego (@temps-code)
+5. When finished: move card to **Testing/Review** and notify Diego (@temps-code)
 6. Check off completed tasks inside your issue using the checkboxes
 
 ### Branch naming

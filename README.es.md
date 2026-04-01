@@ -185,17 +185,17 @@ Todo el avance del equipo se registra en el [Tablero Kanban](https://github.com/
 
 | Columna | Cuándo usarla |
 |---|---|
-| Por Hacer | La tarea todavía no fue iniciada |
-| En Progreso | Estás trabajando activamente en ella |
-| En Revisión | Terminaste — esperando que el Lead revise |
-| Finalizado | El Lead aprobó — tarea completa |
+| **Todo** | La tarea todavía no fue iniciada |
+| **In Progress** | Estás trabajando activamente en ella |
+| **Testing/Review** | Terminaste — esperando que el Lead revise |
+| **Done** | El Lead aprobó — tarea completa |
 
-> Solo el Lead de cada fase mueve una tarjeta a **Finalizado**. No cierres tu propia tarea — esperá la revisión.
+> Solo el Lead de cada fase mueve una tarjeta a **Done**. No cierres tu propia tarea — esperá la revisión.
 
 ### Flujo de trabajo diario
 
 1. Abrí tu issue desde la [pestaña Issues](https://github.com/temps-code/brecha-digital-bi/issues)
-2. Mové tu tarjeta a **En Progreso** en el tablero
+2. Mové tu tarjeta a **In Progress** en el tablero
 3. Creá tu rama de trabajo:
 
    ```bash
@@ -212,7 +212,7 @@ Todo el avance del equipo se registra en el [Tablero Kanban](https://github.com/
    git push origin feature/tu-fase
    ```
 
-5. Al terminar: mové la tarjeta a **En Revisión** y avisale a Diego (@temps-code)
+5. Al terminar: mové la tarjeta a **Testing/Review** y avisale a Diego (@temps-code)
 6. Marcá los checkboxes completados dentro de tu issue
 
 ### Nombres de ramas
