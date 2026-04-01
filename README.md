@@ -32,9 +32,10 @@ Course: Business Intelligence — 2026
 - [Stack](#stack)
 - [Architecture](#architecture)
 - [Data Pipeline](#data-pipeline)
-- [Snowflake Schema](#snowflake-schema)
+- [Star Schema](#star-schema)
 - [Sprint Schedule](#sprint-schedule)
 - [Team & Workflow](#team--workflow)
+- [Kanban Board & Contributing](#kanban-board--contributing)
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
 - [Running the Dashboard](#running-the-dashboard)
@@ -51,7 +52,7 @@ Bolivian technical education institutions generate large amounts of academic dat
 
 Key capabilities:
 
-- Automated ELT pipeline from SQL Server (Bronze) through transformation (Silver) to a snowflake-schema warehouse (Gold)
+- Automated ELT pipeline from SQL Server (Bronze) through transformation (Silver) to a star-schema warehouse (Gold)
 - KPI monitoring: employability rate, dropout prediction, skill gap analysis
 - Regional benchmarking using CEPALSTAT indicators (ODS 4 and ODS 8)
 - Real-time job vacancy analysis from external employment APIs
@@ -103,7 +104,7 @@ SQL Server BrechaDigitalDB     CEPALSTAT API        Adzuna API
                            facts.py · dimensions.py
                                      │
                      SQL Server DW_BrechaDigital
-                    [Gold — Snowflake Schema T-SQL]
+                      [Gold — Star Schema T-SQL]
                     Fact_InsercionLaboral · DIM_* tables
                                      │
                           src/dashboard/ (Streamlit)
@@ -126,23 +127,20 @@ SQL Server BrechaDigitalDB     CEPALSTAT API        Adzuna API
 
 ---
 
-## Snowflake Schema
+## Star Schema
+
+All dimension tables connect **directly** to the central fact table — no hierarchies between dimensions.
 
 ```
-                         DIM_CARRERA
-                              ▲
-              DIM_CATEGORIA_SKILL   DIM_ESTUDIANTE
-                     ▲                    ▲
-               DIM_HABILIDAD              │
-                     ▲                    │
-                     └── FACT_INSERCION_LABORAL ──► DIM_TIEMPO
-                                          │
-                                          └────────► DIM_MERCADO_LABORAL
-                                                              ▲
-                                                         DIM_REGION
+FACT_INSERCION_LABORAL
+├──► DIM_ESTUDIANTE
+├──► DIM_CARRERA
+├──► DIM_HABILIDAD
+├──► DIM_MERCADO_LABORAL   ← includes region as a denormalized column
+└──► DIM_TIEMPO
 ```
 
-Full schema documentation: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_nieve.md)
+Full schema documentation: [`docs/esquema_estrella.md`](docs/esquema_estrella.md)
 
 ---
 
@@ -150,13 +148,13 @@ Full schema documentation: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_niev
 
 | Day | Date | Phase | Layer |
 |---|---|---|---|
-| Day 1 | Setup | Definition, GitHub setup, Bronze extraction | Bronze |
-| Day 2 | April 1 | Cleaning, transformation, integration | Silver |
-| Day 3 | April 2 | Star schema modeling + Dashboard construction | Gold + Viz |
+| Day 1 | April 1 | Definition, GitHub setup, Bronze extraction | Bronze |
+| Day 2 | April 2 | Cleaning, transformation, integration | Silver |
+| Day 3 | April 3 | Star schema modeling + Dashboard construction | Gold + Viz |
 | Day 4 | April 6 | Final testing, storytelling polish, documentation | All |
 | Day 5 | April 7 | **DEMO DAY** — 10-minute presentation | — |
 
-Progress is tracked on the [GitHub Kanban Board](../../projects).
+Progress is tracked on the [GitHub Kanban Board](https://github.com/temps-code/brecha-digital-bi/projects).
 
 ---
 
@@ -171,6 +169,56 @@ All members contribute across every phase. Each person listed below is the **lea
 | Micaela Pérez Vásquez | Gold — Schema Design | [@Sam24p](https://github.com/Sam24p)|
 | Mayra Villca Méndez | Analysis & KPIs — Notebooks | [@MayVillca](https://github.com/MayVillca) |
 | Diego Vargas Urzagaste | Dashboard & Integration | [@temps-code](https://github.com/temps-code) |
+
+---
+
+## Kanban Board & Contributing
+
+All team progress is tracked on the [GitHub Kanban Board](https://github.com/temps-code/brecha-digital-bi/projects) — open the **Projects** tab in the repository.
+
+### Board columns
+
+| Column | When to use |
+|---|---|
+| Por Hacer | Task not yet started |
+| En Progreso | You are actively working on it |
+| En Revisión | Work done — waiting for the Lead to review |
+| Finalizado | Lead approved — task complete |
+
+> The Lead for each phase is the only one who moves a card to **Finalizado**. Never close your own task — wait for review.
+
+### Day-to-day workflow
+
+1. Open your issue from the [Issues tab](https://github.com/temps-code/brecha-digital-bi/issues)
+2. Move your card to **En Progreso** on the board
+3. Create your working branch:
+
+   ```bash
+   git checkout main
+   git pull origin main
+   git checkout -b feature/your-phase   # e.g. feature/bronze
+   ```
+
+4. Commit your progress frequently:
+
+   ```bash
+   git add .
+   git commit -m "feat: brief description of what you did"
+   git push origin feature/your-phase
+   ```
+
+5. When finished: move card to **En Revisión** and notify Diego (@temps-code)
+6. Check off completed tasks inside your issue using the checkboxes
+
+### Branch naming
+
+| Phase | Branch |
+|---|---|
+| Bronze — Data Ingestion | `feature/bronze` |
+| Silver — Transformation | `feature/silver` |
+| Gold — Schema | `feature/gold` |
+| Dashboard | `feature/dashboard` |
+| Notebooks & KPIs | `feature/notebooks` |
 
 ---
 

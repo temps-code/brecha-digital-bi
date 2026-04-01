@@ -32,9 +32,10 @@ Materia: Inteligencia de Negocios — 2026
 - [Stack](#stack)
 - [Arquitectura](#arquitectura)
 - [Pipeline de Datos](#pipeline-de-datos)
-- [Esquema Copo de Nieve](#esquema-copo-de-nieve)
+- [Esquema Estrella](#esquema-estrella)
 - [Cronograma de Sprints](#cronograma-de-sprints)
 - [Equipo y Forma de Trabajo](#equipo-y-forma-de-trabajo)
+- [Tablero Kanban y Flujo de Trabajo](#tablero-kanban-y-flujo-de-trabajo)
 - [Instalación](#instalación)
 - [Variables de Entorno](#variables-de-entorno)
 - [Ejecutar el Dashboard](#ejecutar-el-dashboard)
@@ -51,7 +52,7 @@ Las instituciones de educación técnica bolivianas generan grandes volúmenes d
 
 Capacidades principales:
 
-- Pipeline ELT automatizado desde SQL Server (Bronze) pasando por transformación (Silver) hasta un warehouse con esquema copo de nieve (Gold)
+- Pipeline ELT automatizado desde SQL Server (Bronze) pasando por transformación (Silver) hasta un warehouse con esquema estrella (Gold)
 - Monitoreo de KPIs: tasa de inserción laboral, predicción de deserción, análisis de brecha de habilidades
 - Benchmarking regional usando indicadores CEPALSTAT (ODS 4 y ODS 8)
 - Análisis de vacantes laborales en tiempo real desde APIs externas de empleo
@@ -103,7 +104,7 @@ SQL Server BrechaDigitalDB    API CEPALSTAT       Adzuna API
                          facts.py · dimensions.py
                                   │
                   SQL Server DW_BrechaDigital
-                 [Gold — Esquema Copo de Nieve T-SQL]
+                   [Gold — Esquema Estrella T-SQL]
                  Fact_InsercionLaboral · tablas DIM_*
                                   │
                        src/dashboard/ (Streamlit)
@@ -126,23 +127,20 @@ SQL Server BrechaDigitalDB    API CEPALSTAT       Adzuna API
 
 ---
 
-## Esquema Copo de Nieve
+## Esquema Estrella
+
+Todas las tablas de dimensiones conectan **directamente** a la tabla de hechos central — sin jerarquías entre dimensiones.
 
 ```
-                       DIM_CARRERA
-                            ▲
-            DIM_CATEGORIA_SKILL   DIM_ESTUDIANTE
-                   ▲                    ▲
-             DIM_HABILIDAD              │
-                   ▲                    │
-                   └── FACT_INSERCION_LABORAL ──► DIM_TIEMPO
-                                        │
-                                        └────────► DIM_MERCADO_LABORAL
-                                                            ▲
-                                                       DIM_REGION
+FACT_INSERCION_LABORAL
+├──► DIM_ESTUDIANTE
+├──► DIM_CARRERA
+├──► DIM_HABILIDAD
+├──► DIM_MERCADO_LABORAL   ← incluye región como columna denormalizada
+└──► DIM_TIEMPO
 ```
 
-Documentación completa del esquema: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_nieve.md)
+Documentación completa del esquema: [`docs/esquema_estrella.md`](docs/esquema_estrella.md)
 
 ---
 
@@ -150,13 +148,13 @@ Documentación completa del esquema: [`docs/esquema_copo_nieve.md`](docs/esquema
 
 | Día | Fecha | Fase | Capa |
 |---|---|---|---|
-| Día 1 | Setup | Definición, setup GitHub, extracción Bronze | Bronze |
-| Día 2 | 1 de abril | Limpieza, transformación e integración | Silver |
-| Día 3 | 2 de abril | Modelado estrella + construcción del Dashboard | Gold + Viz |
+| Día 1 | 1 de abril | Definición, setup GitHub, extracción Bronze | Bronze |
+| Día 2 | 2 de abril | Limpieza, transformación e integración | Silver |
+| Día 3 | 3 de abril | Modelado estrella + construcción del Dashboard | Gold + Viz |
 | Día 4 | 6 de abril | Pruebas finales, storytelling y documentación | Todas |
 | Día 5 | 7 de abril | **DEMO DAY** — presentación final de 10 minutos | — |
 
-El avance se registra en el [Tablero Kanban de GitHub](../../projects).
+El avance se registra en el [Tablero Kanban de GitHub](https://github.com/temps-code/brecha-digital-bi/projects).
 
 ---
 
@@ -171,6 +169,56 @@ Todos los integrantes contribuyen en todas las fases del proyecto. Cada persona 
 | Micaela Pérez Vásquez | Gold — Diseño del Esquema | [@Sam24p](https://github.com/Sam24p) |
 | Mayra Villca Méndez | Análisis y KPIs — Notebooks | [@MayVillca](https://github.com/MayVillca) |
 | Diego Vargas Urzagaste | Dashboard e Integración | [@temps-code](https://github.com/temps-code) |
+
+---
+
+## Tablero Kanban y Flujo de Trabajo
+
+Todo el avance del equipo se registra en el [Tablero Kanban](https://github.com/temps-code/brecha-digital-bi/projects) — abrí la pestaña **Projects** del repositorio.
+
+### Columnas del tablero
+
+| Columna | Cuándo usarla |
+|---|---|
+| Por Hacer | La tarea todavía no fue iniciada |
+| En Progreso | Estás trabajando activamente en ella |
+| En Revisión | Terminaste — esperando que el Lead revise |
+| Finalizado | El Lead aprobó — tarea completa |
+
+> Solo el Lead de cada fase mueve una tarjeta a **Finalizado**. No cierres tu propia tarea — esperá la revisión.
+
+### Flujo de trabajo diario
+
+1. Abrí tu issue desde la [pestaña Issues](https://github.com/temps-code/brecha-digital-bi/issues)
+2. Mové tu tarjeta a **En Progreso** en el tablero
+3. Creá tu rama de trabajo:
+
+   ```bash
+   git checkout main
+   git pull origin main
+   git checkout -b feature/tu-fase   # ej: feature/bronze
+   ```
+
+4. Commiteá tu progreso con frecuencia:
+
+   ```bash
+   git add .
+   git commit -m "feat: descripción breve de lo que hiciste"
+   git push origin feature/tu-fase
+   ```
+
+5. Al terminar: mové la tarjeta a **En Revisión** y avisale a Diego (@temps-code)
+6. Marcá los checkboxes completados dentro de tu issue
+
+### Nombres de ramas
+
+| Fase | Rama |
+|---|---|
+| Bronze — Ingesta de Datos | `feature/bronze` |
+| Silver — Transformación | `feature/silver` |
+| Gold — Esquema | `feature/gold` |
+| Dashboard | `feature/dashboard` |
+| Notebooks y KPIs | `feature/notebooks` |
 
 ---
 
