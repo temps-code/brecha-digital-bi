@@ -32,7 +32,7 @@ Materia: Inteligencia de Negocios — 2026
 - [Stack](#stack)
 - [Arquitectura](#arquitectura)
 - [Pipeline de Datos](#pipeline-de-datos)
-- [Esquema Estrella](#esquema-estrella)
+- [Esquema Copo de Nieve](#esquema-copo-de-nieve)
 - [Cronograma de Sprints](#cronograma-de-sprints)
 - [Equipo y Forma de Trabajo](#equipo-y-forma-de-trabajo)
 - [Tablero Kanban y Flujo de Trabajo](#tablero-kanban-y-flujo-de-trabajo)
@@ -52,7 +52,7 @@ Las instituciones de educación técnica bolivianas generan grandes volúmenes d
 
 Capacidades principales:
 
-- Pipeline ELT automatizado desde SQL Server (Bronze) pasando por transformación (Silver) hasta un warehouse con esquema estrella (Gold)
+- Pipeline ELT automatizado desde SQL Server (Bronze) pasando por transformación (Silver) hasta un warehouse con esquema copo de nieve (Gold)
 - Monitoreo de KPIs: tasa de inserción laboral, predicción de deserción, análisis de brecha de habilidades
 - Benchmarking regional usando indicadores CEPALSTAT (ODS 4 y ODS 8)
 - Análisis de vacantes laborales en tiempo real desde APIs externas de empleo
@@ -104,7 +104,7 @@ SQL Server BrechaDigitalDB    API CEPALSTAT       Adzuna API
                          facts.py · dimensions.py
                                   │
                   SQL Server DW_BrechaDigital
-                   [Gold — Esquema Estrella T-SQL]
+               [Gold — Esquema Copo de Nieve T-SQL]
                  Fact_InsercionLaboral · tablas DIM_*
                                   │
                        src/dashboard/ (Streamlit)
@@ -127,20 +127,25 @@ SQL Server BrechaDigitalDB    API CEPALSTAT       Adzuna API
 
 ---
 
-## Esquema Estrella
+## Esquema Copo de Nieve
 
-Todas las tablas de dimensiones conectan **directamente** a la tabla de hechos central — sin jerarquías entre dimensiones.
+Modelo de dimensiones normalizado: las sub-dimensiones reducen la redundancia de datos y mejoran la integridad referencial. Elegido sobre el esquema estrella por correctitud técnica, a costo de JOINs adicionales en las consultas.
 
 ```
-FACT_INSERCION_LABORAL
-├──► DIM_ESTUDIANTE
-├──► DIM_CARRERA
-├──► DIM_HABILIDAD
-├──► DIM_MERCADO_LABORAL   ← incluye región como columna denormalizada
-└──► DIM_TIEMPO
+                       DIM_CARRERA
+                            ▲
+            DIM_CATEGORIA_SKILL   DIM_ESTUDIANTE
+                   ▲                    ▲
+             DIM_HABILIDAD              │
+                   ▲                    │
+                   └── FACT_INSERCION_LABORAL ──► DIM_TIEMPO
+                                        │
+                                        └────────► DIM_MERCADO_LABORAL
+                                                            ▲
+                                                       DIM_REGION
 ```
 
-Documentación completa del esquema: [`docs/esquema_estrella.md`](docs/esquema_estrella.md)
+Documentación completa del esquema: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_nieve.md)
 
 ---
 
@@ -154,7 +159,7 @@ Documentación completa del esquema: [`docs/esquema_estrella.md`](docs/esquema_e
 | Día 4 | 6 de abril | Pruebas finales, storytelling y documentación | Todas |
 | Día 5 | 7 de abril | **DEMO DAY** — presentación final de 10 minutos | — |
 
-El avance se registra en el [Tablero Kanban de GitHub](https://github.com/temps-code/brecha-digital-bi/projects).
+El avance se registra en el [Tablero Kanban de GitHub](https://github.com/users/temps-code/projects/3).
 
 ---
 
@@ -174,7 +179,7 @@ Todos los integrantes contribuyen en todas las fases del proyecto. Cada persona 
 
 ## Tablero Kanban y Flujo de Trabajo
 
-Todo el avance del equipo se registra en el [Tablero Kanban](https://github.com/temps-code/brecha-digital-bi/projects) — abrí la pestaña **Projects** del repositorio.
+Todo el avance del equipo se registra en el [Tablero Kanban](https://github.com/users/temps-code/projects/3) — abrí la pestaña **Projects** del repositorio.
 
 ### Columnas del tablero
 

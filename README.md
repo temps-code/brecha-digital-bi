@@ -32,7 +32,7 @@ Course: Business Intelligence — 2026
 - [Stack](#stack)
 - [Architecture](#architecture)
 - [Data Pipeline](#data-pipeline)
-- [Star Schema](#star-schema)
+- [Snowflake Schema](#snowflake-schema)
 - [Sprint Schedule](#sprint-schedule)
 - [Team & Workflow](#team--workflow)
 - [Kanban Board & Contributing](#kanban-board--contributing)
@@ -52,7 +52,7 @@ Bolivian technical education institutions generate large amounts of academic dat
 
 Key capabilities:
 
-- Automated ELT pipeline from SQL Server (Bronze) through transformation (Silver) to a star-schema warehouse (Gold)
+- Automated ELT pipeline from SQL Server (Bronze) through transformation (Silver) to a snowflake-schema warehouse (Gold)
 - KPI monitoring: employability rate, dropout prediction, skill gap analysis
 - Regional benchmarking using CEPALSTAT indicators (ODS 4 and ODS 8)
 - Real-time job vacancy analysis from external employment APIs
@@ -104,7 +104,7 @@ SQL Server BrechaDigitalDB     CEPALSTAT API        Adzuna API
                            facts.py · dimensions.py
                                      │
                      SQL Server DW_BrechaDigital
-                      [Gold — Star Schema T-SQL]
+                   [Gold — Snowflake Schema T-SQL]
                     Fact_InsercionLaboral · DIM_* tables
                                      │
                           src/dashboard/ (Streamlit)
@@ -127,20 +127,25 @@ SQL Server BrechaDigitalDB     CEPALSTAT API        Adzuna API
 
 ---
 
-## Star Schema
+## Snowflake Schema
 
-All dimension tables connect **directly** to the central fact table — no hierarchies between dimensions.
+Normalized dimension model: sub-dimensions reduce data redundancy and improve referential integrity. Chosen over star schema for technical correctness at the cost of additional JOINs.
 
 ```
-FACT_INSERCION_LABORAL
-├──► DIM_ESTUDIANTE
-├──► DIM_CARRERA
-├──► DIM_HABILIDAD
-├──► DIM_MERCADO_LABORAL   ← includes region as a denormalized column
-└──► DIM_TIEMPO
+                         DIM_CARRERA
+                              ▲
+              DIM_CATEGORIA_SKILL   DIM_ESTUDIANTE
+                     ▲                    ▲
+               DIM_HABILIDAD              │
+                     ▲                    │
+                     └── FACT_INSERCION_LABORAL ──► DIM_TIEMPO
+                                          │
+                                          └────────► DIM_MERCADO_LABORAL
+                                                              ▲
+                                                         DIM_REGION
 ```
 
-Full schema documentation: [`docs/esquema_estrella.md`](docs/esquema_estrella.md)
+Full schema documentation: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_nieve.md)
 
 ---
 
@@ -154,7 +159,7 @@ Full schema documentation: [`docs/esquema_estrella.md`](docs/esquema_estrella.md
 | Day 4 | April 6 | Final testing, storytelling polish, documentation | All |
 | Day 5 | April 7 | **DEMO DAY** — 10-minute presentation | — |
 
-Progress is tracked on the [GitHub Kanban Board](https://github.com/temps-code/brecha-digital-bi/projects).
+Progress is tracked on the [GitHub Kanban Board](https://github.com/users/temps-code/projects/3).
 
 ---
 
@@ -174,7 +179,7 @@ All members contribute across every phase. Each person listed below is the **lea
 
 ## Kanban Board & Contributing
 
-All team progress is tracked on the [GitHub Kanban Board](https://github.com/temps-code/brecha-digital-bi/projects) — open the **Projects** tab in the repository.
+All team progress is tracked on the [GitHub Kanban Board](https://github.com/users/temps-code/projects/3) — open the **Projects** tab in the repository.
 
 ### Board columns
 
