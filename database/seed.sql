@@ -1,0 +1,18 @@
+-- =============================================================================
+-- Brecha Digital Laboral — Bronze Layer
+-- Script T-SQL generado para SQL Server Management Studio (SSMS)
+-- =============================================================================
+-- Instrucciones:
+--   1. Usar el prompt del docente en una IA para generar este script completo.
+--   2. Reemplazar este archivo con el script generado.
+--   3. Ejecutar en SSMS contra la base de datos BrechaDigitalDB.
+--
+-- El script debe incluir:
+--   - Al menos 5 tablas relacionadas con contexto boliviano
+--   - 15+ registros por tabla de dimensión
+--   - 1000+ registros en la tabla transaccional (bucle WHILE)
+--   - 5% de registros con NULL en columnas no críticas (intencional)
+--   - Nombres con mayúsculas mezcladas y espacios extra (intencional para limpieza)
+-- =============================================================================
+
+-- Placeholder: reemplazar con el script generado por IA
