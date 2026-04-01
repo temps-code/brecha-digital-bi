@@ -33,7 +33,8 @@ Course: Business Intelligence — 2026
 - [Architecture](#architecture)
 - [Data Pipeline](#data-pipeline)
 - [Snowflake Schema](#snowflake-schema)
-- [Team](#team)
+- [Sprint Schedule](#sprint-schedule)
+- [Team & Workflow](#team--workflow)
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
 - [Running the Dashboard](#running-the-dashboard)
@@ -145,14 +146,30 @@ Full schema documentation: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_niev
 
 ---
 
-## Team
+## Sprint Schedule
 
-| Member | Role | GitHub |
+| Day | Date | Phase | Layer |
+|---|---|---|---|
+| Day 1 | Setup | Definition, GitHub setup, Bronze extraction | Bronze |
+| Day 2 | April 1 | Cleaning, transformation, integration | Silver |
+| Day 3 | April 2 | Star schema modeling + Dashboard construction | Gold + Viz |
+| Day 4 | April 6 | Final testing, storytelling polish, documentation | All |
+| Day 5 | April 7 | **DEMO DAY** — 10-minute presentation | — |
+
+Progress is tracked on the [GitHub Kanban Board](../../projects).
+
+---
+
+## Team & Workflow
+
+All members contribute across every phase. Each person listed below is the **lead** for their phase — responsible for managing, reviewing, and ensuring quality of that layer's deliverables.
+
+| Member | Phase Lead | GitHub |
 |---|---|---|
-| Abraham Flores Barrionuevo | Data Ingestion | [@AFB-9898](https://github.com/AFB-9898) |
-| Juan Nicolás Flores Delgado | Data Transformation | [@Juan7139nf](https://github.com/Juan7139nf) |
-| Micaela Pérez Vásquez | Schema Design | — |
-| Mayra Villca Méndez | Analysis & KPIs | [@MayVillca](https://github.com/MayVillca) |
+| Abraham Flores Barrionuevo | Bronze — Data Ingestion | [@AFB-9898](https://github.com/AFB-9898) |
+| Juan Nicolás Flores Delgado | Silver — Transformation | [@Juan7139nf](https://github.com/Juan7139nf) |
+| Micaela Pérez Vásquez | Gold — Schema Design | — |
+| Mayra Villca Méndez | Analysis & KPIs — Notebooks | [@MayVillca](https://github.com/MayVillca) |
 | Diego Vargas Urzagaste | Dashboard & Integration | [@temps-code](https://github.com/temps-code) |
 
 ---

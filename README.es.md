@@ -33,7 +33,8 @@ Materia: Inteligencia de Negocios — 2026
 - [Arquitectura](#arquitectura)
 - [Pipeline de Datos](#pipeline-de-datos)
 - [Esquema Copo de Nieve](#esquema-copo-de-nieve)
-- [Equipo](#equipo)
+- [Cronograma de Sprints](#cronograma-de-sprints)
+- [Equipo y Forma de Trabajo](#equipo-y-forma-de-trabajo)
 - [Instalación](#instalación)
 - [Variables de Entorno](#variables-de-entorno)
 - [Ejecutar el Dashboard](#ejecutar-el-dashboard)
@@ -145,14 +146,30 @@ Documentación completa del esquema: [`docs/esquema_copo_nieve.md`](docs/esquema
 
 ---
 
-## Equipo
+## Cronograma de Sprints
 
-| Integrante | Rol | GitHub |
+| Día | Fecha | Fase | Capa |
+|---|---|---|---|
+| Día 1 | Setup | Definición, setup GitHub, extracción Bronze | Bronze |
+| Día 2 | 1 de abril | Limpieza, transformación e integración | Silver |
+| Día 3 | 2 de abril | Modelado estrella + construcción del Dashboard | Gold + Viz |
+| Día 4 | 6 de abril | Pruebas finales, storytelling y documentación | Todas |
+| Día 5 | 7 de abril | **DEMO DAY** — presentación final de 10 minutos | — |
+
+El avance se registra en el [Tablero Kanban de GitHub](../../projects).
+
+---
+
+## Equipo y Forma de Trabajo
+
+Todos los integrantes contribuyen en todas las fases del proyecto. Cada persona indicada abajo es el **lead** de su fase — responsable de gestionar, revisar y garantizar la calidad de esa capa.
+
+| Integrante | Fase Lead | GitHub |
 |---|---|---|
-| Abraham Flores Barrionuevo | Ingesta de Datos | [@AFB-9898](https://github.com/AFB-9898) |
-| Juan Nicolás Flores Delgado | Transformación de Datos | [@Juan7139nf](https://github.com/Juan7139nf) |
-| Micaela Pérez Vásquez | Diseño del Esquema | — |
-| Mayra Villca Méndez | Análisis y KPIs | [@MayVillca](https://github.com/MayVillca) |
+| Abraham Flores Barrionuevo | Bronze — Ingesta de Datos | [@AFB-9898](https://github.com/AFB-9898) |
+| Juan Nicolás Flores Delgado | Silver — Transformación | [@Juan7139nf](https://github.com/Juan7139nf) |
+| Micaela Pérez Vásquez | Gold — Diseño del Esquema | — |
+| Mayra Villca Méndez | Análisis y KPIs — Notebooks | [@MayVillca](https://github.com/MayVillca) |
 | Diego Vargas Urzagaste | Dashboard e Integración | [@temps-code](https://github.com/temps-code) |
 
 ---
