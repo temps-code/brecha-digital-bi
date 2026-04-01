@@ -168,7 +168,7 @@ Todos los integrantes contribuyen en todas las fases del proyecto. Cada persona 
 |---|---|---|
 | Abraham Flores Barrionuevo | Bronze — Ingesta de Datos | [@AFB-9898](https://github.com/AFB-9898) |
 | Juan Nicolás Flores Delgado | Silver — Transformación | [@Juan7139nf](https://github.com/Juan7139nf) |
-| Micaela Pérez Vásquez | Gold — Diseño del Esquema | — |
+| Micaela Pérez Vásquez | Gold — Diseño del Esquema | [@Sam24p](https://github.com/Sam24p) |
 | Mayra Villca Méndez | Análisis y KPIs — Notebooks | [@MayVillca](https://github.com/MayVillca) |
 | Diego Vargas Urzagaste | Dashboard e Integración | [@temps-code](https://github.com/temps-code) |
 

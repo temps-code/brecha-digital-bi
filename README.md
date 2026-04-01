@@ -168,7 +168,7 @@ All members contribute across every phase. Each person listed below is the **lea
 |---|---|---|
 | Abraham Flores Barrionuevo | Bronze — Data Ingestion | [@AFB-9898](https://github.com/AFB-9898) |
 | Juan Nicolás Flores Delgado | Silver — Transformation | [@Juan7139nf](https://github.com/Juan7139nf) |
-| Micaela Pérez Vásquez | Gold — Schema Design | — |
+| Micaela Pérez Vásquez | Gold — Schema Design | [@Sam24p](https://github.com/Sam24p)|
 | Mayra Villca Méndez | Analysis & KPIs — Notebooks | [@MayVillca](https://github.com/MayVillca) |
 | Diego Vargas Urzagaste | Dashboard & Integration | [@temps-code](https://github.com/temps-code) |
 
