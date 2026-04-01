@@ -7,9 +7,9 @@
 <p>
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white" alt="SQL Server">
-  <img src="https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
   <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
   <img src="https://img.shields.io/badge/Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini API">
+  <img src="https://img.shields.io/badge/Adzuna_API-FF6600?style=for-the-badge&logo=briefcase&logoColor=white" alt="Adzuna API">
 </p>
 
 </div>
@@ -64,12 +64,13 @@ Key capabilities:
 |---|---|---|
 | Data Processing | Python | 3.11+ |
 | Data Manipulation | Pandas | 2.0+ |
-| Source Database | SQL Server (T-SQL) | 2019+ |
-| Warehouse | SQLite | 3.x |
+| Bronze Database | SQL Server (T-SQL) — `BrechaDigitalDB` | 2019+ |
+| Gold Warehouse | SQL Server (T-SQL) — `DW_BrechaDigital` | 2019+ |
 | Dashboard | Streamlit | 1.32+ |
 | Charts | Plotly | 5.20+ |
 | AI Assistant | Google Gemini API | 0.5+ |
-| External Data | CEPALSTAT REST API | — |
+| Macro Data | CEPALSTAT REST API | — |
+| Employment Data | Adzuna REST API | — |
 | DB Connectivity | PyODBC + SQLAlchemy | 5.0+ / 2.0+ |
 | Environment | python-dotenv | 1.0+ |
 
@@ -80,30 +81,32 @@ Key capabilities:
 The project follows a **Bronze → Silver → Gold** medallion architecture:
 
 ```
-SQL Server (T-SQL)          CEPALSTAT API       Employment APIs
-    [Bronze Source]           [External]           [External]
-          │                       │                    │
-          └───────────────────────┴────────────────────┘
-                                  │
-                       src/ingestion/ (Python)
-                                  │
-                            data/raw/
-                          [Bronze — CSV]
-                                  │
-                       src/transform/ (Python)
-                    clean.py + normalize.py
-                                  │
-                         data/processed/
-                          [Silver — CSV]
-                                  │
-                        src/schema/ (Python)
-                     facts.py + dimensions.py
-                                  │
-                         data/warehouse/
-                      [Gold — SQLite, Snowflake Schema]
-                                  │
-                       src/dashboard/ (Streamlit)
-                  KPIs · Employability · Skill Gap · Chatbot
+SQL Server BrechaDigitalDB     CEPALSTAT API        Adzuna API
+      [Bronze — Source]         [Macro Data]     [Employment Data]
+             │                       │                   │
+             └───────────────────────┴───────────────────┘
+                                     │
+                          src/ingestion/ (Python)
+                          sqlserver.py · cepalstat.py · empleos.py
+                                     │
+                               data/raw/
+                             [Bronze — CSV]
+                                     │
+                          src/transform/ (Python)
+                          clean.py · normalize.py
+                                     │
+                            data/processed/
+                             [Silver — CSV]
+                                     │
+                           src/schema/ (Python)
+                           facts.py · dimensions.py
+                                     │
+                     SQL Server DW_BrechaDigital
+                    [Gold — Snowflake Schema T-SQL]
+                    Fact_InsercionLaboral · DIM_* tables
+                                     │
+                          src/dashboard/ (Streamlit)
+                     KPIs · Employability · Skill Gap · Chatbot
 ```
 
 ---
@@ -112,13 +115,13 @@ SQL Server (T-SQL)          CEPALSTAT API       Employment APIs
 
 | Step | Module | Input | Output |
 |---|---|---|---|
-| 1. Extract | `src/ingestion/sqlserver.py` | SQL Server tables | `data/raw/*.csv` |
-| 2. Extract | `src/ingestion/cepalstat.py` | CEPALSTAT API | `data/raw/cepalstat/*.csv` |
-| 3. Extract | `src/ingestion/empleos.py` | Employment APIs | `data/raw/empleos/*.csv` |
-| 4. Clean | `src/transform/clean.py` | Raw CSV | `data/processed/*.csv` |
-| 5. Normalize | `src/transform/normalize.py` | Processed CSV | `data/processed/*.csv` |
-| 6. Load | `src/schema/facts.py` | Processed CSV | SQLite warehouse |
-| 7. Load | `src/schema/dimensions.py` | Processed CSV | SQLite warehouse |
+| 1. Extract | `src/ingestion/sqlserver.py` | `BrechaDigitalDB` (SQL Server) | `data/raw/*.csv` |
+| 2. Extract | `src/ingestion/cepalstat.py` | CEPALSTAT REST API | `data/raw/cepalstat/*.csv` |
+| 3. Extract | `src/ingestion/empleos.py` | Adzuna REST API | `data/raw/empleos/*.csv` |
+| 4. Clean | `src/transform/clean.py` | `data/raw/*.csv` | `data/processed/*.csv` |
+| 5. Normalize | `src/transform/normalize.py` | `data/processed/*.csv` | `data/processed/*.csv` |
+| 6. Load Dimensions | `src/schema/dimensions.py` | `data/processed/*.csv` | `DW_BrechaDigital` — DIM_* tables |
+| 7. Load Facts | `src/schema/facts.py` | `data/processed/*.csv` | `DW_BrechaDigital` — Fact_InsercionLaboral |
 
 ---
 
@@ -200,18 +203,27 @@ Full schema documentation: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_niev
 Create a `.env` file in the root directory:
 
 ```env
-# SQL Server
-DB_SERVER=localhost
-DB_NAME=BrechаDigitalDB
+# SQL Server — Bronze Source
+DB_SERVER=localhost\SQLEXPRESS
+DB_NAME=BrechaDigitalDB
 DB_USER=sa
 DB_PASSWORD=your_password
+
+# SQL Server — Gold Warehouse
+DW_SERVER=localhost\SQLEXPRESS
+DW_NAME=DW_BrechaDigital
+DW_USER=sa
+DW_PASSWORD=your_password
 
 # Gemini API
 GEMINI_API_KEY=your_gemini_api_key
 
-# External APIs
+# CEPALSTAT (no key required — public API)
 CEPALSTAT_BASE_URL=https://api-cepalstat.cepal.org/cepalstat/api/v1
-EMPLEOS_API_KEY=your_api_key
+
+# Adzuna Employment API
+ADZUNA_APP_ID=your_app_id
+ADZUNA_APP_KEY=your_app_key
 ```
 
 > Never commit the `.env` file. It is already listed in `.gitignore`.
