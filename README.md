@@ -29,6 +29,7 @@ Course: Business Intelligence — 2026
 ## Table of Contents
 
 - [What It Does](#what-it-does)
+- [OKRs](#okrs)
 - [Stack](#stack)
 - [Architecture](#architecture)
 - [Data Pipeline](#data-pipeline)
@@ -57,6 +58,24 @@ Key capabilities:
 - Regional benchmarking using CEPALSTAT indicators (ODS 4 and ODS 8)
 - Real-time job vacancy analysis from external employment APIs
 - AI-powered assistant (Gemini API) for natural language queries over the data
+
+---
+
+## OKRs
+
+OKRs define project success with measurable key results. Full explanation in [`docs/guia-del-proyecto.md`](docs/guia-del-proyecto.md).
+
+| Objective | Key Result | Metric |
+|-----------|------------|--------|
+| **O1: Functional end-to-end pipeline** | KR1: All 3 layers implemented without errors | Bronze ✓ Silver ✓ Gold ✓ |
+| | KR2: Silver data with 0% nulls or geographic inconsistencies | `df.isnull().sum() == 0` |
+| | KR3: DW with fact table and all dimensions loaded with real data | `DW_BrechaDigital` populated |
+| **O2: Actionable insights on the digital gap** | KR1: Dashboard shows 4+ KPIs with real data | 4 functional pages |
+| | KR2: 3+ skills with gap identified | Skill Gap analyzed |
+| | KR3: Analysis covers 2+ Bolivian cities | Regional benchmarking |
+| **O3: Demonstrated BI methodology mastery** | KR1: All 4 dashboard sections working | Demo Day ready |
+| | KR2: Each team member explains their layer without notes | Individual understanding |
+| | KR3: Final report documents key technical decisions | Complete PDF |
 
 ---
 

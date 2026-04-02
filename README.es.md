@@ -29,6 +29,7 @@ Materia: Inteligencia de Negocios — 2026
 ## Tabla de Contenidos
 
 - [Descripción](#descripción)
+- [OKRs](#okrs)
 - [Stack](#stack)
 - [Arquitectura](#arquitectura)
 - [Pipeline de Datos](#pipeline-de-datos)
@@ -57,6 +58,24 @@ Capacidades principales:
 - Benchmarking regional usando indicadores CEPALSTAT (ODS 4 y ODS 8)
 - Análisis de vacantes laborales en tiempo real desde APIs externas de empleo
 - Asistente con IA (Gemini API) para consultas en lenguaje natural sobre los datos
+
+---
+
+## OKRs
+
+Los OKRs definen el éxito del proyecto con resultados clave medibles. Para la explicación completa ver [`docs/guia-del-proyecto.md`](docs/guia-del-proyecto.md).
+
+| Objetivo | Resultado Clave | Métrica |
+|----------|-----------------|---------|
+| **O1: Pipeline funcional de punta a punta** | KR1: Las 3 capas implementadas sin errores | Bronze ✓ Silver ✓ Gold ✓ |
+| | KR2: Silver con 0% nulos o inconsistencias geográficas | `df.isnull().sum() == 0` |
+| | KR3: DW con tabla de hechos y todas las dimensiones cargadas | `DW_BrechaDigital` poblado |
+| **O2: Insights accionables sobre la brecha digital** | KR1: Dashboard con 4+ KPIs con datos reales | 4 páginas funcionales |
+| | KR2: 3+ habilidades con brecha identificadas | Skill Gap analizado |
+| | KR3: Análisis en 2+ ciudades bolivianas | Benchmarking regional |
+| **O3: Dominio de metodología BI demostrado** | KR1: 4 secciones del dashboard funcionando | Demo Day ready |
+| | KR2: Cada integrante explica su capa sin leer notas | Comprensión individual |
+| | KR3: Informe documenta decisiones técnicas clave | PDF final completo |
 
 ---
 
