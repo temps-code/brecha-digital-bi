@@ -5,56 +5,57 @@ Responsable: Abraham Flores Barrionuevo (@AFB-9898)
 Extrae todas las tablas fuente desde SQL Server y las exporta
 como archivos CSV en data/raw/.
 """
-import pandas as pd
 import os
-import random
+import pandas as pd
+import pyodbc
+from dotenv import load_dotenv
 
-def fetch_adzuna_jobs_mock():
+# 1. Cargar configuración desde el archivo .env
+load_dotenv() 
+
+def extract_to_raw():
     try:
-        print("--- Iniciando extracción de Adzuna (Simulación con Variedad de Habilidades) ---")
+        # Obtener credenciales del .env
+        server = os.getenv('DB_SERVER')
+        database = os.getenv('DB_NAME')
         
-        mock_jobs = []
-        titles = ['Data Engineer', 'Data Analyst', 'BI Developer', 'Python Developer', 'SQL Specialist']
-        locations = ['Tarija', 'La Paz', 'Santa Cruz', 'Cochabamba', 'Remote']
-        # Mapa de habilidades para generar variedad analítica
-        skills_map = {
-            'Data Engineer': 'Experiencia en pipelines ETL, Spark y SQL avanzado.',
-            'Data Analyst': 'Manejo de Power BI, Excel avanzado y estadística descriptiva.',
-            'BI Developer': 'Conocimientos en modelado dimensional, SSAS y DAX.',
-            'Python Developer': 'Python orientado a datos, pandas y scikit-learn.',
-            'SQL Specialist': 'Optimización de queries, stored procedures y DW design.'
-        }
+        if not server or not database:
+            print("❌ Error: No se encontraron DB_SERVER o DB_NAME en el archivo .env")
+            return
+
+        print(f"--- Conectando a SQL Server: {server} ---")
         
-        for i in range(50):
-            job_title = random.choice(titles)
-            # Seleccionamos la descripción según el título elegido
-            description = skills_map.get(job_title, 'Requerimos habilidades TIC para reducir la brecha digital.')
-            
-            mock_jobs.append({
-                'id': f'adz-{1000+i}',
-                'title': job_title,
-                'location': random.choice(locations), 
-                'salary_min': random.randint(800, 1800),
-                'category': 'IT Jobs',                
-                'description': description,          
-                'created': '2026-03-30T10:00:00Z'
-            })
+        # Cadena de conexión profesional
+        conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};Trusted_Connection=yes;'
+        conn = pyodbc.connect(conn_str)
         
-        df = pd.DataFrame(mock_jobs)
+        tablas = ['Estudiantes', 'Carreras', 'Inscripciones', 'SeguimientoEgresados']
         
-        # Validación de salida
-        assert not df.empty, "Error: El DataFrame de empleos está vacío."
-        
-        output_dir = 'data/raw/empleos'
+        # Asegurar que la carpeta de destino exista
+        output_dir = 'data/raw'
         os.makedirs(output_dir, exist_ok=True)
-        
-        file_path = os.path.join(output_dir, "vacantes_tecnologicas.csv")
-        df.to_csv(file_path, index=False, encoding='utf-8')
-        
-        print(f"✅ Éxito: Generadas 50 vacantes con descripciones variadas en: {file_path}")
+
+        for table_name in tablas:
+            print(f"--- Iniciando extracción de {table_name} ---")
+            query = f"SELECT * FROM {table_name}"
+            
+            # Cargar a DataFrame
+            df = pd.read_sql(query, conn)
+            
+            # Validación de Ingeniería (Punto clave de la rúbrica)
+            assert not df.empty, f"Error: La tabla {table_name} está vacía en la base de datos."
+            
+            # Guardar en CSV (usamos .lower() para mantener consistencia en los nombres)
+            file_path = os.path.join(output_dir, f"{table_name.lower()}.csv")
+            df.to_csv(file_path, index=False, encoding='utf-8')
+            
+            print(f" Tabla {table_name} exportada con éxito: {len(df)} filas.")
+
+        conn.close()
+        print("--- Proceso de Ingesta SQL finalizado correctamente ---")
 
     except Exception as e:
-        print(f"❌ Error en la simulación de empleos: {e}")
+        print(f" Error crítico en la ingesta de SQL Server: {e}")
 
 if __name__ == "__main__":
-    fetch_adzuna_jobs_mock()
+    extract_to_raw()
