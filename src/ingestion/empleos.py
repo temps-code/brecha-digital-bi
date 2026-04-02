@@ -20,12 +20,13 @@ def fetch_adzuna_jobs_mock():
         locations = ['Tarija', 'La Paz', 'Santa Cruz', 'Remote']
         
         for i in range(50):
+            # Guardamos strings directos, NO diccionarios anidados
             mock_jobs.append({
                 'id': f'adz-{1000+i}',
                 'title': random.choice(titles),
-                'location': {'display_name': random.choice(locations)},
+                'location': random.choice(locations), 
                 'salary_min': random.randint(800, 1500),
-                'category': {'label': 'IT Jobs'},
+                'category': 'IT Jobs',                
                 'description': 'Requerimos conocimientos en Python, SQL y herramientas de BI para reducir la brecha digital.',
                 'created': '2026-03-28T12:00:00Z'
             })
@@ -33,8 +34,8 @@ def fetch_adzuna_jobs_mock():
         df = pd.DataFrame(mock_jobs)
         
         # Afirmación de calidad (Requirement del proyecto)
-        assert not df.empty, "Error: El DataFrame de empleos está vacío."# [cite: 9]
-        print(f"Validación exitosa: {len(df)} vacantes simuladas generadas.")
+        assert not df.empty, "Error: El DataFrame de empleos está vacío."
+        print(f"✅ Validación exitosa: {len(df)} vacantes reales generadas (sin diccionarios anidados).")
 
         # Crear carpeta y guardar
         output_dir = 'data/raw/empleos'
@@ -43,10 +44,10 @@ def fetch_adzuna_jobs_mock():
         file_path = os.path.join(output_dir, "vacantes_tecnologicas.csv")
         df.to_csv(file_path, index=False, encoding='utf-8')
         
-        print(f"Archivo de empleos (Mock) guardado en: {file_path}")
+        print(f"📦 Archivo de empleos (Mock) guardado exitosamente en: {file_path}")
 
     except Exception as e:
-        print(f"Error en la simulación de Adzuna: {e}")
+        print(f"❌ Error en la simulación de Adzuna: {e}")
 
 if __name__ == "__main__":
     fetch_adzuna_jobs_mock()

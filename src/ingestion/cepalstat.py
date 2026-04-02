@@ -9,6 +9,7 @@ Exporta los resultados en data/raw/cepalstat/.
 import requests
 import pandas as pd
 import os
+import json
 
 def fetch_cepal_data():
     try:
@@ -22,20 +23,31 @@ def fetch_cepal_data():
         
         json_data = response.json()
         
-        # Extraemos solo los datos de la tabla (normalmente en 'body')
-        # Si la estructura es irregular, usamos pd.json_normalize
-        records = json_data.get('body', [])
+        # Intentamos obtener los datos de las claves más comunes de la API
+        records = json_data.get('body') or json_data.get('data') or json_data.get('results')
         
+        # Si 'records' es un string (JSON anidado), lo convertimos a objeto Python
+        if isinstance(records, str):
+            records = json.loads(records)
+
         if not records:
-            print("No se encontraron registros en el cuerpo de la respuesta.")
+            print("❌ Error: No se encontraron registros válidos en la respuesta de la API.")
+            # Debug: imprimir claves para saber qué envió la API realmente
+            print(f"Claves disponibles en el JSON: {list(json_data.keys())}")
             return
 
-        # json_normalize ayuda a manejar diccionarios de diferentes longitudes
+        # Si records es una lista de diccionarios, json_normalize hará una fila por registro
         df = pd.json_normalize(records)
         
-        # Validación de Ingeniería
+        # Si por alguna razón Pandas metió todo en una columna llamada 'data', 
+        # volvemos a normalizar ese contenido específico
+        if 'data' in df.columns and len(df) == 1:
+            inner_data = df['data'].iloc[0]
+            df = pd.json_normalize(inner_data)
+
+        # Validación de Ingeniería 
         assert not df.empty, "Error: El DataFrame resultó vacío tras la normalización."
-        print(f"Validación exitosa: {len(df)} registros normalizados.")
+        print(f"✅ Validación exitosa: {len(df)} registros reales generados (no celdas anidadas).")
 
         # Crear ruta
         output_dir = 'data/raw/cepalstat'
@@ -45,10 +57,10 @@ def fetch_cepal_data():
         file_path = os.path.join(output_dir, "indicadores_tic_region.csv")
         df.to_csv(file_path, index=False, encoding='utf-8')
         
-        print(f"Archivo de CEPAL guardado exitosamente en: {file_path}")
+        print(f"📦 Archivo de CEPAL guardado exitosamente en: {file_path}")
 
     except Exception as e:
-        print(f"Error técnico en la ingesta: {e}")
+        print(f"❌ Error técnico en la ingesta: {e}")
 
 if __name__ == "__main__":
     fetch_cepal_data()
