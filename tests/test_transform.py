@@ -15,6 +15,7 @@ import numpy as np
 import os
 import sys
 import warnings
+import tempfile  # Necesario para el Test 3 robusto
 
 warnings.filterwarnings("ignore")
 
@@ -43,11 +44,8 @@ def test_limpieza_nulos_y_espacios():
     df_limpio = manejar_nulos(df_sucio)
 
     # Assertions
-    # Verificar minúsculas (y acentos si los hubiera)
     assert df_limpio['nombre'].iloc[0] == 'juan', "Error: No se eliminaron espacios o minúsculas"
     assert df_limpio['nombre'].iloc[1] == 'maria', "Error: No se normalizó a minúsculas"
-    
-    # Verificar imputación numérica (mediana de [20, 22, 23] es 22)
     assert df_limpio['edad'].iloc[1] == 22.0, f"Error: La imputación numérica falló. Esperado 22.0, obtenido {df_limpio['edad'].iloc[1]}"
 
     print("✅ Test 1 PASADO: Funciones de limpieza importadas funcionan correctamente.")
@@ -75,32 +73,54 @@ def test_tipos_de_datos():
 
 def test_validacion_archivos_procesados():
     """
-    Integration Test.
-    Verifica que los archivos procesados (RESULTADO DE clean.py) existen
-    y tienen 0 nulos (Assertion final cumplido).
+    Unit Test Robusto.
+    Verifica que procesar_archivo() genere archivos libres de nulos.
     
-    Requisito: Ejecutar 'python src/transform/clean.py' antes de este test.
+    CORRECCIÓN: Ya no depende de archivos externos (data/processed).
+    Genera sus propios datos temporales y parchea las rutas del módulo.
     """
-    print("\n🧪 Test 3: Validación de Archivos Procesados (Integration Test)...")
+    print("\n🧪 Test 3: Validación de Pipeline de Limpieza (Unit Test Robusto)...")
 
-    archivos_procesados_requeridos = [
-        'data/processed/estudiantes_cleaned.csv',
-        'data/processed/inscripciones_cleaned.csv',
-        'data/processed/seguimientoegresados_cleaned.csv',
-        'data/processed/carreras_cleaned.csv'
-    ]
+    # Importamos el módulo completo para poder parchear sus rutas globales
+    import transform.clean as clean_mod
+    from transform.clean import procesar_archivo
 
-    for path in archivos_procesados_requeridos:
-        assert os.path.exists(path), f"Error crítico: No se encontró el archivo procesado {path}. ¿Ejecutaste clean.py?"
+    # Datos de prueba sucios
+    data = {
+        'nombre': ['  Juan  ', 'MARIA'], 
+        'ciudad': ['La Paz', 'cbba'], 
+        'fecha_ingreso': ['2023-01-15', '2022-05-20']
+    }
+    
+    with tempfile.TemporaryDirectory() as tmp:
+        # Definir rutas temporales
+        raw_path = os.path.join(tmp, 'raw')
+        proc_path = os.path.join(tmp, 'processed')
+        os.makedirs(raw_path)
+        os.makedirs(proc_path)
         
-        df = pd.read_csv(path)
-        assert len(df) > 0, f"Error: El archivo {path} está vacío."
-        
-        # Verificación de Calidad: 0 Nulos
-        nulos_restantes = df.isnull().sum().sum()
-        assert nulos_restantes == 0, f"Error: El archivo {path} todavía tiene {nulos_restantes} valores nulos."
+        # Crear archivo CSV de entrada en la carpeta raw temporal
+        input_csv = os.path.join(raw_path, 'test_estudiantes.csv')
+        pd.DataFrame(data).to_csv(input_csv, index=False)
 
-    print(f"✅ Test 3 PASADO: Existen {len(archivos_procesados_requeridos)} archivos limpios con 0 nulos.")
+        # PARCHEO: Sobrescribir las rutas globales del módulo clean.py
+        # Esto hace que procesar_archivo use nuestras carpetas temporales
+        clean_mod.RAW_PATH = raw_path
+        clean_mod.PROCESSED_PATH = proc_path
+
+        # Ejecutar la función de limpieza
+        procesar_archivo('test_estudiantes.csv')
+
+        # Verificar que el archivo de salida existe
+        output_csv = os.path.join(proc_path, 'test_estudiantes_cleaned.csv')
+        assert os.path.exists(output_csv), "El archivo limpio no fue generado."
+        
+        # Verificar que el archivo generado tiene 0 nulos
+        df_res = pd.read_csv(output_csv)
+        nulos_restantes = df_res.isnull().sum().sum()
+        assert nulos_restantes == 0, f"El archivo generado tiene {nulos_restantes} nulos."
+
+    print("✅ Test 3 PASADO: El pipeline genera archivos limpios de forma autónoma.")
 
 if __name__ == "__main__":
     print("======================================")
