@@ -1,0 +1,51 @@
+id,title,location,salary_min,category,description,created
+adz-1000,BI Developer,Remote,1254,IT Jobs,"Conocimientos en modelado dimensional, SSAS y DAX.",2026-03-30T10:00:00Z
+adz-1001,SQL Specialist,Cochabamba,1142,IT Jobs,"Optimización de queries, stored procedures y DW design.",2026-03-30T10:00:00Z
+adz-1002,Data Analyst,Tarija,1287,IT Jobs,"Manejo de Power BI, Excel avanzado y estadística descriptiva.",2026-03-30T10:00:00Z
+adz-1003,Data Analyst,La Paz,945,IT Jobs,"Manejo de Power BI, Excel avanzado y estadística descriptiva.",2026-03-30T10:00:00Z
+adz-1004,Python Developer,Tarija,1037,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1005,Python Developer,Santa Cruz,1449,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1006,BI Developer,Tarija,1318,IT Jobs,"Conocimientos en modelado dimensional, SSAS y DAX.",2026-03-30T10:00:00Z
+adz-1007,Python Developer,Santa Cruz,1176,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1008,SQL Specialist,La Paz,1534,IT Jobs,"Optimización de queries, stored procedures y DW design.",2026-03-30T10:00:00Z
+adz-1009,Python Developer,La Paz,1110,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1010,Data Engineer,Cochabamba,1002,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1011,BI Developer,Tarija,1052,IT Jobs,"Conocimientos en modelado dimensional, SSAS y DAX.",2026-03-30T10:00:00Z
+adz-1012,Data Analyst,Cochabamba,1293,IT Jobs,"Manejo de Power BI, Excel avanzado y estadística descriptiva.",2026-03-30T10:00:00Z
+adz-1013,Python Developer,Remote,1394,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1014,Data Analyst,Remote,1670,IT Jobs,"Manejo de Power BI, Excel avanzado y estadística descriptiva.",2026-03-30T10:00:00Z
+adz-1015,SQL Specialist,Santa Cruz,1611,IT Jobs,"Optimización de queries, stored procedures y DW design.",2026-03-30T10:00:00Z
+adz-1016,Data Engineer,Remote,831,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1017,Python Developer,Santa Cruz,1646,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1018,Data Engineer,Santa Cruz,1592,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1019,Data Engineer,Santa Cruz,1689,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1020,Data Engineer,Tarija,1309,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1021,BI Developer,Santa Cruz,1104,IT Jobs,"Conocimientos en modelado dimensional, SSAS y DAX.",2026-03-30T10:00:00Z
+adz-1022,SQL Specialist,Tarija,1637,IT Jobs,"Optimización de queries, stored procedures y DW design.",2026-03-30T10:00:00Z
+adz-1023,Python Developer,La Paz,996,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1024,SQL Specialist,Santa Cruz,1008,IT Jobs,"Optimización de queries, stored procedures y DW design.",2026-03-30T10:00:00Z
+adz-1025,Python Developer,Santa Cruz,1407,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1026,Data Analyst,Cochabamba,1182,IT Jobs,"Manejo de Power BI, Excel avanzado y estadística descriptiva.",2026-03-30T10:00:00Z
+adz-1027,Data Analyst,Tarija,1219,IT Jobs,"Manejo de Power BI, Excel avanzado y estadística descriptiva.",2026-03-30T10:00:00Z
+adz-1028,Data Engineer,Santa Cruz,802,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1029,BI Developer,La Paz,975,IT Jobs,"Conocimientos en modelado dimensional, SSAS y DAX.",2026-03-30T10:00:00Z
+adz-1030,Data Engineer,Tarija,1701,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1031,Python Developer,Tarija,1261,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1032,Data Engineer,Tarija,987,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1033,Python Developer,La Paz,805,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1034,Data Engineer,Cochabamba,1687,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1035,BI Developer,Tarija,1687,IT Jobs,"Conocimientos en modelado dimensional, SSAS y DAX.",2026-03-30T10:00:00Z
+adz-1036,SQL Specialist,La Paz,1394,IT Jobs,"Optimización de queries, stored procedures y DW design.",2026-03-30T10:00:00Z
+adz-1037,SQL Specialist,Tarija,1157,IT Jobs,"Optimización de queries, stored procedures y DW design.",2026-03-30T10:00:00Z
+adz-1038,Python Developer,Remote,864,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1039,BI Developer,Remote,1225,IT Jobs,"Conocimientos en modelado dimensional, SSAS y DAX.",2026-03-30T10:00:00Z
+adz-1040,BI Developer,La Paz,1270,IT Jobs,"Conocimientos en modelado dimensional, SSAS y DAX.",2026-03-30T10:00:00Z
+adz-1041,Data Engineer,La Paz,1141,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1042,Data Engineer,Santa Cruz,1345,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1043,Python Developer,La Paz,1522,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1044,SQL Specialist,Cochabamba,1016,IT Jobs,"Optimización de queries, stored procedures y DW design.",2026-03-30T10:00:00Z
+adz-1045,Data Engineer,Remote,1463,IT Jobs,"Experiencia en pipelines ETL, Spark y SQL avanzado.",2026-03-30T10:00:00Z
+adz-1046,Data Analyst,Remote,1575,IT Jobs,"Manejo de Power BI, Excel avanzado y estadística descriptiva.",2026-03-30T10:00:00Z
+adz-1047,Python Developer,Cochabamba,1474,IT Jobs,"Python orientado a datos, pandas y scikit-learn.",2026-03-30T10:00:00Z
+adz-1048,BI Developer,Remote,1215,IT Jobs,"Conocimientos en modelado dimensional, SSAS y DAX.",2026-03-30T10:00:00Z
+adz-1049,BI Developer,Remote,1092,IT Jobs,"Conocimientos en modelado dimensional, SSAS y DAX.",2026-03-30T10:00:00Z
