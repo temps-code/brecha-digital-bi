@@ -12,6 +12,7 @@ plotly>=5.20.0
 
 # AI Assistant
 google-genai>=1.0.0
+groq>=1.0.0
 
 # External APIs
 requests>=2.31.0
