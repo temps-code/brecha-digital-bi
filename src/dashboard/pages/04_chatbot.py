@@ -37,8 +37,7 @@ if 'messages' not in st.session_state:
 
 if 'gemini_chat' not in st.session_state:
     try:
-        from google import genai
-        from google.genai import types
+        import google.genai as genai
         client = genai.Client(api_key=api_key)
         st.session_state.gemini_client = client
         st.session_state.gemini_history = []
@@ -80,7 +79,7 @@ if prompt := st.chat_input('Preguntá sobre los datos del proyecto...'):
     with st.chat_message('assistant'):
         with st.spinner('Analizando...'):
             try:
-                from google.genai import types
+                import google.genai.types as types
                 history = st.session_state.get('gemini_history', [])
                 response = st.session_state.gemini_client.models.generate_content(
                     model='gemini-2.0-flash',
