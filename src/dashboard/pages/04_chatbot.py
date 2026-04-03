@@ -5,6 +5,8 @@ Responsable: Diego Vargas Urzagaste (@temps-code)
 Chatbot con contexto del warehouse para responder preguntas en lenguaje natural.
 Usa st.chat_input y st.chat_message de Streamlit con Google Gemini API.
 Requiere GEMINI_API_KEY en el archivo .env.
+
+SDK: google-genai >= 1.0 (google.genai — NO usar google.generativeai, está deprecado)
 """
 import os
 import sys
@@ -24,61 +26,61 @@ st.set_page_config(page_title='Asistente BI — Brecha Digital BI', page_icon=':
 
 inject_styles()
 
-st.markdown("""
+st.html("""
 <div class="page-header">
   <h2><i class="ti ti-robot"></i> Asistente BI</h2>
-  <p>Consultá los datos del proyecto en lenguaje natural — potenciado por Gemini</p>
+  <p>Consulta los datos del proyecto en lenguaje natural — potenciado por Gemini</p>
 </div>
-""", unsafe_allow_html=True)
-
-st.markdown('<hr class="divider">', unsafe_allow_html=True)
+<hr class="divider">
+""")
 
 # --- Verificar API key ---
 api_key = os.getenv('GEMINI_API_KEY')
 if not api_key:
-    st.error('**GEMINI_API_KEY no encontrada.** Agregá `GEMINI_API_KEY=tu_clave` en el `.env` del proyecto.')
+    st.error(
+        '**GEMINI_API_KEY no encontrada.**  \n'
+        'Crea un archivo `.env` en la raíz del proyecto con:  \n'
+        '```\nGEMINI_API_KEY=tu_clave_aqui\n```'
+    )
     st.stop()
 
-# --- Inicializar modelo ---
-if 'gemini_model' not in st.session_state:
-    st.session_state.gemini_model   = None
-    st.session_state.gemini_history = []
+# --- Inicializar cliente Gemini (google-genai SDK 1.x) ---
+if 'gemini_client' not in st.session_state:
+    st.session_state.gemini_client  = None
+    st.session_state.gemini_history = []   # lista de dicts {role, parts}
+    st.session_state.gemini_ctx     = None
     st.session_state.gemini_error   = None
 
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=api_key)
+        from google import genai  # SDK nuevo: pip install google-genai
 
-        # build_gemini_context() puede fallar si los CSVs no están — usar contexto mínimo como fallback
+        st.session_state.gemini_client = genai.Client(api_key=api_key)
+
         try:
-            system_ctx = build_gemini_context()
+            st.session_state.gemini_ctx = build_gemini_context()
         except Exception:
-            system_ctx = (
+            st.session_state.gemini_ctx = (
                 'Sos un asistente de Business Intelligence para el proyecto '
                 '"Brecha Digital Laboral — UPDS Bolivia". '
                 'Respondé preguntas sobre educación técnica, inserción laboral '
                 'y brecha digital. Respondé siempre en español.'
             )
 
-        st.session_state.gemini_model = genai.GenerativeModel(
-            model_name='gemini-2.0-flash',
-            system_instruction=system_ctx,
-        )
     except Exception as e:
         st.session_state.gemini_error = str(e)
 
 if st.session_state.gemini_error:
     st.error(f'Error al inicializar Gemini: {st.session_state.gemini_error}')
-    st.caption('Verificá que `GEMINI_API_KEY` sea válida y que `google-generativeai` esté instalado.')
+    st.caption('Verificá que `google-genai` esté instalado: `pip install google-genai`')
     st.stop()
 
-# --- Historial de mensajes ---
+# --- Historial de mensajes (display) ---
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 
 # --- Sugerencias (solo si historial vacío) ---
 if not st.session_state.messages:
-    st.markdown('<div class="sug-label">Preguntas sugeridas</div>', unsafe_allow_html=True)
+    st.html('<div class="sug-label">Preguntas sugeridas</div>')
     sugerencias = [
         'Cual es la carrera con mayor tasa de empleo?',
         'Cuales son las habilidades mas demandadas en Bolivia?',
@@ -90,14 +92,14 @@ if not st.session_state.messages:
         if cols[i % 2].button(sug, key=f'sug_{i}', use_container_width=True):
             st.session_state.messages.append({'role': 'user', 'content': sug})
             st.rerun()
-    st.markdown('<hr class="divider">', unsafe_allow_html=True)
+    st.html('<hr class="divider">')
 
-# --- Historial de chat ---
+# --- Renderizar historial ---
 for msg in st.session_state.messages:
     with st.chat_message(msg['role']):
         st.markdown(msg['content'])
 
-# --- Input ---
+# --- Input del usuario ---
 if prompt := st.chat_input('Pregunta sobre los datos del proyecto...'):
     st.session_state.messages.append({'role': 'user', 'content': prompt})
     with st.chat_message('user'):
@@ -106,33 +108,54 @@ if prompt := st.chat_input('Pregunta sobre los datos del proyecto...'):
     answer = ''
     with st.chat_message('assistant'):
         try:
-            chat = st.session_state.gemini_model.start_chat(
-                history=st.session_state.gemini_history,
+            from google import genai
+            from google.genai import types
+
+            # Construir contents con historial completo para mantener contexto
+            contents = []
+            for msg in st.session_state.messages[:-1]:  # excluir el último (ya es el prompt actual)
+                role = 'user' if msg['role'] == 'user' else 'model'
+                contents.append(types.Content(
+                    role=role,
+                    parts=[types.Part(text=msg['content'])],
+                ))
+            contents.append(types.Content(
+                role='user',
+                parts=[types.Part(text=prompt)],
+            ))
+
+            response_stream = st.session_state.gemini_client.models.generate_content_stream(
+                model='gemini-2.0-flash',
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    system_instruction=st.session_state.gemini_ctx,
+                    temperature=0.7,
+                ),
             )
-            response = chat.send_message(prompt, stream=True, request_options={'timeout': 30})
 
-            # st.write_stream renderiza los chunks en tiempo real dentro del chat bubble
-            answer = st.write_stream(chunk.text for chunk in response if chunk.text)
-
-            # Guardar historial de Gemini para mantener el contexto conversacional
-            st.session_state.gemini_history = chat.history
+            answer = st.write_stream(
+                chunk.text for chunk in response_stream
+                if chunk.text
+            )
 
         except Exception as e:
             err = str(e)
             if '429' in err or 'RESOURCE_EXHAUSTED' in err:
-                answer = 'La API de Gemini alcanzo el limite de solicitudes por minuto. Espera unos segundos y vuelve a intentar.'
+                answer = 'La API de Gemini alcanzo el limite de solicitudes. Espera unos segundos y vuelve a intentar.'
+            elif 'API_KEY' in err or 'invalid' in err.lower():
+                answer = 'La API key no es valida. Verificá `GEMINI_API_KEY` en el `.env`.'
             else:
-                answer = f'Error al consultar Gemini: {err}'
+                answer = f'Error: {err}'
             st.markdown(answer)
 
     if answer:
         st.session_state.messages.append({'role': 'assistant', 'content': answer})
 
-# --- Limpiar ---
+# --- Limpiar conversación ---
 if st.session_state.messages:
-    st.markdown('<hr class="divider">', unsafe_allow_html=True)
+    st.html('<hr class="divider">')
     if st.button('Limpiar conversacion', icon=':material/delete:', use_container_width=False):
         st.session_state.messages         = []
         st.session_state.gemini_history   = []
-        st.session_state.pop('gemini_model', None)
+        st.session_state.pop('gemini_client', None)
         st.rerun()

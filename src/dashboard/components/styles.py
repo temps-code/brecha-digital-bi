@@ -6,19 +6,9 @@ Paleta zinc-950 + indigo-500, tipografía Inter, iconos Tabler Icons.
 import streamlit as st
 
 _CSS = """
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css"
-/>
-<link
-  rel="preconnect"
-  href="https://fonts.googleapis.com"
-/>
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-/>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.34.0/dist/tabler-icons.min.css');
   /* ── Design tokens ─────────────────────────────────── */
   :root {
     --bg:           #09090B;
@@ -274,4 +264,5 @@ _CSS = """
 
 
 def inject_styles() -> None:
-    st.markdown(_CSS, unsafe_allow_html=True)
+    # st.html() inyecta HTML arbitrario sin el parser de Markdown (Streamlit ≥1.36)
+    st.html(_CSS)
