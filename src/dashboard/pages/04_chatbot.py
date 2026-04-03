@@ -7,12 +7,12 @@ Requiere GROQ_API_KEY en el archivo .env — obtener en: https://console.groq.co
 """
 import os
 import sys
+import traceback
 from pathlib import Path
 
 import streamlit as st
 from dotenv import load_dotenv
 
-# Path absoluto al .env — garantiza que siempre lo encuentra independiente del CWD
 _ROOT = Path(__file__).resolve().parents[3]
 load_dotenv(_ROOT / '.env', override=False)
 
@@ -35,7 +35,7 @@ st.set_page_config(
 
 inject_styles()
 
-# ── DEBUG PANEL (sidebar) ─────────────────────────────────────────────────────
+# ── DEBUG PANEL ───────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown('---')
     with st.expander('Estado del chatbot', expanded=False):
@@ -60,52 +60,45 @@ st.html("""
 <hr class="divider">
 """)
 
-# ── VERIFICAR API KEY ─────────────────────────────────────────────────────────
+# ── API KEY ───────────────────────────────────────────────────────────────────
 api_key = os.getenv('GROQ_API_KEY', '').strip()
 if not api_key:
-    st.error(
-        '**GROQ_API_KEY no encontrada.**  \n'
-        f'Ruta buscada: `{_ROOT / ".env"}`  \n'
-        'Agregá `GROQ_API_KEY=gsk_...` a ese archivo.'
-    )
+    st.error(f'GROQ_API_KEY no encontrada en `{_ROOT / ".env"}`')
     st.stop()
 
-# ── INICIALIZAR CLIENTE (una sola vez por sesión) ─────────────────────────────
+# ── CLIENTE ───────────────────────────────────────────────────────────────────
 if 'groq_client' not in st.session_state:
+    print('[chatbot] inicializando cliente Groq...')
     st.session_state.groq_client = None
     st.session_state.groq_error  = None
     st.session_state.groq_system = _SYSTEM_FALLBACK
-
     try:
         from groq import Groq
         st.session_state.groq_client = Groq(api_key=api_key)
-
-        # Enriquecer el contexto con los KPIs si están disponibles
+        print('[chatbot] cliente Groq OK')
         try:
             from components.data_loader import build_gemini_context
-            ctx = build_gemini_context()
-            if ctx:
-                st.session_state.groq_system = ctx
-        except Exception:
-            pass  # contexto básico ya está seteado en groq_system
-
+            st.session_state.groq_system = build_gemini_context()
+            print('[chatbot] contexto KPIs cargado OK')
+        except Exception as ctx_err:
+            print(f'[chatbot] contexto KPIs fallido (usando fallback): {ctx_err}')
     except Exception as e:
         st.session_state.groq_error = str(e)
+        print(f'[chatbot] ERROR inicializando Groq: {e}')
 
 if st.session_state.groq_error:
     st.error(f'Error al inicializar Groq: `{st.session_state.groq_error}`')
-    st.caption('Verificá que `groq` esté instalado: `pip install groq --break-system-packages`')
     st.stop()
 
 if st.session_state.groq_client is None:
-    st.error('Cliente Groq no inicializado. Revisá el panel de debug en el sidebar.')
+    st.error('Cliente Groq no disponible. Revisá la consola del servidor.')
     st.stop()
 
 # ── HISTORIAL ─────────────────────────────────────────────────────────────────
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 
-# ── SUGERENCIAS (solo si historial vacío) ─────────────────────────────────────
+# ── SUGERENCIAS ───────────────────────────────────────────────────────────────
 if not st.session_state.messages:
     st.html('<div class="sug-label">Preguntas sugeridas</div>')
     sugerencias = [
@@ -121,58 +114,65 @@ if not st.session_state.messages:
             st.rerun()
     st.html('<hr class="divider">')
 
-# ── RENDERIZAR HISTORIAL ──────────────────────────────────────────────────────
+# ── HISTORIAL RENDERIZADO ─────────────────────────────────────────────────────
 for msg in st.session_state.messages:
     with st.chat_message(msg['role']):
         st.markdown(msg['content'])
 
-# ── INPUT Y GENERACIÓN ────────────────────────────────────────────────────────
+# ── INPUT ─────────────────────────────────────────────────────────────────────
 if prompt := st.chat_input('Preguntá sobre los datos del proyecto...'):
+    print(f'[chatbot] prompt recibido: {prompt[:50]}')
 
-    # 1. Mostrar mensaje del usuario
+    # Mostrar mensaje del usuario
     with st.chat_message('user'):
         st.markdown(prompt)
 
-    # 2. Construir historial para la API
+    # Construir historial para la API
     api_messages = [{'role': 'system', 'content': st.session_state.groq_system}]
     for msg in st.session_state.messages:
         api_messages.append({'role': msg['role'], 'content': msg['content']})
     api_messages.append({'role': 'user', 'content': prompt})
 
-    # 3. Generar respuesta con streaming visible
+    print(f'[chatbot] enviando {len(api_messages)} mensajes a Groq...')
+
+    # Generar respuesta
     answer = ''
     with st.chat_message('assistant'):
-        placeholder = st.empty()
-        placeholder.markdown('▌')  # cursor visible inmediatamente
-
         try:
-            stream = st.session_state.groq_client.chat.completions.create(
-                model=_MODEL,
-                messages=api_messages,
-                stream=True,
-                temperature=0.7,
-                max_tokens=1024,
-            )
-            for chunk in stream:
-                delta = chunk.choices[0].delta.content or ''
-                answer += delta
-                placeholder.markdown(answer + '▌')
+            # Generador que hace streaming desde Groq
+            def _groq_stream():
+                stream = st.session_state.groq_client.chat.completions.create(
+                    model=_MODEL,
+                    messages=api_messages,
+                    stream=True,
+                    temperature=0.7,
+                    max_tokens=1024,
+                )
+                for chunk in stream:
+                    delta = chunk.choices[0].delta.content
+                    if delta:
+                        yield delta
 
-            placeholder.markdown(answer)
+            # st.write_stream renderiza el generador en tiempo real dentro del chat bubble
+            answer = st.write_stream(_groq_stream())
+            print(f'[chatbot] respuesta recibida: {len(answer)} chars')
 
         except Exception as e:
+            tb = traceback.format_exc()
+            print(f'[chatbot] ERROR en generación:\n{tb}')
             err = str(e)
             if '429' in err or 'rate_limit' in err.lower():
                 answer = 'Límite de solicitudes alcanzado. Esperá unos segundos y volvé a intentar.'
             elif 'auth' in err.lower() or 'api_key' in err.lower():
-                answer = 'GROQ_API_KEY inválida. Verificá el sidebar para más detalles.'
+                answer = 'GROQ_API_KEY inválida. Verificá el sidebar.'
             else:
-                answer = f'Error inesperado: {err}'
-            placeholder.markdown(answer)
+                answer = f'Error: {err}'
+            st.markdown(answer)
 
-    # 4. Persistir historial
+    # Persistir en historial
     st.session_state.messages.append({'role': 'user',      'content': prompt})
-    st.session_state.messages.append({'role': 'assistant', 'content': answer})
+    st.session_state.messages.append({'role': 'assistant', 'content': answer or '(sin respuesta)'})
+    print(f'[chatbot] historial actualizado: {len(st.session_state.messages)} mensajes')
 
 # ── LIMPIAR ───────────────────────────────────────────────────────────────────
 if st.session_state.messages:
