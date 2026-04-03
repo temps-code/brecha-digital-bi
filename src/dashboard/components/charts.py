@@ -9,10 +9,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 
-_BG = 'rgba(0,0,0,0)'
-_BLUE = '#2196F3'
-_ORANGE = '#FF9800'
-_GRID = '#2A2D3E'
+_BG     = 'rgba(0,0,0,0)'
+_ACCENT = '#6366F1'
+_ORANGE = '#F59E0B'
+_GRID   = '#3F3F46'
 
 
 def _base_layout(fig: go.Figure, title: str = '') -> go.Figure:
@@ -94,7 +94,7 @@ def combo_skill_gap(df: pd.DataFrame) -> go.Figure:
         name='Demanda (vacantes)',
         x=df['habilidad'],
         y=df['demanda'],
-        marker_color=_BLUE,
+        marker_color=_ACCENT,
         yaxis='y',
     ))
     fig.add_trace(go.Scatter(
@@ -132,7 +132,7 @@ def line_cepal_bolivia(df: pd.DataFrame) -> go.Figure:
         y='value',
         markers=True,
         labels={'anio': 'Año', 'value': 'Indicador TIC (%)'},
-        color_discrete_sequence=[_BLUE],
+        color_discrete_sequence=[_ACCENT],
     )
     fig.update_traces(line_width=2, marker_size=7)
     return _base_layout(fig, 'Indicador TIC Bolivia — CEPALSTAT (ODS 4.4.1)')

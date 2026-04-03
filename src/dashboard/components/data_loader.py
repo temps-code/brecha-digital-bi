@@ -1,13 +1,16 @@
 """
 Dashboard — Data Loader
-Carga y cachea los datasets desde los CSVs raw.
-Cuando la capa Gold esté disponible, solo hay que cambiar las rutas aquí.
+Carga y cachea los datasets desde la capa Gold (SQL Server DW_BrechaDigital).
+Si Gold no está disponible (sin credenciales o servidor offline), cae
+silenciosamente a los CSVs processed/raw para que el dashboard siga funcionando.
 """
+import os
 import pandas as pd
 from pathlib import Path
 import streamlit as st
 
 RAW = Path(__file__).resolve().parents[3] / 'data' / 'raw'
+PROCESSED = Path(__file__).resolve().parents[3] / 'data' / 'processed'
 
 # dim_29117 en CEPALSTAT: 29160 → año 2000
 _YEAR_BASE = 29160
@@ -30,6 +33,36 @@ CARRERA_SKILLS = {
 }
 
 
+def _gold_engine():
+    """
+    Retorna un engine SQLAlchemy apuntando a DW_BrechaDigital (Gold).
+    Retorna None si las variables de entorno no están configuradas o
+    si la conexión falla (SQL Server no disponible).
+    La conexión es lazy — se crea solo cuando se invoca esta función.
+    """
+    server = os.getenv('DW_SERVER')
+    db     = os.getenv('DW_NAME')
+    user   = os.getenv('DW_USER')
+    pwd    = os.getenv('DW_PASSWORD')
+
+    if not all([server, db, user, pwd]):
+        return None
+
+    try:
+        from sqlalchemy import create_engine, text
+        conn_str = (
+            f'mssql+pyodbc://{user}:{pwd}@{server}/{db}'
+            '?driver=ODBC+Driver+17+for+SQL+Server'
+        )
+        engine = create_engine(conn_str, connect_args={'connect_timeout': 5})
+        # ping rápido para verificar que el servidor responde
+        with engine.connect() as con:
+            con.execute(text('SELECT 1'))
+        return engine
+    except Exception:
+        return None
+
+
 @st.cache_data
 def _load_raw():
     est = pd.read_csv(RAW / 'estudiantes.csv')
@@ -41,9 +74,53 @@ def _load_raw():
     return est, ins, egr, car, vac, cep
 
 
+def _load_df_from_gold(engine) -> pd.DataFrame | None:
+    """
+    Consulta Gold: FACT_INSERCION_LABORAL + DIM_CARRERA + DIM_ESTUDIANTE + DIM_REGION.
+    Retorna DataFrame con columnas equivalentes al CSV merge, o None si falla.
+    """
+    sql = """
+        SELECT
+            e.EstudianteID,
+            e.nombre        AS Nombre,
+            c.nombrecarrera AS NombreCarrera,
+            r.Ciudad,
+            e.Genero,
+            f.EstaEmpleado          AS TieneEmpleoFormal,
+            f.TrabajaEnAreaDeEstudio,
+            f.SalarioMensualUSD
+        FROM FACT_INSERCION_LABORAL f
+        JOIN DIM_CARRERA    c ON f.SK_Carrera    = c.SK_Carrera
+        JOIN DIM_ESTUDIANTE e ON f.SK_Estudiante = e.SK_Estudiante
+        JOIN DIM_REGION     r ON f.SK_Region     = r.SK_Region
+    """
+    try:
+        df = pd.read_sql(sql, engine)
+        for col in ['TieneEmpleoFormal', 'TrabajaEnAreaDeEstudio']:
+            df[col] = df[col].map({
+                True: True, False: False,
+                1: True, 0: False,
+                'True': True, 'False': False,
+            })
+        return df
+    except Exception:
+        return None
+
+
 @st.cache_data
 def load_df() -> pd.DataFrame:
-    """DataFrame principal: estudiantes + inscripciones + egresados + carreras."""
+    """
+    DataFrame principal: intenta Gold primero, cae a CSVs si no disponible.
+    Columnas garantizadas: EstudianteID, Nombre, NombreCarrera, Ciudad,
+    Genero, TieneEmpleoFormal, TrabajaEnAreaDeEstudio, SalarioMensualUSD.
+    """
+    engine = _gold_engine()
+    if engine is not None:
+        df = _load_df_from_gold(engine)
+        if df is not None:
+            return df
+
+    # Fallback: CSVs raw (comportamiento original)
     est, ins, egr, car, _, _ = _load_raw()
     df = (
         est
@@ -58,6 +135,7 @@ def load_df() -> pd.DataFrame:
 
 @st.cache_data
 def load_vacantes() -> pd.DataFrame:
+    """Vacantes del mercado — siempre desde CSV raw (sin equivalente en Gold)."""
     _, _, _, _, vac, _ = _load_raw()
     return vac
 
@@ -152,6 +230,7 @@ def get_skill_gap() -> pd.DataFrame:
 
 @st.cache_data
 def get_cepal_bolivia() -> pd.DataFrame:
+    """Indicador CEPALSTAT — siempre desde CSV raw (sin equivalente en Gold)."""
     _, _, _, _, _, cep = _load_raw()
     bol = cep[(cep['iso3'] == 'BOL') & (cep['dim_28619'] == 28620)].copy()
     bol['anio'] = bol['dim_29117'] - _YEAR_BASE + _YEAR_OFFSET
