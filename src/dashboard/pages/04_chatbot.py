@@ -37,16 +37,14 @@ if 'messages' not in st.session_state:
 
 if 'gemini_chat' not in st.session_state:
     try:
-        import google.generativeai as genai
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(
-            model_name='gemini-1.5-flash',
-            system_instruction=build_gemini_context(),
-        )
-        st.session_state.gemini_chat = model.start_chat(history=[])
+        from google import genai
+        from google.genai import types
+        client = genai.Client(api_key=api_key)
+        st.session_state.gemini_client = client
+        st.session_state.gemini_history = []
         st.session_state.gemini_error = None
     except Exception as e:
-        st.session_state.gemini_chat = None
+        st.session_state.gemini_client = None
         st.session_state.gemini_error = str(e)
 
 if st.session_state.get('gemini_error'):
@@ -82,8 +80,20 @@ if prompt := st.chat_input('Preguntá sobre los datos del proyecto...'):
     with st.chat_message('assistant'):
         with st.spinner('Analizando...'):
             try:
-                response = st.session_state.gemini_chat.send_message(prompt)
+                from google.genai import types
+                history = st.session_state.get('gemini_history', [])
+                response = st.session_state.gemini_client.models.generate_content(
+                    model='gemini-2.0-flash',
+                    contents=history + [{'role': 'user', 'parts': [{'text': prompt}]}],
+                    config=types.GenerateContentConfig(
+                        system_instruction=build_gemini_context(),
+                    ),
+                )
                 answer = response.text
+                st.session_state.gemini_history = history + [
+                    {'role': 'user', 'parts': [{'text': prompt}]},
+                    {'role': 'model', 'parts': [{'text': answer}]},
+                ]
             except Exception as e:
                 answer = f'Error al consultar Gemini: {e}'
         st.markdown(answer)
@@ -94,5 +104,5 @@ if st.session_state.messages:
     st.divider()
     if st.button('Limpiar conversación'):
         st.session_state.messages = []
-        st.session_state.pop('gemini_chat', None)
+        st.session_state.gemini_history = []
         st.rerun()
