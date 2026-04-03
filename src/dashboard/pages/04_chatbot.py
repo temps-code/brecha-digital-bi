@@ -33,7 +33,7 @@ st.markdown("""
 st.markdown("""
 <div class="page-header">
   <h2>🤖 Asistente BI</h2>
-  <p>Consultá los datos del proyecto en lenguaje natural — potenciado por Gemini 2.0 Flash</p>
+  <p>Consultá los datos del proyecto en lenguaje natural — potenciado por Gemini</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -45,16 +45,20 @@ if not api_key:
     st.error('**GEMINI_API_KEY no encontrada.** Agregá `GEMINI_API_KEY=tu_clave` en el `.env` del proyecto.')
     st.stop()
 
-# --- Inicializar cliente Gemini ---
-if 'gemini_client' not in st.session_state:
+# --- Inicializar modelo Gemini (mismo patrón que Road-to-build-with-AI) ---
+if 'gemini_model' not in st.session_state:
     try:
-        import google.genai as genai
-        st.session_state.gemini_client  = genai.Client(api_key=api_key)
+        import google.generativeai as genai
+        genai.configure(api_key=api_key)
+        st.session_state.gemini_model   = genai.GenerativeModel(
+            model_name='gemini-2.0-flash',
+            system_instruction=build_gemini_context(),
+        )
         st.session_state.gemini_history = []
         st.session_state.gemini_error   = None
     except Exception as e:
-        st.session_state.gemini_client = None
-        st.session_state.gemini_error  = str(e)
+        st.session_state.gemini_model = None
+        st.session_state.gemini_error = str(e)
 
 if st.session_state.get('gemini_error'):
     st.error(f'Error al inicializar Gemini: {st.session_state.gemini_error}')
@@ -94,22 +98,21 @@ if prompt := st.chat_input('Preguntá sobre los datos del proyecto...'):
     with st.chat_message('assistant'):
         with st.spinner('Analizando...'):
             try:
-                import google.genai.types as types
-                history = st.session_state.get('gemini_history', [])
-                response = st.session_state.gemini_client.models.generate_content(
-                    model='gemini-2.0-flash',
-                    contents=history + [{'role': 'user', 'parts': [{'text': prompt}]}],
-                    config=types.GenerateContentConfig(
-                        system_instruction=build_gemini_context(),
-                    ),
+                chat = st.session_state.gemini_model.start_chat(
+                    history=st.session_state.gemini_history,
+                )
+                response = chat.send_message(
+                    prompt,
+                    request_options={'timeout': 15},
                 )
                 answer = response.text
-                st.session_state.gemini_history = history + [
-                    {'role': 'user',  'parts': [{'text': prompt}]},
-                    {'role': 'model', 'parts': [{'text': answer}]},
-                ]
+                st.session_state.gemini_history = chat.history
             except Exception as e:
-                answer = f'Error al consultar Gemini: {e}'
+                err = str(e)
+                if '429' in err or 'RESOURCE_EXHAUSTED' in err:
+                    answer = '⏳ La API de Gemini alcanzó el límite de solicitudes por minuto. Esperá unos segundos y volvé a intentar.'
+                else:
+                    answer = f'Error al consultar Gemini: {err}'
         st.markdown(answer)
         st.session_state.messages.append({'role': 'assistant', 'content': answer})
 
@@ -119,4 +122,5 @@ if st.session_state.messages:
     if st.button('🗑️ Limpiar conversación', use_container_width=False):
         st.session_state.messages         = []
         st.session_state.gemini_history   = []
+        st.session_state.pop('gemini_model', None)
         st.rerun()
