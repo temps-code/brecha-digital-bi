@@ -29,7 +29,7 @@ _CSS = """
     font-family: 'Inter', sans-serif !important;
   }
   .block-container {
-    padding-top: 1.75rem !important;
+    padding-top: 4rem !important;
     padding-bottom: 2rem !important;
   }
 

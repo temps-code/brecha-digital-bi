@@ -124,28 +124,48 @@ if prompt := st.chat_input('Pregunta sobre los datos del proyecto...'):
                 parts=[types.Part(text=prompt)],
             ))
 
-            response_stream = st.session_state.gemini_client.models.generate_content_stream(
-                model='gemini-2.0-flash',
-                contents=contents,
-                config=types.GenerateContentConfig(
-                    system_instruction=st.session_state.gemini_ctx,
-                    temperature=0.7,
-                ),
-            )
+            # Retry con backoff — el free tier de AI Studio limita a 15 RPM
+            import time
+            max_retries = 3
+            last_err = None
+            for attempt in range(max_retries):
+                try:
+                    response_stream = st.session_state.gemini_client.models.generate_content_stream(
+                        model='gemini-1.5-flash',
+                        contents=contents,
+                        config=types.GenerateContentConfig(
+                            system_instruction=st.session_state.gemini_ctx,
+                            temperature=0.7,
+                        ),
+                    )
+                    answer = st.write_stream(
+                        chunk.text for chunk in response_stream if chunk.text
+                    )
+                    last_err = None
+                    break
+                except Exception as inner_e:
+                    last_err = inner_e
+                    err_str = str(inner_e)
+                    if '429' in err_str or 'RESOURCE_EXHAUSTED' in err_str:
+                        wait = 5 * (attempt + 1)
+                        with st.spinner(f'Limite de API alcanzado — reintentando en {wait}s...'):
+                            time.sleep(wait)
+                    else:
+                        break
 
-            answer = st.write_stream(
-                chunk.text for chunk in response_stream
-                if chunk.text
-            )
+            if last_err is not None:
+                err = str(last_err)
+                if '429' in err or 'RESOURCE_EXHAUSTED' in err:
+                    answer = 'La API de Gemini alcanzo el limite de solicitudes por minuto. Esperá unos segundos y volvé a intentar.'
+                elif 'API_KEY' in err or 'invalid' in err.lower():
+                    answer = 'La API key no es valida. Verificá `GEMINI_API_KEY` en el `.env`.'
+                else:
+                    answer = f'Error: {err}'
+                st.markdown(answer)
 
         except Exception as e:
             err = str(e)
-            if '429' in err or 'RESOURCE_EXHAUSTED' in err:
-                answer = 'La API de Gemini alcanzo el limite de solicitudes. Espera unos segundos y vuelve a intentar.'
-            elif 'API_KEY' in err or 'invalid' in err.lower():
-                answer = 'La API key no es valida. Verificá `GEMINI_API_KEY` en el `.env`.'
-            else:
-                answer = f'Error: {err}'
+            answer = f'Error inesperado: {err}'
             st.markdown(answer)
 
     if answer:
