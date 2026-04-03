@@ -10,32 +10,8 @@ Ver docs/esquema_copo_nieve.md para la definición completa.
 """
 
 import pandas as pd
-import os
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
 
-# --- 1. Cargar configuración y definir el gestor de conexión ---
-load_dotenv()
-
-DW_SERVER = os.getenv('DW_SERVER')
-DW_NAME = os.getenv('DW_NAME')
-DW_USER = os.getenv('DW_USER')
-DW_PASSWORD = os.getenv('DW_PASSWORD')
-
-if not all([DW_SERVER, DW_NAME, DW_USER, DW_PASSWORD]):
-    raise ValueError("Faltan variables de entorno para la conexión al Data Warehouse (DW_*)")
-
-# Patrón Singleton para el motor de base de datos
-_engine = None
-
-def get_engine():
-    """Crea y devuelve una instancia del motor de base de datos."""
-    global _engine
-    if _engine is None:
-        connection_string = f"mssql+pyodbc://{DW_USER}:{DW_PASSWORD}@{DW_SERVER}/{DW_NAME}?driver=ODBC+Driver+17+for+SQL+Server"
-        print("   🔗 Creando conexión a la base de datos...")
-        _engine = create_engine(connection_string)
-    return _engine
+from .db import get_engine
 
 def _validar_fact_table(df: pd.DataFrame, nombre_tabla: str):
     """Valida la integridad de la tabla de hechos."""
