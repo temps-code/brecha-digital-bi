@@ -15,67 +15,84 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from components.data_loader import get_habilidades_demandadas, get_skill_gap, load_vacantes, CARRERA_SKILLS
 from components.charts import bar_habilidades_demandadas, combo_skill_gap
 
-st.title('🎯 Brecha de Habilidades')
-st.caption('Habilidades TIC demandadas por el mercado vs cobertura del sistema educativo')
+st.set_page_config(page_title='Brecha de Habilidades — Brecha Digital BI', page_icon='🎯', layout='wide')
 
-# --- Insight principal ---
+st.markdown("""
+<style>
+  .page-header h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.2rem; }
+  .page-header p  { color: #9CA3AF; font-size: 0.9rem; margin: 0; }
+  .alert-card { background: #2D1B1B; border-left: 4px solid #EF4444; border-radius: 8px;
+                padding: 0.9rem 1.1rem; margin-bottom: 0.5rem; }
+  .alert-card .title { font-weight: 600; color: #FCA5A5; font-size: 0.92rem; }
+  .alert-card .body  { color: #D1D5DB; font-size: 0.85rem; margin-top: 0.2rem; }
+  .skill-card { background: #1E2130; border-radius: 10px; padding: 0.8rem 1rem;
+                border: 1px solid #2A2D3E; margin-bottom: 0.4rem; }
+  .skill-item { font-size: 0.85rem; color: #D1D5DB; padding: 2px 0; }
+  hr.thin { border: none; border-top: 1px solid #2A2D3E; margin: 1.2rem 0; }
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="page-header">
+  <h2>🎯 Brecha de Habilidades</h2>
+  <p>Habilidades TIC demandadas por el mercado vs cobertura del sistema educativo</p>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown('<hr class="thin">', unsafe_allow_html=True)
+
 gap_df = get_skill_gap()
-habs_sin_cobertura = gap_df[gap_df['cobertura'] == 0]
-n_gap = len(habs_sin_cobertura)
+sin_cobertura = gap_df[gap_df['cobertura'] == 0]
 
-if n_gap > 0:
-    skills_faltantes = ', '.join(habs_sin_cobertura['habilidad'].tolist())
-    st.error(
-        f'**Brecha detectada:** {n_gap} habilidad(es) demandada(s) por el mercado '
-        f'sin cobertura académica en ninguna carrera: **{skills_faltantes}**'
-    )
+if not sin_cobertura.empty:
+    skills_str = ' · '.join(sin_cobertura['habilidad'].tolist())
+    st.markdown(f"""
+    <div class="alert-card">
+      <div class="title">⚠️ Brecha detectada — {len(sin_cobertura)} habilidades sin cobertura académica</div>
+      <div class="body">{skills_str}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-st.divider()
-
-# --- Gráfico combo ---
+# --- Combo chart ---
 st.plotly_chart(combo_skill_gap(gap_df), use_container_width=True)
 
-st.divider()
+st.markdown('<hr class="thin">', unsafe_allow_html=True)
 
-col_izq, col_der = st.columns(2)
+col_l, col_r = st.columns([3, 2])
 
-with col_izq:
-    st.subheader('Habilidades más demandadas')
-    dem_df = get_habilidades_demandadas()
-    st.plotly_chart(bar_habilidades_demandadas(dem_df), use_container_width=True)
+with col_l:
+    st.markdown('#### Habilidades más demandadas')
+    st.plotly_chart(bar_habilidades_demandadas(get_habilidades_demandadas()), use_container_width=True)
 
-with col_der:
-    st.subheader('Cobertura académica por carrera')
+with col_r:
+    st.markdown('#### Cobertura por carrera')
     for carrera, skills in CARRERA_SKILLS.items():
-        with st.expander(carrera):
-            if skills:
-                for s in skills:
-                    st.markdown(f'- ✅ {s}')
-            else:
-                st.markdown('_Sin habilidades TIC mapeadas_')
+        st.markdown(f"""
+        <div class="skill-card">
+          <div style="font-weight:600;font-size:0.88rem;color:#F9FAFB;margin-bottom:0.3rem">{carrera}</div>
+          {''.join(f'<div class="skill-item">✅ {s}</div>' for s in skills) if skills
+           else '<div class="skill-item" style="color:#6B7280">Sin habilidades TIC mapeadas</div>'}
+        </div>
+        """, unsafe_allow_html=True)
 
-st.divider()
+st.markdown('<hr class="thin">', unsafe_allow_html=True)
 
-st.subheader('Vacantes del Mercado')
-vac = load_vacantes()
-st.dataframe(
-    vac[['title', 'location', 'salary_min', 'description']].rename(columns={
-        'title': 'Título',
-        'location': 'Ciudad',
-        'salary_min': 'Salario Mín. (USD)',
-        'description': 'Habilidades Requeridas',
-    }),
-    use_container_width=True,
-)
+with st.expander('Ver vacantes del mercado'):
+    vac = load_vacantes()
+    st.dataframe(
+        vac[['title', 'location', 'salary_min', 'description']].rename(columns={
+            'title': 'Título', 'location': 'Ciudad',
+            'salary_min': 'Salario Mín. (USD)', 'description': 'Habilidades requeridas',
+        }),
+        use_container_width=True, hide_index=True,
+    )
 
-st.divider()
-
-st.subheader('Tabla de Brecha Detallada')
-st.dataframe(
-    gap_df.rename(columns={
-        'habilidad': 'Habilidad',
-        'demanda': 'Vacantes que la requieren',
-        'cobertura': 'Cobertura Académica (%)',
-    }),
-    use_container_width=True,
-)
+with st.expander('Ver tabla de brecha detallada'):
+    st.dataframe(
+        gap_df.rename(columns={
+            'habilidad': 'Habilidad',
+            'demanda':   'Vacantes que la requieren',
+            'cobertura': 'Cobertura Académica (%)',
+        }),
+        use_container_width=True, hide_index=True,
+    )
