@@ -51,8 +51,8 @@ def load_df() -> pd.DataFrame:
         .merge(egr, on='EstudianteID', how='left')
         .merge(car, on='CarreraID', how='left')
     )
-    df['TieneEmpleoFormal'] = df['TieneEmpleoFormal'].map({'True': True, 'False': False})
-    df['TrabajaEnAreaDeEstudio'] = df['TrabajaEnAreaDeEstudio'].map({'True': True, 'False': False})
+    for col in ['TieneEmpleoFormal', 'TrabajaEnAreaDeEstudio']:
+        df[col] = df[col].map({True: True, False: False, 'True': True, 'False': False})
     return df
 
 
