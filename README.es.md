@@ -289,23 +289,37 @@ Todo el avance del equipo se registra en el [Tablero Kanban](https://github.com/
 
 ## Variables de Entorno
 
-Crear un archivo `.env` en el directorio raíz:
+El repositorio incluye un archivo `.env.example`. Copialo y completá tus valores:
+
+```bash
+cp .env.example .env
+```
 
 ```env
 # SQL Server — Base de Datos Bronze
-DB_SERVER=localhost\SQLEXPRESS
+# Docker / Linux / servidor remoto con credenciales:
+DB_SERVER=localhost,1433
 DB_NAME=BrechaDigitalDB
 DB_USER=sa
 DB_PASSWORD=tu_contraseña
 
+# Windows con SQL Server local (Windows Auth): dejá DB_USER y DB_PASSWORD vacíos
+# DB_SERVER=localhost\SQLEXPRESS
+# DB_USER=
+# DB_PASSWORD=
+
 # SQL Server — Warehouse Gold
-DW_SERVER=localhost\SQLEXPRESS
+# Misma regla: dejá DW_USER y DW_PASSWORD vacíos para Windows Auth
+DW_SERVER=localhost,1433
 DW_NAME=DW_BrechaDigital
 DW_USER=sa
 DW_PASSWORD=tu_contraseña
 
 # Gemini API
 GEMINI_API_KEY=tu_api_key_de_gemini
+
+# Groq API
+GROQ_API_KEY=tu_api_key_de_groq
 
 # CEPALSTAT (no requiere clave — API pública)
 CEPALSTAT_BASE_URL=https://api-cepalstat.cepal.org/cepalstat/api/v1
@@ -316,6 +330,7 @@ ADZUNA_APP_KEY=tu_app_key
 ```
 
 > Nunca commitear el archivo `.env`. Ya está incluido en el `.gitignore`.
+> El pipeline detecta el modo de autenticación automáticamente: SQL Auth si hay credenciales, Windows Auth si no las hay.
 
 ---
 

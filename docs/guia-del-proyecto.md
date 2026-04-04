@@ -111,7 +111,7 @@ En nuestro proyecto, esa fábrica tiene tres capas bien definidas. Cada capa dep
 
 - `FACT_INSERCION_LABORAL` → registra el evento (egresado X consiguió trabajo)
 - `DIM_ESTUDIANTE` → datos del estudiante (nombre, carrera, año de ingreso)
-- `DIM_HABILIDAD` → qué habilidades tiene ese estudiante
+- `DIM_HABILIDAD` → 22 competencias digitales del currículo académico (fuente: `CompetenciasDigitales` en Bronze)
 - `DIM_MERCADO_LABORAL` → datos de la empresa que lo contrató
 - `DIM_REGION` → ciudad y departamento
 
@@ -152,7 +152,7 @@ Tiene cuatro secciones:
 Para entender cómo todo se conecta, seguimos a un dato específico desde el origen hasta el dashboard:
 
 ```
-1. SQL Server tiene registrado:
+1. SQL Server tiene registrado (50.000 estudiantes, 25.000 seguimientos, 22 competencias):
    EstudianteID=42, Nombre="María Quispe", Carrera="Sistemas", Promedio=78
 
 2. Bronze (sqlserver.py) lo extrae y guarda en:
@@ -164,10 +164,10 @@ Para entender cómo todo se conecta, seguimos a un dato específico desde el ori
    data/processed/estudiantes_cleaned.csv
 
 4. Gold (dimensions.py) lo carga en:
-   DIM_ESTUDIANTE  →  id_estudiante=42, nombre="María Quispe", id_carrera=3
+   DIM_ESTUDIANTE  →  SK_Estudiante=42, nombre="María Quispe", SK_Carrera=3
 
 5. Gold (facts.py) registra el hecho:
-   FACT_INSERCION_LABORAL  →  María Quispe, egresó, consiguió trabajo en 8 meses, salario 3200 BOB
+   FACT_INSERCION_LABORAL  →  SK_Estudiante=42, EstaEmpleado=1, SalarioMensualUSD=650, TrabajaEnAreaDeEstudio=1
 
 6. Dashboard muestra:
    "Sistemas: 74% de inserción laboral — promedio 7.2 meses hasta primer empleo"

@@ -174,7 +174,7 @@ Full schema documentation: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_niev
 |---|---|---|---|
 | Day 1 | April 1 | Definition, GitHub setup, Bronze extraction | Bronze |
 | Day 2 | April 2 | Cleaning, transformation, integration | Silver |
-| Day 3 | April 3 | Star schema modeling + Dashboard construction | Gold + Viz |
+| Day 3 | April 3 | Snowflake schema modeling + Dashboard construction | Gold + Viz |
 | Day 4 | April 6 | Final testing, storytelling polish, documentation | All |
 | Day 5 | April 7 | **DEMO DAY** — 10-minute presentation | — |
 
@@ -289,23 +289,37 @@ All team progress is tracked on the [GitHub Kanban Board](https://github.com/use
 
 ## Environment Variables
 
-Create a `.env` file in the root directory:
+A `.env.example` file is included in the repository. Copy it and fill in your values:
+
+```bash
+cp .env.example .env
+```
 
 ```env
 # SQL Server — Bronze Source
-DB_SERVER=localhost\SQLEXPRESS
+# Docker / Linux / remote server with credentials:
+DB_SERVER=localhost,1433
 DB_NAME=BrechaDigitalDB
 DB_USER=sa
 DB_PASSWORD=your_password
 
+# Windows with local SQL Server (Windows Auth): leave DB_USER and DB_PASSWORD empty
+# DB_SERVER=localhost\SQLEXPRESS
+# DB_USER=
+# DB_PASSWORD=
+
 # SQL Server — Gold Warehouse
-DW_SERVER=localhost\SQLEXPRESS
+# Same rule applies: leave DW_USER and DW_PASSWORD empty for Windows Auth
+DW_SERVER=localhost,1433
 DW_NAME=DW_BrechaDigital
 DW_USER=sa
 DW_PASSWORD=your_password
 
 # Gemini API
 GEMINI_API_KEY=your_gemini_api_key
+
+# Groq API
+GROQ_API_KEY=your_groq_api_key
 
 # CEPALSTAT (no key required — public API)
 CEPALSTAT_BASE_URL=https://api-cepalstat.cepal.org/cepalstat/api/v1
@@ -316,6 +330,7 @@ ADZUNA_APP_KEY=your_app_key
 ```
 
 > Never commit the `.env` file. It is already listed in `.gitignore`.
+> The pipeline auto-detects the auth mode: SQL Auth when credentials are set, Windows Auth otherwise.
 
 ---
 
