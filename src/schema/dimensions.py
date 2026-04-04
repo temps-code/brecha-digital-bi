@@ -82,9 +82,9 @@ def cargar_dim_carrera():
     """Crea la dimensión de carrera a partir del catálogo de carreras."""
     print("Cargando DIM_CARRERA...")
     try:
-        df_carreras = pd.read_csv('data/raw/carreras.csv')
+        df_carreras = pd.read_csv('data/processed/carreras_cleaned.csv')
     except FileNotFoundError:
-        raise ValueError("No se encontró el archivo 'data/raw/carreras.csv'. Asegúrate de que la ruta sea correcta.") from None
+        raise ValueError("No se encontró 'data/processed/carreras_cleaned.csv'. Ejecutá primero clean.py.") from None
 
     required_cols = ['CarreraID', 'NombreCarrera', 'Facultad']
     if not all(col in df_carreras.columns for col in required_cols):

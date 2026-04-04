@@ -174,7 +174,7 @@ Documentación completa del esquema: [`docs/esquema_copo_nieve.md`](docs/esquema
 |---|---|---|---|
 | Día 1 | 1 de abril | Definición, setup GitHub, extracción Bronze | Bronze |
 | Día 2 | 2 de abril | Limpieza, transformación e integración | Silver |
-| Día 3 | 3 de abril | Modelado estrella + construcción del Dashboard | Gold + Viz |
+| Día 3 | 3 de abril | Modelado copo de nieve + construcción del Dashboard | Gold + Viz |
 | Día 4 | 6 de abril | Pruebas finales, storytelling y documentación | Todas |
 | Día 5 | 7 de abril | **DEMO DAY** — presentación final de 10 minutos | — |
 
