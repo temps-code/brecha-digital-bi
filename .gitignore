@@ -29,3 +29,6 @@ data/warehouse/*.db
 # OS
 .DS_Store
 Thumbs.db
+
+# Agent tooling
+.atl/

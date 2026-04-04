@@ -140,7 +140,8 @@ if __name__ == "__main__":
         'estudiantes.csv',
         'inscripciones.csv',
         'seguimientoegresados.csv',
-        'carreras.csv', 
+        'carreras.csv',
+        'competenciasdigitales.csv',
         'empleos/vacantes_tecnologicas.csv',
         'cepalstat/indicadores_tic_region.csv'
     ]

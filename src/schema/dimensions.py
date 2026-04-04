@@ -143,37 +143,44 @@ def cargar_dim_mercado_laboral():
     _validar_carga(df_mercado, 'DIM_MERCADO_LABORAL')
 
 def cargar_dim_categoria_y_habilidad():
-    """Carga las dimensiones de categoría y habilidad basadas en descripciones de vacantes."""
+    """Carga DIM_CATEGORIA_SKILL y DIM_HABILIDAD desde CompetenciasDigitales (Bronze).
+
+    NivelRequerido (Básico / Intermedio / Avanzado) se convierte en la categoría de skill.
+    NombreHabilidad se convierte en la habilidad concreta dentro de esa categoría.
+    """
     print("Cargando DIM_CATEGORIA_SKILL y DIM_HABILIDAD...")
-    df_vacantes = pd.read_csv('data/processed/empleos/vacantes_tecnologicas_cleaned.csv')
-    
-    habilidades_map = {
-        'python': 'Lenguajes de Programación', 'sql': 'Bases de Datos', 'spark': 'Big Data',
-        'power bi': 'Herramientas de BI', 'excel': 'Herramientas de Oficina', 'etl': 'Procesos de Datos'
-    }
-    
-    habilidades_encontradas = set()
-    for desc in df_vacantes['description'].str.lower():
-        for habilidad in habilidades_map.keys():
-            if habilidad in desc:
-                habilidades_encontradas.add(habilidad)
-    
-    categorias = sorted(list(set(habilidades_map.values())))
-    df_cat = pd.DataFrame(categorias, columns=['NombreCategoria'])
+
+    try:
+        df_comp = pd.read_csv('data/processed/competenciasdigitales_cleaned.csv')
+    except FileNotFoundError:
+        raise ValueError(
+            "No se encontró 'data/processed/competenciasdigitales_cleaned.csv'. "
+            "Ejecutá primero sqlserver.py y luego clean.py."
+        ) from None
+
+    required_cols = {'NombreHabilidad', 'NivelRequerido'}
+    if not required_cols.issubset(df_comp.columns):
+        faltantes = required_cols - set(df_comp.columns)
+        raise ValueError(f"El archivo de competencias no contiene las columnas: {faltantes}")
+
+    # --- DIM_CATEGORIA_SKILL: una fila por nivel (Básico, Intermedio, Avanzado) ---
+    niveles = sorted(df_comp['NivelRequerido'].str.strip().str.title().unique())
+    df_cat = pd.DataFrame(niveles, columns=['NombreCategoria'])
     df_cat['SK_Categoria'] = df_cat.index + 1
-    
+
     engine = get_engine()
     df_cat.to_sql('DIM_CATEGORIA_SKILL', con=engine, if_exists='replace', index=False)
     print(f"   ✅ DIM_CATEGORIA_SKILL cargada con {len(df_cat)} registros.")
     _validar_carga(df_cat, 'DIM_CATEGORIA_SKILL')
 
-    df_habilidades_list = []
-    for habilidad in sorted(list(habilidades_encontradas)):
-        categoria = habilidades_map[habilidad]
-        sk_cat = df_cat[df_cat['NombreCategoria'] == categoria]['SK_Categoria'].iloc[0]
-        df_habilidades_list.append({'NombreHabilidad': habilidad.title(), 'SK_Categoria': sk_cat})
-    
-    df_hab = pd.DataFrame(df_habilidades_list)
+    # --- DIM_HABILIDAD: una fila por competencia, con FK a su categoría ---
+    cat_index = df_cat.set_index('NombreCategoria')['SK_Categoria'].to_dict()
+
+    df_hab = df_comp[['NombreHabilidad', 'NivelRequerido']].copy()
+    df_hab['NombreHabilidad'] = df_hab['NombreHabilidad'].str.strip()
+    df_hab['NivelRequerido'] = df_hab['NivelRequerido'].str.strip().str.title()
+    df_hab = df_hab.drop_duplicates(subset=['NombreHabilidad']).reset_index(drop=True)
+    df_hab['SK_Categoria'] = df_hab['NivelRequerido'].map(cat_index)
     df_hab['SK_Habilidad'] = df_hab.index + 1
     df_hab = df_hab[['SK_Habilidad', 'NombreHabilidad', 'SK_Categoria']]
     df_hab.to_sql('DIM_HABILIDAD', con=engine, if_exists='replace', index=False)
