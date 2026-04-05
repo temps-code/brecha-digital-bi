@@ -24,12 +24,24 @@ def extract_to_raw():
             return
 
         print(f"--- Conectando a SQL Server: {server} ---")
-        
-        # Cadena de conexión profesional
-        conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};Trusted_Connection=yes;'
+
+        user = os.getenv('DB_USER')
+        password = os.getenv('DB_PASSWORD')
+
+        if user and password:
+            # SQL Auth — compatible con Docker y servidores remotos
+            conn_str = (
+                f'DRIVER={{ODBC Driver 17 for SQL Server}};'
+                f'SERVER={server};DATABASE={database};'
+                f'UID={user};PWD={password};'
+            )
+        else:
+            # Windows Auth — entornos locales sin contenedor
+            conn_str = f'DRIVER={{SQL Server}};SERVER={server};DATABASE={database};Trusted_Connection=yes;'
+
         conn = pyodbc.connect(conn_str)
         
-        tablas = ['Estudiantes', 'Carreras', 'Inscripciones', 'SeguimientoEgresados']
+        tablas = ['Estudiantes', 'Carreras', 'Inscripciones', 'SeguimientoEgresados', 'CompetenciasDigitales']
         
         # Asegurar que la carpeta de destino exista
         output_dir = 'data/raw'

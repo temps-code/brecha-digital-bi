@@ -1,0 +1,23 @@
+CompetenciaID,NombreHabilidad,NivelRequerido
+1,Manejo de correo electrónico,Básico
+2,Uso de procesador de texto,Básico
+3,Navegación web y búsqueda,Básico
+4,Hojas de cálculo (Excel básico),Básico
+5,"Videoconferencias (Zoom, Meet)",Básico
+6,Gestión de archivos y carpetas,Básico
+7,Redes sociales profesionales,Básico
+8,SQL y bases de datos relacionales,Intermedio
+9,Python (scripting y análisis),Intermedio
+10,Visualización de datos (Power BI),Intermedio
+11,Excel avanzado y tablas dinámicas,Intermedio
+12,Gestión de proyectos (Jira/Trello),Intermedio
+13,Seguridad informática básica,Intermedio
+14,Control de versiones (Git),Intermedio
+15,Administración de redes LAN,Intermedio
+16,Machine Learning aplicado,Avanzado
+17,Arquitectura de datos en la nube,Avanzado
+18,Desarrollo web fullstack,Avanzado
+19,Ciberseguridad y ethical hacking,Avanzado
+20,DevOps y CI/CD,Avanzado
+21,"Big Data (Spark, Hadoop)",Avanzado
+22,Inteligencia Artificial generativa,Avanzado

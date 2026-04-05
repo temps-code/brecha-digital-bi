@@ -55,16 +55,45 @@ CREATE TABLE SeguimientoEgresados (
 GO
 
 -- 3. Inserción de Datos Base
-INSERT INTO Carreras (NombreCarrera, Facultad) VALUES 
+
+-- Competencias Digitales (catálogo de habilidades TIC por nivel)
+INSERT INTO CompetenciasDigitales (NombreHabilidad, NivelRequerido) VALUES
+-- Básico
+('Manejo de correo electrónico',     'Básico'),
+('Uso de procesador de texto',       'Básico'),
+('Navegación web y búsqueda',        'Básico'),
+('Hojas de cálculo (Excel básico)',  'Básico'),
+('Videoconferencias (Zoom, Meet)',   'Básico'),
+('Gestión de archivos y carpetas',   'Básico'),
+('Redes sociales profesionales',     'Básico'),
+-- Intermedio
+('SQL y bases de datos relacionales','Intermedio'),
+('Python (scripting y análisis)',    'Intermedio'),
+('Visualización de datos (Power BI)','Intermedio'),
+('Excel avanzado y tablas dinámicas','Intermedio'),
+('Gestión de proyectos (Jira/Trello)','Intermedio'),
+('Seguridad informática básica',     'Intermedio'),
+('Control de versiones (Git)',       'Intermedio'),
+('Administración de redes LAN',     'Intermedio'),
+-- Avanzado
+('Machine Learning aplicado',        'Avanzado'),
+('Arquitectura de datos en la nube', 'Avanzado'),
+('Desarrollo web fullstack',         'Avanzado'),
+('Ciberseguridad y ethical hacking', 'Avanzado'),
+('DevOps y CI/CD',                   'Avanzado'),
+('Big Data (Spark, Hadoop)',         'Avanzado'),
+('Inteligencia Artificial generativa','Avanzado');
+GO
+
+INSERT INTO Carreras (NombreCarrera, Facultad) VALUES
 ('Ingeniería de Sistemas', 'Ingeniería'),
 ('Electrónica', 'Ingeniería'),
 ('Administración de Empresas', 'Ciencias Económicas'),
 ('Diseño Gráfico', 'Arquitectura y Diseño'),
 ('Derecho', 'Ciencias Jurídicas');
 
--- --- CORRECCIÓN MENOR: VARIEDAD DE DATOS (Ciudad y Fechas) ---
 DECLARE @i INT = 1;
-WHILE @i <= 1000
+WHILE @i <= 50000
 BEGIN
     INSERT INTO Estudiantes (Nombre, FechaIngreso, Genero, Ciudad)
     VALUES (
@@ -96,7 +125,7 @@ GO
 
 -- Seguimiento de Egresados (Variedad en empleabilidad)
 DECLARE @j INT = 1;
-WHILE @j <= 500
+WHILE @j <= 25000
 BEGIN
     INSERT INTO SeguimientoEgresados (EstudianteID, TieneEmpleoFormal, SalarioMensualUSD, TrabajaEnAreaDeEstudio)
     VALUES (
