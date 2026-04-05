@@ -45,18 +45,9 @@ def fetch_cepal_data():
             inner_data = df['data'].iloc[0]
             df = pd.json_normalize(inner_data)
 
-        # Validación de Ingeniería
+        # Validación de Ingeniería 
         assert not df.empty, "Error: El DataFrame resultó vacío tras la normalización."
         print(f"✅ Validación exitosa: {len(df)} registros reales generados (no celdas anidadas).")
-
-        # Extracción de año
-        if 'dim_29117' in df.columns:
-            df['anio'] = pd.to_numeric(df['dim_29117'], errors='coerce') - 29160 + 2000
-        elif 'anio' not in df.columns:
-            for year_col in ['year', 'period', 'anio']:
-                if year_col in df.columns:
-                    df['anio'] = pd.to_numeric(df[year_col], errors='coerce')
-                    break
 
         # Crear ruta
         output_dir = 'data/raw/cepalstat'
