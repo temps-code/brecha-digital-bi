@@ -24,6 +24,13 @@ RAW_PATH = 'data/raw'
 PROCESSED_PATH = 'data/processed'
 os.makedirs(PROCESSED_PATH, exist_ok=True)
 
+PRESERVE_CASE_COLS = {
+    'nombrecarrera', 'ciudad', 'ciudad_residencia', 'facultad',
+    'nombre', 'nombrehabilidad', 'nivelrequerido', 'location',
+}
+
+NO_IMPUTE_COLS = {'salariomensualusd'}
+
 def limpiar_texto(texto):
     """
     Normaliza texto a minúsculas y elimina espacios.
@@ -35,17 +42,26 @@ def limpiar_texto(texto):
     # str(texto) maneja posibles números u otros tipos
     return str(texto).strip().lower()
 
+def limpiar_texto_preserve_case(texto):
+    if pd.isna(texto):
+        return texto
+    return str(texto).strip()
+
 def manejar_nulos(df):
     """
     Elimina filas con exceso de nulos e imputa los restantes.
     """
-    # 1. Eliminar filas con exceso de nulos (requiere al menos 95% de datos válidos)
-    threshold = int(df.shape[1] * 0.95)
-    df = df.dropna(thresh=threshold)
+    # 1. Eliminar filas con exceso de nulos.
+    # Se excluyen NO_IMPUTE_COLS del conteo para no penalizar nulls semánticos válidos.
+    cols_contables = [c for c in df.columns if c.lower() not in NO_IMPUTE_COLS]
+    threshold = max(1, int(len(cols_contables) * 0.95))
+    df = df.dropna(subset=cols_contables, thresh=threshold)
     
     # 2. Imputación de nulos
     for col in df.columns:
         if df[col].isnull().any():
+            if col.lower() in NO_IMPUTE_COLS:
+                continue
             if df[col].dtype in ['float64', 'int64', 'Int64', 'float']:
                 # CORRECCIÓN: Asignación directa para evitar ChainedAssignmentError
                 df[col] = df[col].fillna(df[col].median())
@@ -91,31 +107,36 @@ def procesar_archivo(nombre_archivo):
     # 1. Limpieza de texto
     cols_texto = df.select_dtypes(include=['object', 'string']).columns
     for col in cols_texto:
-        df[col] = df[col].apply(limpiar_texto)
+        if col.lower() in PRESERVE_CASE_COLS:
+            df[col] = df[col].apply(limpiar_texto_preserve_case)
+        else:
+            df[col] = df[col].apply(limpiar_texto)
 
     # 2. Manejo de Nulos
     df = manejar_nulos(df)
 
     # 3. Extracción de Año
-    col_fecha = None
-    # Buscar columnas que suenen a fecha
-    for col in df.columns:
-        if 'fecha' in col.lower() or 'date' in col.lower() or 'ingreso' in col.lower() or 'created' in col.lower():
-            col_fecha = col
-            break
-    
-    # Si no hay fecha, buscamos año explícito
-    if not col_fecha:
+    if 'anio' not in df.columns:
+        col_fecha = None
+        # Buscar columnas que suenen a fecha
         for col in df.columns:
-            if 'anio' in col.lower() or 'year' in col.lower() or 'period' in col.lower():
+            if 'fecha' in col.lower() or 'date' in col.lower() or 'ingreso' in col.lower() or 'created' in col.lower():
                 col_fecha = col
                 break
 
-    df = extraer_anio(df, col_fecha)
+        # Si no hay fecha, buscamos año explícito
+        if not col_fecha:
+            for col in df.columns:
+                if 'anio' in col.lower() or 'year' in col.lower() or 'period' in col.lower():
+                    col_fecha = col
+                    break
+
+        df = extraer_anio(df, col_fecha)
 
     # 4. Assertion de Calidad
     try:
-        assert df.isnull().sum().sum() == 0, f"Aún existen nulos en {nombre_archivo}"
+        cols_to_check = [c for c in df.columns if c.lower() not in NO_IMPUTE_COLS]
+        assert df[cols_to_check].isnull().sum().sum() == 0, f"Aún existen nulos en {nombre_archivo}"
         print(f"   ✅ Assertion pasada: 0 Nulos.")
     except AssertionError as e:
         print(f"   ❌ {e}")
