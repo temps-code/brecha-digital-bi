@@ -13,7 +13,7 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from components.data_loader import get_habilidades_demandadas, get_skill_gap, load_vacantes, CARRERA_SKILLS
+from components.data_loader import get_habilidades_demandadas, get_skill_gap, load_vacantes, load_habilidades_academicas
 from components.charts import bar_habilidades_demandadas, combo_skill_gap
 from components.styles import inject_styles
 
@@ -57,18 +57,24 @@ with col_l:
     st.plotly_chart(bar_habilidades_demandadas(get_habilidades_demandadas()), use_container_width=True)
 
 with col_r:
-    st.markdown('<p style="font-size:0.9375rem;font-weight:600;color:#FAFAFA;margin-bottom:0.75rem">Cobertura por carrera</p>', unsafe_allow_html=True)
-    for carrera, skills in CARRERA_SKILLS.items():
-        tags = ''.join(
-            f'<span class="skill-tag"><i class="ti ti-check"></i>{s}</span>'
-            for s in skills
-        ) if skills else '<span class="skill-tag" style="color:#71717A">Sin habilidades TIC mapeadas</span>'
-        st.markdown(f"""
-        <div class="skill-card">
-          <div class="skill-name">{carrera}</div>
-          <div>{tags}</div>
-        </div>
-        """, unsafe_allow_html=True)
+    st.markdown('<p style="font-size:0.9375rem;font-weight:600;color:#FAFAFA;margin-bottom:0.75rem">Currículo Digital por Nivel</p>', unsafe_allow_html=True)
+    habilidades_academicas = load_habilidades_academicas()
+    if not habilidades_academicas:
+        st.info("Sin datos de currículo disponibles.")
+    else:
+        nivel_icons = {'Básico': 'ti-circle-1', 'Intermedio': 'ti-circle-2', 'Avanzado': 'ti-circle-3'}
+        for nivel, habilidades in habilidades_academicas.items():
+            icon = nivel_icons.get(nivel, 'ti-circle')
+            tags = ''.join(
+                f'<span class="skill-tag"><i class="ti ti-check"></i>{h}</span>'
+                for h in habilidades
+            ) if habilidades else '<span class="skill-tag" style="color:#71717A">Sin habilidades mapeadas</span>'
+            st.markdown(f"""
+            <div class="skill-card">
+              <div class="skill-name"><i class="ti {icon}"></i> {nivel}</div>
+              <div>{tags}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
@@ -83,11 +89,14 @@ with st.expander('Ver vacantes del mercado'):
     )
 
 with st.expander('Ver tabla de brecha detallada'):
+    rename_cols = {
+        'habilidad': 'Habilidad',
+        'demanda':   'Vacantes que la requieren',
+        'cobertura': 'Cobertura Académica (%)',
+    }
+    if 'nivel' in gap_df.columns:
+        rename_cols['nivel'] = 'Nivel'
     st.dataframe(
-        gap_df.rename(columns={
-            'habilidad': 'Habilidad',
-            'demanda':   'Vacantes que la requieren',
-            'cobertura': 'Cobertura Académica (%)',
-        }),
+        gap_df.rename(columns=rename_cols),
         use_container_width=True, hide_index=True,
     )

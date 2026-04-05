@@ -77,8 +77,8 @@ if 'groq_client' not in st.session_state:
         st.session_state.groq_client = Groq(api_key=api_key)
         print('[chatbot] cliente Groq OK')
         try:
-            from components.data_loader import build_gemini_context
-            st.session_state.groq_system = build_gemini_context()
+            from components.data_loader import build_groq_context
+            st.session_state.groq_system = build_groq_context()
             print('[chatbot] contexto KPIs cargado OK')
         except Exception as ctx_err:
             print(f'[chatbot] contexto KPIs fallido (usando fallback): {ctx_err}')
@@ -111,6 +111,7 @@ if not st.session_state.messages:
     for i, sug in enumerate(sugerencias):
         if cols[i % 2].button(sug, key=f'sug_{i}', use_container_width=True):
             st.session_state.messages.append({'role': 'user', 'content': sug})
+            st.session_state['_pending_response'] = True
             st.rerun()
     st.html('<hr class="divider">')
 
@@ -119,27 +120,18 @@ for msg in st.session_state.messages:
     with st.chat_message(msg['role']):
         st.markdown(msg['content'])
 
-# ── INPUT ─────────────────────────────────────────────────────────────────────
-if prompt := st.chat_input('Preguntá sobre los datos del proyecto...'):
-    print(f'[chatbot] prompt recibido: {prompt[:50]}')
 
-    # Mostrar mensaje del usuario
-    with st.chat_message('user'):
-        st.markdown(prompt)
-
-    # Construir historial para la API
+def _generar_respuesta(prompt: str, history: list) -> None:
+    """Llama a Groq y agrega la respuesta al historial."""
     api_messages = [{'role': 'system', 'content': st.session_state.groq_system}]
-    for msg in st.session_state.messages:
+    for msg in history:
         api_messages.append({'role': msg['role'], 'content': msg['content']})
     api_messages.append({'role': 'user', 'content': prompt})
-
     print(f'[chatbot] enviando {len(api_messages)} mensajes a Groq...')
 
-    # Generar respuesta
     answer = ''
     with st.chat_message('assistant'):
         try:
-            # Generador que hace streaming desde Groq
             def _groq_stream():
                 stream = st.session_state.groq_client.chat.completions.create(
                     model=_MODEL,
@@ -153,7 +145,6 @@ if prompt := st.chat_input('Preguntá sobre los datos del proyecto...'):
                     if delta:
                         yield delta
 
-            # st.write_stream renderiza el generador en tiempo real dentro del chat bubble
             answer = st.write_stream(_groq_stream())
             print(f'[chatbot] respuesta recibida: {len(answer)} chars')
 
@@ -169,10 +160,24 @@ if prompt := st.chat_input('Preguntá sobre los datos del proyecto...'):
                 answer = f'Error: {err}'
             st.markdown(answer)
 
-    # Persistir en historial
-    st.session_state.messages.append({'role': 'user',      'content': prompt})
     st.session_state.messages.append({'role': 'assistant', 'content': answer or '(sin respuesta)'})
     print(f'[chatbot] historial actualizado: {len(st.session_state.messages)} mensajes')
+
+
+# ── RESPUESTA PENDIENTE (sugerencias) ─────────────────────────────────────────
+if st.session_state.pop('_pending_response', False):
+    msgs = st.session_state.messages
+    if msgs and msgs[-1]['role'] == 'user':
+        _generar_respuesta(msgs[-1]['content'], msgs[:-1])
+
+# ── INPUT ─────────────────────────────────────────────────────────────────────
+if prompt := st.chat_input('Preguntá sobre los datos del proyecto...'):
+    print(f'[chatbot] prompt recibido: {prompt[:50]}')
+    with st.chat_message('user'):
+        st.markdown(prompt)
+    history_before = list(st.session_state.messages)
+    st.session_state.messages.append({'role': 'user', 'content': prompt})
+    _generar_respuesta(prompt, history_before)
 
 # ── LIMPIAR ───────────────────────────────────────────────────────────────────
 if st.session_state.messages:

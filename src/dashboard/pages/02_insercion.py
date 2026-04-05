@@ -14,8 +14,8 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from components.data_loader import load_df, get_empleo_por_carrera, get_salario_por_carrera
-from components.charts import bar_empleo_por_carrera, pie_distribucion_ciudad, bar_salario_por_carrera
+from components.data_loader import load_df, get_empleo_por_carrera, get_salario_por_carrera, get_empleo_temporal
+from components.charts import bar_empleo_por_carrera, pie_distribucion_ciudad, bar_salario_por_carrera, line_empleo_temporal
 from components.styles import inject_styles
 
 st.set_page_config(page_title='Inserción Laboral — Brecha Digital BI', page_icon=':material/work:', layout='wide')
@@ -90,6 +90,22 @@ with col_r:
 
 # --- Gráfico fila 2 ---
 st.plotly_chart(bar_salario_por_carrera(get_salario_por_carrera()), use_container_width=True)
+
+st.markdown('<hr class="divider">', unsafe_allow_html=True)
+
+st.markdown('<hr class="divider">', unsafe_allow_html=True)
+
+# --- Evolución Temporal ---
+st.markdown('<p style="font-size:0.9375rem;font-weight:600;color:#FAFAFA;margin-bottom:0.25rem">Evolución Temporal de la Inserción Laboral</p>', unsafe_allow_html=True)
+
+df_temporal = get_empleo_temporal()
+if df_temporal.empty:
+    st.info("Análisis temporal disponible solo con conexión a Gold.")
+else:
+    fuente_unica = df_temporal['fuente'].iloc[0] if 'fuente' in df_temporal.columns and not df_temporal.empty else ''
+    st.plotly_chart(line_empleo_temporal(df_temporal), use_container_width=True)
+    if fuente_unica == 'Silver (cohorte de ingreso)':
+        st.caption("Año basado en cohorte de ingreso (anio_x) — no refleja año de egreso.")
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 

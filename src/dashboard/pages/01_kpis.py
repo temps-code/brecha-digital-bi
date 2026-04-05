@@ -14,8 +14,8 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from components.data_loader import get_kpis, get_cepal_bolivia
-from components.charts import line_cepal_bolivia
+from components.data_loader import get_kpis, get_cepal_bolivia, get_tasa_desercion
+from components.charts import line_cepal_bolivia, bar_tasa_desercion
 from components.styles import inject_styles
 
 st.set_page_config(page_title='KPIs — Brecha Digital BI', page_icon=':material/monitoring:', layout='wide')
@@ -31,9 +31,12 @@ st.markdown("""
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
-kpis = get_kpis()
+kpis         = get_kpis()
+desercion    = get_tasa_desercion()
+tasa_deser   = desercion.get('tasa_desercion')
+valor_deser  = f"{tasa_deser:.1f}%" if tasa_deser is not None else "N/D"
 
-c1, c2, c3, c4 = st.columns(4)
+c1, c2, c3, c4, c5 = st.columns(5)
 for col, icon, label, value, caption in [
     (c1, 'ti-trending-up', 'Tasa de Empleo Formal',  f"{kpis['tasa_empleo']}%",
          'Egresados con empleo formal registrado'),
@@ -42,6 +45,8 @@ for col, icon, label, value, caption in [
     (c3, 'ti-coin',        'Salario Promedio',        f"${kpis['salario_prom']} USD",
          'Salario mensual promedio de egresados empleados'),
     (c4, 'ti-users',       'Egresados Analizados',   str(kpis['total_egresados']), ''),
+    (c5, 'ti-user-x',      'Tasa de Deserción',      valor_deser,
+         'Heurística: SemestreActual < 8 y NotaFinal < 51 · Fuente: Silver'),
 ]:
     col.markdown(f"""
     <div class="kpi-card">
@@ -54,6 +59,12 @@ for col, icon, label, value, caption in [
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
+# --- Gauge de deserción ---
+st.markdown('<p style="font-size:0.9375rem;font-weight:600;color:#FAFAFA;margin-bottom:0.25rem">Riesgo de Deserción Estudiantil</p>', unsafe_allow_html=True)
+st.plotly_chart(bar_tasa_desercion(desercion), use_container_width=True)
+
+st.markdown('<hr class="divider">', unsafe_allow_html=True)
+
 # --- CEPALSTAT ---
 st.markdown('<p style="font-size:0.9375rem;font-weight:600;color:#FAFAFA;margin-bottom:0.25rem">Benchmark Regional — CEPALSTAT</p>', unsafe_allow_html=True)
 st.caption('Indicador 4.4.1: Proporción de jóvenes con competencias TIC · Bolivia')
@@ -61,6 +72,20 @@ st.caption('Indicador 4.4.1: Proporción de jóvenes con competencias TIC · Bol
 cepal_bol = get_cepal_bolivia()
 if cepal_bol.empty:
     st.warning('No se encontraron datos de CEPALSTAT para Bolivia.')
+elif cepal_bol['anio'].nunique() == 1:
+    anio_val = int(cepal_bol['anio'].iloc[0])
+    val_prom = round(float(cepal_bol['value'].mean()), 1)
+    val_max  = round(float(cepal_bol['value'].max()), 1)
+    c1, c2 = st.columns(2)
+    c1.metric(f'Variación promedio TIC ({anio_val})', f'{val_prom:+.1f}%')
+    c2.metric('Indicador más alto', f'{val_max:+.1f}%')
+    st.caption(f'Fuente: CEPALSTAT — {len(cepal_bol)} indicadores TIC para Bolivia · Datos disponibles solo para {anio_val}')
+    with st.expander('Ver todos los indicadores CEPALSTAT'):
+        st.dataframe(
+            cepal_bol.rename(columns={'anio': 'Año', 'value': 'Valor (%)'}),
+            use_container_width=True,
+            hide_index=True,
+        )
 else:
     st.plotly_chart(line_cepal_bolivia(cepal_bol), use_container_width=True)
     with st.expander('Ver datos crudos CEPALSTAT'):
