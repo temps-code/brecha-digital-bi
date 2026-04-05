@@ -15,7 +15,7 @@ def fetch_adzuna_jobs_mock():
         
         mock_jobs = []
         titles = ['Data Engineer', 'Data Analyst', 'BI Developer', 'Python Developer', 'SQL Specialist']
-        locations = ['Tarija', 'La Paz', 'Santa Cruz', 'Cochabamba', 'Remote']
+        locations = ['Tarija', 'La Paz', 'Santa Cruz', 'Cochabamba', 'Remote', 'Sucre']
         
         # Mapa de habilidades para generar variedad analítica
         skills_map = {

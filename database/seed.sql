@@ -115,7 +115,7 @@ BEGIN
     VALUES (
         @i, 
         (ABS(CHECKSUM(NEWID())) % 5) + 1, -- Ahora elige entre las 5 carreras
-        CASE WHEN @i % 20 = 0 THEN NULL ELSE (ABS(CHECKSUM(NEWID())) % 51) + 50 END, 
+        CASE WHEN @i % 20 = 0 THEN NULL ELSE (ABS(CHECKSUM(NEWID())) % 81) + 20 END,
         (ABS(CHECKSUM(NEWID())) % 10) + 1
     );
     
@@ -123,17 +123,70 @@ BEGIN
 END
 GO
 
--- Seguimiento de Egresados (Variedad en empleabilidad)
+-- Seguimiento de Egresados — patrones realistas correlacionados con carrera y ciudad
+-- Tasas de empleo por carrera: Ing.Sistemas 82%, Electrónica 78%, Adm.Empresas 72%, Diseño 58%, Derecho 65%
+-- Salarios: reflejan mercado boliviano real por carrera (USD)
+-- TrabajaEnAreaDeEstudio: correlacionado con carrera
 DECLARE @j INT = 1;
-WHILE @j <= 25000
+WHILE @j <= 50000
 BEGIN
+    DECLARE @carreraId INT;
+    DECLARE @ciudad NVARCHAR(50);
+    DECLARE @empleado BIT;
+    DECLARE @salario DECIMAL(10,2);
+    DECLARE @enArea BIT;
+    DECLARE @rnd INT = ABS(CHECKSUM(NEWID())) % 100;
+
+    -- Obtener carrera y ciudad del estudiante
+    SELECT @carreraId = i.CarreraID, @ciudad = e.Ciudad
+    FROM Inscripciones i JOIN Estudiantes e ON i.EstudianteID = e.EstudianteID
+    WHERE i.EstudianteID = @j;
+
+    -- Empleo: probabilidad base por carrera + ajuste por ciudad
+    SET @empleado = CASE
+        WHEN @carreraId = 1 AND @rnd < 82 THEN 1  -- Ing. Sistemas 82%
+        WHEN @carreraId = 2 AND @rnd < 78 THEN 1  -- Electrónica 78%
+        WHEN @carreraId = 3 AND @rnd < 72 THEN 1  -- Adm. Empresas 72%
+        WHEN @carreraId = 4 AND @rnd < 58 THEN 1  -- Diseño Gráfico 58%
+        WHEN @carreraId = 5 AND @rnd < 65 THEN 1  -- Derecho 65%
+        ELSE 0
+    END;
+
+    -- Salario base por carrera, ajustado por ciudad
+    SET @salario = CASE WHEN @empleado = 0 THEN NULL ELSE
+        CASE @carreraId
+            WHEN 1 THEN (ABS(CHECKSUM(NEWID())) % 550) + 1100  -- $1100-1650
+            WHEN 2 THEN (ABS(CHECKSUM(NEWID())) % 500) + 950   -- $950-1450
+            WHEN 3 THEN (ABS(CHECKSUM(NEWID())) % 450) + 750   -- $750-1200
+            WHEN 4 THEN (ABS(CHECKSUM(NEWID())) % 450) + 550   -- $550-1000
+            WHEN 5 THEN (ABS(CHECKSUM(NEWID())) % 550) + 700   -- $700-1250
+            ELSE (ABS(CHECKSUM(NEWID())) % 800) + 600
+        END *
+        CASE @ciudad
+            WHEN 'Santa Cruz'  THEN 1.12
+            WHEN 'La Paz'      THEN 1.08
+            WHEN 'Cochabamba'  THEN 1.04
+            WHEN 'Tarija'      THEN 1.00
+            WHEN 'Sucre'       THEN 0.95
+            ELSE 1.00
+        END
+    END;
+
+    -- Trabaja en área: más probable en carreras técnicas y jurídicas
+    SET @enArea = CASE WHEN @empleado = 0 THEN 0 ELSE
+        CASE
+            WHEN @carreraId = 1 AND @rnd < 65 THEN 1  -- Ing. Sistemas 65%
+            WHEN @carreraId = 2 AND @rnd < 60 THEN 1  -- Electrónica 60%
+            WHEN @carreraId = 3 AND @rnd < 45 THEN 1  -- Adm. Empresas 45%
+            WHEN @carreraId = 4 AND @rnd < 35 THEN 1  -- Diseño Gráfico 35%
+            WHEN @carreraId = 5 AND @rnd < 70 THEN 1  -- Derecho 70%
+            ELSE 0
+        END
+    END;
+
     INSERT INTO SeguimientoEgresados (EstudianteID, TieneEmpleoFormal, SalarioMensualUSD, TrabajaEnAreaDeEstudio)
-    VALUES (
-        @j, 
-        CASE WHEN @j % 4 = 0 THEN 0 ELSE 1 END, 
-        CASE WHEN @j % 4 = 0 THEN NULL ELSE (ABS(CHECKSUM(NEWID())) % 1200) + 450 END, 
-        CASE WHEN @j % 2 = 0 THEN 1 ELSE 0 END
-    );
+    VALUES (@j, @empleado, @salario, @enArea);
+
     SET @j = @j + 1;
 END
 GO
