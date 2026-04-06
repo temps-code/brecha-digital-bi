@@ -2,7 +2,8 @@
 
 **Para:** Todo el equipo  
 **Proyecto:** Estrategia para la Reducción de la Brecha Digital Laboral en la Educación Técnica Superior  
-**Materia:** Inteligencia de Negocios — UPDS 2026
+**Materia:** Inteligencia de Negocios — UPDS 2026  
+**Versión:** 2.0 (Actualizada 2026-04-05)
 
 ---
 
@@ -67,14 +68,37 @@ En nuestro proyecto, esa fábrica tiene tres capas bien definidas. Cada capa dep
 
 **¿Qué hicimos?**
 - Conectamos con la base de datos SQL Server (`BrechaDigitalDB`) y extrajimos las tablas de estudiantes, inscripciones, carreras y egresados
-- Consultamos la API de CEPALSTAT para obtener indicadores de conectividad digital por región
 - Consultamos la API de Adzuna para obtener vacantes laborales reales del sector tecnológico
+- Consultamos la API de CEPALSTAT para obtener indicadores de conectividad digital por región
 
 **¿Dónde quedan los datos?** En la carpeta `data/raw/` — archivos CSV, uno por cada fuente.
 
 **¿Qué NO se hace en Bronze?** No se modifica ningún dato. Si hay errores, valores raros, o nombres mal escritos, se dejan así. La idea es tener una copia fiel de la fuente original.
 
-**Responsable:** Abraham Flores — `src/ingestion/`
+**Archivos involucrados:**
+- `src/ingestion/sqlserver.py` — Extrae de SQL Server (conexión + queries)
+- `src/empleos/empleos.py` — Consulta API Adzuna y extrae habilidades
+- `src/empleos/cepalstat.py` — Consulta API CEPALSTAT
+- `data/raw/` — Donde se guardan los CSVs crudos
+  - `estudiantes_raw.csv`
+  - `inscripciones_raw.csv`
+  - `egresados_raw.csv`
+  - `carreras_raw.csv`
+  - `adzuna_raw.csv`
+  - `cepalstat_raw.csv`
+
+**Cómo ejecutar:**
+```bash
+# Extraer todos los datos Bronze
+python scripts/run_ingestion.py
+
+# O individually
+python src/ingestion/sqlserver.py
+python src/empleos/empleos.py
+python src/empleos/cepalstat.py
+```
+
+**Responsable:** Abraham Flores
 
 ---
 
@@ -86,13 +110,47 @@ En nuestro proyecto, esa fábrica tiene tres capas bien definidas. Cada capa dep
 - Se eliminan espacios, caracteres raros, valores duplicados
 - Se unifican los formatos (todas las ciudades escritas igual, todas las fechas en el mismo formato)
 - Se reemplazan los valores vacíos con valores por defecto cuando tiene sentido hacerlo
-- Se integran datos de distintas fuentes que hablan de lo mismo (ej: un estudiante en la base interna + su ciudad en los datos regionales)
+- Se integran datos de distintas fuentes que hablan de lo mismo
+- Se valida la calidad (0% nulos, sin inconsistencias geográficas)
 
-**¿Dónde quedan los datos?** En `data/processed/` — archivos CSV limpios, uno por cada tabla.
+**¿Dónde quedan los datos?** En `data/processed/` — archivos CSV limpios, listos para análisis.
 
-**¿Por qué es importante?** Si en Bronze un estudiante tiene ciudad = "Stanta Cruz" y otro tiene "santa cruz de la sierra", son la misma ciudad pero el sistema los va a contar como dos ciudades distintas. Silver es donde eso se arregla. Un dato sucio en Silver contamina todos los análisis que vienen después.
+**¿Por qué es importante?** Un dato sucio en Silver contamina todos los análisis que vienen después.
 
-**Responsable:** Juan Nicolás Flores — `src/transform/`
+**Archivos involucrados:**
+- `src/transform/limpiar_estudiantes.py` — Limpieza de académicos
+  - Normaliza nombres de carreras
+  - Valida rangos (género, semestre, notas)
+  - Trata valores ausentes
+- `src/transform/limpiar_empleos.py` — Limpieza de vacantes
+  - Estandariza ciudades
+  - Extrae y normaliza salarios
+  - Extrae habilidades de descripciones
+- `src/transform/validar_calidad.py` — Valida calidad de datos
+  - Porcentaje de nulos
+  - Duplicados
+  - Valores fuera de rango
+- `data/processed/` — Archivos limpios
+  - `estudiantes_cleaned.csv`
+  - `inscripciones_cleaned.csv`
+  - `egresados_cleaned.csv`
+  - `carreras_cleaned.csv`
+  - `competenciasdigitales_cleaned.csv`
+  - `empleos/vacantes_tecnologicas_cleaned.csv`
+  - `cepalstat/indicadores_tic_region_cleaned.csv`
+
+**Cómo ejecutar:**
+```bash
+# Transformación completa
+python src/transform/main.py
+
+# O paso a paso
+python src/transform/limpiar_estudiantes.py
+python src/transform/limpiar_empleos.py
+python src/transform/validar_calidad.py
+```
+
+**Responsable:** Juan Nicolás Flores
 
 ---
 
@@ -102,48 +160,206 @@ En nuestro proyecto, esa fábrica tiene tres capas bien definidas. Cada capa dep
 
 **¿Qué se hace?**
 - Se cargan los datos en tablas especialmente diseñadas para responder preguntas de negocio rápidamente
-- Se organiza todo en un **esquema copo de nieve**: una tabla central de hechos (los eventos que queremos analizar) rodeada de tablas de dimensiones (el contexto de esos eventos)
-- La tabla central es `FACT_INSERCION_LABORAL` — cada fila representa a un egresado y si consiguió trabajo o no, con cuánto salario, en qué ciudad, con qué habilidades
+- Se organiza todo en un **esquema copo de nieve**: una tabla central de hechos rodeada de dimensiones
+- La tabla central es `FACT_INSERCION_LABORAL` — cada fila representa a un egresado y si consiguió trabajo
 
-**¿Dónde quedan los datos?** En SQL Server, base de datos `DW_BrechaDigital`.
+**¿Dónde quedan los datos?** En SQL Server, base de datos `DW_BrechaDigital`. También disponible como CSVs para deployment.
 
-**¿Qué es el esquema copo de nieve?** Es una forma de organizar las tablas. En lugar de tener todo mezclado en una sola tabla gigante (que sería redundante y difícil de mantener), separamos la información en tablas más pequeñas que se conectan entre sí. Por ejemplo:
+**Archivos involucrados:**
+- `database/schema/create_dimensions.sql` — Crea tablas de dimensiones
+  - `DIM_ESTUDIANTE`
+  - `DIM_CARRERA`
+  - `DIM_REGION`
+  - `DIM_TIEMPO`
+  - `DIM_COMPETENCIA`
+  - `DIM_VACANTE`
+- `database/schema/create_fact.sql` — Crea tabla de hechos
+  - `FACT_INSERCION_LABORAL` (eventos: egresado X tiene/no tiene empleo)
+- `scripts/seed.sql` — Carga datos desde CSVs a Gold
+  - Trunca tablas
+  - Inserta dimensiones
+  - Inserta hechos con cálculos
+- `src/schema/` — Código Python para cargas automáticas
 
-- `FACT_INSERCION_LABORAL` → registra el evento (egresado X consiguió trabajo)
-- `DIM_ESTUDIANTE` → datos del estudiante (nombre, carrera, año de ingreso)
-- `DIM_HABILIDAD` → 22 competencias digitales del currículo académico (fuente: `CompetenciasDigitales` en Bronze)
-- `DIM_MERCADO_LABORAL` → datos de la empresa que lo contrató
-- `DIM_REGION` → ciudad y departamento
+**Cómo ejecutar:**
+```bash
+# Carga completa
+python scripts/load_data.py
 
-**Responsable:** Micaela Pérez — `src/schema/`
+# O vía SQL directo (en SQL Server)
+sqlcmd -S SERVER -d DW_BrechaDigital -i scripts/seed.sql
+```
+
+**Responsable:** Micaela Pérez
 
 ---
 
-## Análisis y KPIs — "Las preguntas que respondemos"
+## Capa Final: Dashboard y Análisis
 
-Antes de construir el dashboard, necesitamos calcular los indicadores clave (**KPIs**). Esto se hace en notebooks de Jupyter — archivos donde se escribe código Python y se ven los resultados al instante.
+### Notebooks de Análisis (Antes del Dashboard)
 
-Los KPIs que calculamos son:
-- **Tasa de inserción laboral:** % de egresados que consiguieron empleo en su área dentro de los 12 meses de graduarse
-- **Índice de brecha de habilidades:** comparación entre las habilidades que enseña la institución y las que pide el mercado laboral
-- **Predicción de deserción:** identificación de estudiantes con alto riesgo de abandonar según su historial académico
-- **Benchmarking regional:** cómo está Bolivia comparada con otros países de América Latina en conectividad digital (datos CEPALSTAT)
+**¿Qué son?** Archivos Jupyter donde se escriben los KPIs y se hacen análisis exploratorios. Aquí es donde se responden las preguntas de negocio.
 
-**Responsable:** Mayra Villca — `notebooks/`
+**Archivos involucrados:**
+- `notebooks/01_eda_estudiantes.ipynb` — Análisis exploratorio
+  - Distribución de estudiantes por carrera IT
+  - Tendencias demográficas
+  - Datos académicos (semestre, notas)
+- `notebooks/02_brecha_habilidades.ipynb` — Skill gap analysis
+  - Habilidades del mercado vs currículo
+  - Fuzzy matching (0.80 threshold)
+  - Brecha identificada
+- `notebooks/03_calculo_kpis.ipynb` — KPIs finales
+  - Tasa de empleo: 82.7%
+  - % empleados en área: 98%
+  - Salario promedio: $2,800+
+  - Deserción: validación de heurística
+
+**Cambios recientes:**
+- Refactorizados para usar CSVs (no SQL Server)
+- Filtrados a 5 carreras IT solo
+- Resultado portable y deployable
+
+**Cómo ejecutar:**
+```bash
+jupyter notebook notebooks/
+# Abrir y ejecutar cada notebook (las celdas con comentarios)
+```
+
+**Responsable:** Mayra Villca
 
 ---
 
-## El Dashboard — "Lo que se muestra en la demo"
+### Dashboard Interactivo
 
-El dashboard es la interfaz final. Es una aplicación web que cualquier persona puede abrir en el navegador y explorar los datos sin saber nada de programación.
+**¿Qué es?** Aplicación web interactiva donde se visualizan los datos con gráficos, tablas y un asistente IA.
 
-Tiene cuatro secciones:
-1. **KPIs generales** — los números más importantes en pantalla grande
-2. **Inserción laboral** — gráficos por carrera, ciudad y año
-3. **Skill Gap** — qué pide el mercado vs qué enseña la institución
-4. **Asistente IA** — se puede hacer preguntas en lenguaje natural ("¿cuántos egresados de Sistemas consiguieron trabajo en 2024?") y la IA responde usando los datos
+**Tecnología:** Streamlit + Plotly + Groq API
 
-**Responsable:** Diego Vargas — `src/dashboard/`
+**Estructura:**
+```
+src/dashboard/
+├── app.py                          # Entry point (hero + KPI cards)
+├── components/
+│   ├── data_loader.py              # Carga datos + filtrado IT + validación
+│   ├── charts.py                   # Funciones de gráficos
+│   └── styles.py                   # Diseño (colores, fuentes, componentes)
+└── pages/
+    ├── 01_kpis.py                  # KPIs generales + benchmarking
+    ├── 02_insercion.py             # Análisis de inserción laboral
+    ├── 03_skill_gap.py             # Visualización brecha de habilidades (OPTIMIZADA)
+    └── 04_chatbot.py               # Asistente IA con Groq
+```
+
+#### 4.1 Data Layer - `components/data_loader.py`
+
+**Lo que hace:** Carga datos desde SQL o CSVs, filtra a 5 carreras IT, valida, calcula KPIs.
+
+**Funciones principales:**
+
+**`load_df()` — Carga datos (líneas 95-180)**
+```python
+# Intenta SQL Server (si disponible)
+# Si falla: usa CSVs desde data/processed/
+# Filtra: solo 5 carreras IT (IT_CAREERS constante, líneas 8-12)
+# Agrega: columna graduation_year (fórmula)
+# Valida: cobertura de datos
+# Retorna: DataFrame + errors list
+```
+
+**`get_kpis()` — Calcula indicadores (líneas 292-342)**
+```python
+# Tasa empleo: 82.7%
+# % en área: 98%
+# Salario promedio: $2,800+
+# Total egresados: 49,866
+# Retorna: dict con KPIs + _errors
+```
+
+**`get_skill_gap()` — Analiza brecha (líneas 443-551)**
+```python
+# Fuzzy matching: difflib.SequenceMatcher
+# Threshold: 0.80 similitud
+# Retorna: DataFrame [habilidad, demanda, cobertura_%]
+```
+
+**`get_skill_gap_filtered(top_n=15)` — Filtra para visualización (líneas NEW)**
+```python
+# Retorna: top 15 habilidades + count de otras
+# Uso: evita que gráfico sea ilegible
+```
+
+**`get_habilidades_demandadas_filtered(top_n=10)` — Filtra demanda (líneas NEW)**
+```python
+# Retorna: top 10 + count de otras
+# Uso: gráfico compacto
+```
+
+**Cambios recientes (Commits 53c88de - 08be7ca):**
+- Agregado IT_CAREERS constant (5 carreras)
+- Agregado cálculo graduation_year
+- Implementado fuzzy matching
+- Agregada validación de datos
+- Agregadas funciones de filtrado
+
+#### 4.2 Visualización - `components/charts.py`
+
+**`combo_skill_gap()` — Gráfico demanda vs cobertura (líneas 247-285)**
+- Barras azules: demanda (vacantes)
+- Línea naranja: cobertura (%)
+- Doble eje Y
+- Interactivo
+
+**`bar_habilidades_demandadas()` — Top habilidades (línea 133-160)**
+- Barras horizontales
+- Ordenadas por demanda
+- Top 10 mostrados
+
+#### 4.3 Páginas
+
+**`01_kpis.py` — KPIs generales**
+- 4 tarjetas: Empleo, Área, Salario, Egresados
+- Badge de validación (línea 41)
+- Gráfico de benchmarking CEPALSTAT
+- Gauge de deserción
+- Cambios: agregada validación (líneas 31-38)
+
+**`02_insercion.py` — Inserción laboral**
+- Tabla: empleo por carrera
+- Gráfico: evolución temporal (ahora usa graduation_year)
+- Mapa de calor: ciudades
+- Cambios: temporal fix, validación de salarios (líneas 60-74)
+
+**`03_skill_gap.py` — Brecha de habilidades (OPTIMIZADA - Commit 08be7ca)**
+- Expander: advertencias colapsadas (líneas 45-60)
+- Gráfico 1: Top 15 + "+944 adicionales" (líneas 65-75)
+- Gráfico 2: Top 10 demandadas + expander (líneas 80-105)
+- Expanders: tabla completa, vacantes (líneas 135-140)
+- Cambios: filtrado, mensajes cortos, mejor UX
+
+**`04_chatbot.py` — Asistente IA**
+- Chat interactivo con Groq API
+- Contexto: KPIs + skill gap
+- Prompts sugeridos (español)
+- Cambios: contexto actualizado para IT-only
+
+**Cómo ejecutar:**
+```bash
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Correr dashboard
+streamlit run src/dashboard/app.py
+
+# Accesible en http://localhost:8501
+```
+
+**Archivos de configuración:**
+- `.env` — Credenciales (DW_SERVER, ADZUNA_APP_ID, GROQ_API_KEY)
+- `.streamlit/config.toml` — Configuración Streamlit
+- `requirements.txt` — Dependencias Python
+
+**Responsable:** Diego Vargas
 
 ---
 
@@ -152,76 +368,108 @@ Tiene cuatro secciones:
 Para entender cómo todo se conecta, seguimos a un dato específico desde el origen hasta el dashboard:
 
 ```
-1. SQL Server tiene registrado (50.000 estudiantes, 25.000 seguimientos, 22 competencias):
-   EstudianteID=42, Nombre="María Quispe", Carrera="Sistemas", Promedio=78
+1. SQL Server tiene: EstudianteID=42, Nombre="María Quispe", Carrera="Ingeniería de Sistemas"
 
-2. Bronze (sqlserver.py) lo extrae y guarda en:
-   data/raw/estudiantes.csv  →  fila: 42, María Quispe, Sistemas, 78
+2. Bronze (sqlserver.py) lo extrae:
+   data/raw/estudiantes_raw.csv
 
-3. Silver (clean.py + normalize.py) lo limpia:
-   - "María Quispe" queda como "María Quispe" (sin espacios extra)
-   - Ciudad "LA PAZ" se estandariza a "La Paz"
+3. Silver (limpiar_estudiantes.py) lo normaliza:
    data/processed/estudiantes_cleaned.csv
+   → "Ingeniería de Sistemas" (estandarizado)
 
-4. Gold (dimensions.py) lo carga en:
-   DIM_ESTUDIANTE  →  SK_Estudiante=42, nombre="María Quispe", SK_Carrera=3
+4. Gold (dimensions.py) lo carga:
+   DIM_ESTUDIANTE → SK_Estudiante=42, SK_Carrera=3 (Sistemas)
 
-5. Gold (facts.py) registra el hecho:
-   FACT_INSERCION_LABORAL  →  SK_Estudiante=42, EstaEmpleado=1, SalarioMensualUSD=650, TrabajaEnAreaDeEstudio=1
+5. Dashboard (data_loader.py) lo filtra:
+   if NombreCarrera in IT_CAREERS: ✓ (Sistemas es IT)
+   load_df() retorna fila con María Quispe
 
-6. Dashboard muestra:
-   "Sistemas: 74% de inserción laboral — promedio 7.2 meses hasta primer empleo"
+6. KPIs lo cuentan:
+   get_kpis() → +1 a total_egresados
+
+7. Dashboard muestra:
+   "Egresados Analizados: 49,866"
 ```
-
-Si en cualquier paso hay un error, el dato llega mal al final y el KPI es incorrecto. Por eso cada capa importa.
 
 ---
 
-## Cronograma y estado actual
+### Fase 4: UI Polish (COMPLETADA)
+- **Commits:** 1af7744
+- **Qué:** Data quality indicators, badges, contexto IA
+- **Archivos:** app.py + 4 pages
+- **Status:** ✅ DONE — todas las páginas muestran datos
 
-| Día | Fecha | Fase | Estado |
-|-----|-------|------|--------|
-| Día 1 | 1 de abril | Bronze — Extracción de datos | ✅ Completado |
-| Día 2 | 2 de abril | Silver — Limpieza y transformación | 🔄 En progreso |
-| Día 3 | 3 de abril | Gold — Modelado + Dashboard | ⏳ Pendiente |
-| Día 4 | 6 de abril | Pruebas finales y documentación | ⏳ Pendiente |
-| Día 5 | 7 de abril | **DEMO DAY** | ⏳ Pendiente |
+### Fase 5: Testing & Optimization (COMPLETADA)
+- **Commits:** d35c082, 08be7ca
+- **Qué:** 40 tests, visualización optimizada
+- **Archivos:** tests/dashboard/ + 03_skill_gap.py optimizado
+- **Status:** ✅ DONE — 40/40 tests passing, gráficos legibles
 
 ---
 
 ## Responsabilidades del equipo
 
-Cada integrante es **lead** de su fase — eso significa que es responsable de que esa parte funcione correctamente y de revisar el trabajo de los demás en esa área.
+| Integrante | Rol | Qué entrega | Estado |
+|------------|-----|-------------|--------|
+| Abraham Flores | Lead Bronze | Scripts de extracción + `data/raw/` | ✅ |
+| Juan Nicolás Flores | Lead Silver | Scripts de limpieza + `data/processed/` | ✅ |
+| Micaela Pérez | Lead Gold | Tablas + schema copo nieve + `DW_BrechaDigital` | ✅ |
+| Mayra Villca | Lead Análisis | Notebooks con KPIs + `notebooks/` | ✅ |
+| Diego Vargas | Lead Dashboard | Dashboard 4 secciones + `src/dashboard/` | ✅ |
 
-| Integrante | Rol | Qué entrega |
-|------------|-----|-------------|
-| Abraham Flores | Lead Bronze | Scripts de extracción funcionando, datos en `data/raw/` |
-| Juan Nicolás Flores | Lead Silver | Scripts de limpieza funcionando, datos en `data/processed/` sin nulos ni inconsistencias |
-| Micaela Pérez | Lead Gold | Tablas cargadas en `DW_BrechaDigital`, esquema copo de nieve completo |
-| Mayra Villca | Lead Análisis | Notebooks con KPIs calculados y comentados |
-| Diego Vargas | Lead Dashboard | Dashboard corriendo en Streamlit con las 4 secciones funcionando |
-
-**Todos contribuyen en todas las fases.** El rol de Lead no significa que trabaja solo — significa que coordina, revisa y garantiza la calidad de esa capa.
+**Todos contribuyen en todas las fases.**
 
 ---
 
 ## ¿Qué se presenta en la demo?
 
-La presentación final dura 10 minutos. El objetivo es mostrar el sistema funcionando de punta a punta:
+1. **Problema** (1 min) — por qué la brecha digital importa
+2. **Arquitectura** (2 min) — pipeline Bronze → Silver → Gold
+3. **Demo del dashboard** (5 min) — las 4 secciones con datos reales
+4. **Conclusiones** (2 min) — qué responde, qué decisiones permitiría
 
-1. **Problema** (1 min) — explicar la brecha digital y por qué importa
-2. **Arquitectura** (2 min) — mostrar el pipeline Bronze → Silver → Gold en el diagrama
-3. **Demo del dashboard** (5 min) — navegar las 4 secciones con datos reales
-4. **Conclusiones** (2 min) — qué responde el sistema, qué decisiones permitiría tomar
+**Cada integrante debe explicar su capa sin leer notas.**
 
-El jurado va a preguntar sobre las decisiones técnicas — por qué copo de nieve y no estrella, por qué limpiar los datos de esa manera, cómo funciona el asistente IA. Cada integrante debe poder explicar su capa.
+---
+
+## Comandos rápidos
+
+```bash
+# Setup
+git clone https://github.com/temps-code/brecha-digital-bi.git
+cd brecha-digital-bi
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# Ejecutar pipeline completo
+python scripts/run_ingestion.py     # Bronze
+python src/transform/main.py        # Silver
+python scripts/load_data.py         # Gold
+
+# Dashboard
+streamlit run src/dashboard/app.py
+
+# Tests
+pytest tests/dashboard/ -v
+
+# Ver rama actual
+git branch
+git status
+
+# Cambiar rama
+git checkout main
+```
 
 ---
 
 ## Documentación adicional
 
-- [`docs/guia-git.md`](guia-git.md) — Cómo usar Git y GitHub en este proyecto (para quienes recién arrancan)
-- [`docs/esquema_copo_nieve.md`](esquema_copo_nieve.md) — Documentación técnica completa del esquema Gold
+- [`docs/guia-git.md`](guia-git.md) — Git workflow para el proyecto
+- [`docs/esquema_copo_nieve.md`](esquema_copo_nieve.md) — Esquema Gold técnico
+- [`README.md`](../README.md) — Overview del proyecto
+- [`design.md`](../design.md) — Decisiones técnicas dashboard
+- [`proposal.md`](../proposal.md) — Propuesta cambio dashboard
 
 ---
 
@@ -229,13 +477,19 @@ El jurado va a preguntar sobre las decisiones técnicas — por qué copo de nie
 
 | Término | Qué significa en este proyecto |
 |---------|-------------------------------|
-| **Pipeline** | El flujo completo de datos desde la fuente hasta el dashboard |
-| **Bronze / Silver / Gold** | Las tres etapas de procesamiento de datos (crudo → limpio → estructurado) |
-| **Data Warehouse (DW)** | Base de datos optimizada para análisis, no para transacciones |
-| **Esquema Copo de Nieve** | Forma de organizar las tablas del DW para evitar redundancia |
-| **Tabla de Hechos (FACT)** | Registra los eventos que queremos analizar (ej: inserción laboral) |
-| **Dimensión (DIM)** | Contexto del evento (quién, dónde, cuándo, qué habilidades) |
-| **KPI** | Indicador clave de desempeño — el número que resume algo importante |
-| **ETL / ELT** | Proceso de Extraer, Transformar y Cargar datos |
-| **CSV** | Archivo de texto con datos en filas y columnas, separados por comas |
-| **API** | Servicio externo del que obtenemos datos (Adzuna, CEPALSTAT) |
+| **Pipeline** | Bronze → Silver → Gold → Dashboard |
+| **CSV** | Archivo de texto con datos (estudiantes.csv, empleos.csv, etc.) |
+| **Carrera IT** | Solo 5: Sistemas, Software, Data, Telecomunicaciones, Ciberseguridad |
+| **Fuzzy Matching** | Comparación de similitud entre textos (0.80 threshold) |
+| **Graduation Year** | Año de egreso (no entrada) — fórmula: anio_y + (8-SemestreActual)/2 |
+| **KPI** | Número clave (82.7% empleo, $2800 salario, etc.) |
+| **Skill Gap** | Diferencia entre habilidades que enseña institución vs mercado |
+| **Streamlit** | Framework Python para dashboards (localhost:8501) |
+| **Groq API** | Servicio de IA (LLaMA) para el chatbot |
+| **DW** | Data Warehouse — BD estructurada para análisis |
+
+---
+
+**Última actualización:** 2026-04-05  
+**Contribuidores:** Equipo BI — UPDS 2026  
+**Rama principal:** `main`

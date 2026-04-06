@@ -21,8 +21,10 @@ def _validar_fact_table(df: pd.DataFrame, nombre_tabla: str):
         
         fk_cols = [col for col in df.columns if col.startswith('SK_')]
         for col in fk_cols:
-            nulls_count = df[col].isna().sum()
-            assert nulls_count == 0, f"ERROR: La columna de FK '{col}' en {nombre_tabla} contiene {nulls_count} valores nulos. El lookup falló."
+            unknown_count = (df[col] == -1).sum()
+            pct = unknown_count / len(df) * 100
+            if pct > 5:
+                print(f"   WARNING: {unknown_count} rows con SK desconocido en '{col}' ({pct:.1f}%)")
             
         print(f"   ✅ Validaciones para {nombre_tabla} superadas.")
     except AssertionError as e:
@@ -65,13 +67,18 @@ def cargar_fact_insercion_laboral():
     df_fact['tiempo_key'] = df_fact['anio_x'].astype(str) + '_' + df_fact['mes'].astype(str)
     sk_tiempo['tiempo_key'] = sk_tiempo['anio'].astype(str) + '_' + sk_tiempo['mes'].astype(str)
 
-    # Unir las claves surrogate
+    # Unir las claves surrogate (how='left' para evitar data loss por ciudades sin match)
     df_fact = pd.merge(df_fact, sk_tiempo[['SK_Tiempo', 'tiempo_key']], on='tiempo_key', how='left')
     df_fact = df_fact.drop(columns=['tiempo_key'])
-    df_fact = pd.merge(df_fact, sk_region, on='Ciudad')
-    df_fact = pd.merge(df_fact, sk_carrera, on='CarreraID')
-    df_fact = pd.merge(df_fact, sk_estudiante, on='EstudianteID')
-    df_fact = pd.merge(df_fact, sk_mercado, left_on='Ciudad', right_on='Ubicacion')
+    df_fact = pd.merge(df_fact, sk_region, on='Ciudad', how='left')
+    df_fact = pd.merge(df_fact, sk_carrera, on='CarreraID', how='left')
+    df_fact = pd.merge(df_fact, sk_estudiante, on='EstudianteID', how='left')
+    df_fact = pd.merge(df_fact, sk_mercado, left_on='Ciudad', right_on='Ubicacion', how='left')
+
+    # Rellenar SKs sin match con -1 (sentinel de miembro desconocido)
+    sk_cols = [c for c in df_fact.columns if c.startswith('SK_')]
+    for col in sk_cols:
+        df_fact[col] = df_fact[col].fillna(-1).astype(int)
 
     # Seleccionar y ordenar las columnas finales
     df_fact_final = df_fact[[

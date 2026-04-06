@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white" alt="SQL Server">
   <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
-  <img src="https://img.shields.io/badge/Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini API">
+  <img src="https://img.shields.io/badge/Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Groq API">
   <img src="https://img.shields.io/badge/Adzuna_API-FF6600?style=for-the-badge&logo=briefcase&logoColor=white" alt="Adzuna API">
 </p>
 
@@ -54,10 +54,11 @@ Bolivian technical education institutions generate large amounts of academic dat
 Key capabilities:
 
 - Automated ELT pipeline from SQL Server (Bronze) through transformation (Silver) to a snowflake-schema warehouse (Gold)
+- 100% Technology Focus: Analysis centered exclusively on IT careers (Software Engineering, Cybersecurity, Data Science, etc.)
 - KPI monitoring: employability rate, dropout prediction, skill gap analysis
 - Regional benchmarking using CEPALSTAT indicators (ODS 4 and ODS 8)
-- Real-time job vacancy analysis from external employment APIs
-- AI-powered assistant (Gemini API) for natural language queries over the data
+- Real-time international labor demand analysis extracting vacancies from the US, Spain, Mexico, and Brazil via Adzuna API (evaluating remote opportunities)
+- AI-powered assistant (Groq API) for natural language queries over the data
 
 ---
 
@@ -89,7 +90,7 @@ OKRs define project success with measurable key results. Full explanation in [`d
 | Gold Warehouse | SQL Server (T-SQL) — `DW_BrechaDigital` | 2019+ |
 | Dashboard | Streamlit | 1.32+ |
 | Charts | Plotly | 5.20+ |
-| AI Assistant | Google Gemini API | 0.5+ |
+| AI Assistant | Groq API | 0.5+ |
 | Macro Data | CEPALSTAT REST API | — |
 | Employment Data | Adzuna REST API | — |
 | DB Connectivity | PyODBC + SQLAlchemy | 5.0+ / 2.0+ |
@@ -315,9 +316,6 @@ DW_NAME=DW_BrechaDigital
 DW_USER=sa
 DW_PASSWORD=your_password
 
-# Gemini API
-GEMINI_API_KEY=your_gemini_api_key
-
 # Groq API
 GROQ_API_KEY=your_groq_api_key
 
@@ -347,7 +345,7 @@ The dashboard will be available at `http://localhost:8501`.
 | KPIs | General employability and dropout indicators |
 | Labor Insertion | Graduate insertion rate by career and region |
 | Skill Gap | Comparison between academic skills and market demand |
-| AI Assistant | Natural language queries powered by Gemini API |
+| AI Assistant | Natural language queries powered by Groq API |
 
 ---
 

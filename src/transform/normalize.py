@@ -19,15 +19,23 @@ PROCESSED_PATH = 'data/processed'
 # Diccionario de estandarización geográfica (Bolivia)
 # DOCUMENTACIÓN: Se asume que si el usuario ingresa el nombre del departamento 
 # (ej. 'beni', 'pando'), se refiere a su capital principal para fines de localización.
+# CORRECCIÓN: Agregados aliases para ciudades con múltiples formas (e.g. 'Santa Cruz' y 'santa cruz' → 'Santa Cruz de la Sierra')
 MAPA_CIUDADES = {
     'la paz': 'La Paz', 'lp': 'La Paz', 'el alto': 'El Alto',
-    'santa cruz': 'Santa Cruz de la Sierra', 'santa cruz de la sierra': 'Santa Cruz de la Sierra',
-    'cochabamba': 'Cochabamba', 'cbba': 'Cochabamba',
-    'sucre': 'Sucre', 'oruro': 'Oruro', 'potosi': 'Potosí', 'tarija': 'Tarija',
+    'santa cruz': 'Santa Cruz de la Sierra', 'santa cruz de la sierra': 'Santa Cruz de la Sierra', 'sc': 'Santa Cruz de la Sierra',
+    'cochabamba': 'Cochabamba', 'cbba': 'Cochabamba', 'cbba.': 'Cochabamba',
+    'sucre': 'Sucre', 'oruro': 'Oruro', 'potosi': 'Potosí', 'potosí': 'Potosí', 'tarija': 'Tarija',
     'beni': 'Trinidad',   # Mapeo Depto -> Capital
     'pando': 'Cobija',    # Mapeo Depto -> Capital
     'remote': 'Remoto'
 }
+
+
+def _normalize_geo(x):
+    if pd.isna(x):
+        return x
+    key = str(x).strip().lower()
+    return MAPA_CIUDADES.get(key, str(x).strip().title())
 
 
 def estandarizar_geografia(df, col_geo):
@@ -36,7 +44,7 @@ def estandarizar_geografia(df, col_geo):
         return df
 
     # Mapear: si la ciudad está en el diccionario, usar el valor estándar. Si no, Title Case.
-    df[col_geo] = df[col_geo].apply(lambda x: MAPA_CIUDADES.get(x, x.title()))
+    df[col_geo] = df[col_geo].apply(_normalize_geo)
     return df
 
 
@@ -56,10 +64,10 @@ def normalizar_archivo(nombre_archivo):
     if len(df) < original_len:
         print(f"   ℹ️  Eliminados {original_len - len(df)} duplicados.")
 
-    # 2. Estandarización Geográfica
-    posibles_cols_geo = ['ciudad', 'location', 'ciudad_residencia']
-    for col in posibles_cols_geo:
-        if col in df.columns:
+    # 2. Estandarización Geográfica (lookup case-insensitive en nombre de columna)
+    posibles_cols_geo = {'ciudad', 'location', 'ciudad_residencia'}
+    for col in df.columns:
+        if col.lower() in posibles_cols_geo:
             df = estandarizar_geografia(df, col)
 
     # 3. Preparación para Esquema Copo de Nieve (Tips de tipo)
