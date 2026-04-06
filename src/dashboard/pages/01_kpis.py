@@ -31,6 +31,27 @@ st.markdown("""
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
+# --- Filtros Interactivos ---
+with st.sidebar:
+    st.markdown('<p style="font-size:0.75rem;font-weight:600;color:#A1A1AA;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">Filtros</p>', unsafe_allow_html=True)
+    
+    # Year range filter
+    year_range = st.slider(
+        'Rango de Años de Egreso',
+        min_value=2020,
+        max_value=2028,
+        value=(2024, 2028),
+        step=1,
+        help='Filtra KPIs por años de egreso'
+    )
+    
+    # Región filter
+    region_filter = st.selectbox(
+        'Región CEPALSTAT',
+        ['Todas', 'Bolivia', 'Región Andina'],
+        help='Selecciona región para benchmark'
+    )
+
 # ✅ Success Badge: IT Careers Detected
 kpis         = get_kpis()
 desercion    = get_tasa_desercion()

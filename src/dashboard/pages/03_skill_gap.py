@@ -33,7 +33,39 @@ st.markdown("""
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
+# --- Filtros Interactivos ---
+with st.sidebar:
+    st.markdown('<p style="font-size:0.75rem;font-weight:600;color:#A1A1AA;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">Filtros</p>', unsafe_allow_html=True)
+    
+    # Demand range filter
+    demand_range = st.slider(
+        'Rango de Demanda (vacantes)',
+        min_value=0,
+        max_value=500,
+        value=(0, 500),
+        step=10,
+        help='Filtra habilidades por número de vacantes'
+    )
+    
+    # Coverage filter
+    min_coverage = st.slider(
+        'Cobertura Académica Mínima (%)',
+        min_value=0,
+        max_value=100,
+        value=0,
+        step=5,
+        help='Muestra solo habilidades con cobertura >= al valor seleccionado'
+    )
+
 gap_df = get_skill_gap()
+
+# Aplicar filtros interactivos
+if not gap_df.empty:
+    gap_df = gap_df[
+        (gap_df['demanda'] >= demand_range[0]) &
+        (gap_df['demanda'] <= demand_range[1]) &
+        (gap_df['cobertura_%'] >= min_coverage)
+    ]
 
 # ✅ Skill Quality Metrics
 students_analyzed = gap_df['demanda'].sum() if not gap_df.empty else 0

@@ -28,6 +28,26 @@ st.markdown("""
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
+# --- ODS & Mission Context ---
+st.markdown("""
+<div style="background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+  <div style="display: flex; gap: 1rem; align-items: start;">
+    <div style="font-size: 2rem;">🎯</div>
+    <div>
+      <h3 style="margin: 0 0 0.5rem 0; color: var(--text); font-size: 1rem;">Misión: Reducir la Brecha Digital en Habilidades TIC</h3>
+      <p style="margin: 0 0 0.75rem 0; color: var(--muted); font-size: 0.9rem;">
+        Este dashboard analiza la alineación entre la oferta educativa en carreras IT y la demanda del mercado laboral boliviano, 
+        vinculado directamente a los <strong>ODS 4 (Educación de Calidad)</strong> y <strong>ODS 8 (Trabajo Decente e Innovación)</strong>.
+      </p>
+      <p style="margin: 0; color: var(--text); font-size: 0.9rem; font-weight: 500;">
+        <i class="ti ti-target" style="color: var(--accent); margin-right: 0.25rem;"></i> 
+        Objetivo 2026: 85% de egresados IT con empleo formal en su área de estudio
+      </p>
+    </div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
 # --- Data Quality Indicator Card ---
 df = load_df()
 kpis_preview = get_kpis()

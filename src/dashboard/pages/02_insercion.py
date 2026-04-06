@@ -46,6 +46,16 @@ with st.sidebar:
     carrera_sel = st.selectbox('Carrera', carreras)
     ciudad_sel  = st.selectbox('Ciudad',  ciudades)
     genero_sel  = st.selectbox('Género',  ['Todos', 'F', 'M'])
+    
+    # Temporal filter
+    year_range = st.slider(
+        'Rango de Años de Egreso',
+        min_value=2020,
+        max_value=2028,
+        value=(2024, 2028),
+        step=1,
+        help='Filtra por cohorte de egreso estimada'
+    )
 
 df_f = df.copy()
 if carrera_sel != 'Todas':
@@ -54,6 +64,21 @@ if ciudad_sel != 'Todas':
     df_f = df_f[df_f['Ciudad'] == ciudad_sel]
 if genero_sel != 'Todos':
     df_f = df_f[df_f['Genero'] == genero_sel]
+
+# Temporal filtering (estimated graduation year)
+# Nota: Si existe columna AñoEgreso, filtrar; si no, usar estimación desde SemestreActual
+if 'AñoEgreso' in df_f.columns:
+    df_f = df_f[
+        (df_f['AñoEgreso'] >= year_range[0]) &
+        (df_f['AñoEgreso'] <= year_range[1])
+    ]
+elif 'SemestreActual' in df_f.columns and 'anio_y' in df_f.columns:
+    # Estimación: AñoEgreso ≈ anio_y + (SemestreActual / 6)
+    df_f['AñoEgreso_Est'] = df_f['anio_y'] + (df_f['SemestreActual'] / 6).astype(int)
+    df_f = df_f[
+        (df_f['AñoEgreso_Est'] >= year_range[0]) &
+        (df_f['AñoEgreso_Est'] <= year_range[1])
+    ]
 
 # --- Métricas del segmento ---
 con_dato  = df_f.dropna(subset=['TieneEmpleoFormal'])
