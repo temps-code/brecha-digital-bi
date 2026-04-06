@@ -1,0 +1,26 @@
+CompetenciaID,CarreraID,NombreHabilidad,NivelRequerido,anio
+1,1,Python y Java,Básico,2024
+2,1,SQL y bases de datos relacionales,Intermedio,2024
+3,1,Arquitectura de Software,Avanzado,2024
+4,1,Gestión de proyectos (Jira/Scrum),Intermedio,2024
+5,1,Administración de servidores Linux,Intermedio,2024
+6,2,Control de versiones (Git),Básico,2024
+7,2,Desarrollo web fullstack (React/Node),Avanzado,2024
+8,2,Testing y QA Automatizado,Intermedio,2024
+9,2,DevOps y CI/CD,Avanzado,2024
+10,2,"Patrones de Diseño (C#, Java)",Intermedio,2024
+11,3,Estadística descriptiva e inferencial,Básico,2024
+12,3,"Python (pandas, numpy, scikit-learn)",Intermedio,2024
+13,3,Machine Learning aplicado,Avanzado,2024
+14,3,"Visualización de datos (Power BI, Tableau)",Intermedio,2024
+15,3,"Big Data (Spark, Hadoop)",Avanzado,2024
+16,4,"Fundamentos de Redes (OSI, TCP/IP)",Básico,2024
+17,4,Configuración de Routers (Cisco),Intermedio,2024
+18,4,Administración de redes LAN/WAN,Intermedio,2024
+19,4,Fibra Óptica y Radioenlaces,Avanzado,2024
+20,4,Seguridad en Redes Perimetrales,Avanzado,2024
+21,5,Seguridad informática básica,Básico,2024
+22,5,Criptografía y Protocolos Seguros,Intermedio,2024
+23,5,Ciberseguridad y Ethical Hacking,Avanzado,2024
+24,5,Análisis de Vulnerabilidades y Pentesting,Avanzado,2024
+25,5,Arquitectura de seguridad en la nube,Avanzado,2024
