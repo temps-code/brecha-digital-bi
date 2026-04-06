@@ -398,9 +398,46 @@ def get_salario_por_carrera() -> pd.DataFrame:
 
 @st.cache_data
 def get_habilidades_demandadas() -> pd.DataFrame:
-    vac = load_vacantes()
+    """
+    Load demanded skills from extracted skills CSV (Groq LLM) or fallback to regex tokenization.
+    
+    Priority:
+    1. skills_extracted.csv (Groq LLM extraction, high quality)
+    2. Naive tokenization (comma/semicolon split, fallback if CSV not available)
+    3. Static SKILLS_MAP (if description column missing)
+    
+    Returns:
+        DataFrame with columns [habilidad, demanda] sorted by demand descending
+    """
+    import json
+    
     conteo = {}
-
+    skills_csv = PROCESSED / 'empleos' / 'skills_extracted.csv'
+    
+    # PRIORITY 1: Try loading from extracted skills CSV
+    if skills_csv.exists():
+        try:
+            extracted = pd.read_csv(skills_csv)
+            # Aggregate skills from JSON column
+            for _, row in extracted.iterrows():
+                try:
+                    skills = json.loads(row['skills_json'])
+                    for skill in skills:
+                        if skill and len(skill) > 1:
+                            conteo[skill] = conteo.get(skill, 0) + 1
+                except (json.JSONDecodeError, KeyError):
+                    pass
+            
+            if conteo:
+                return (
+                    pd.DataFrame(list(conteo.items()), columns=['habilidad', 'demanda'])
+                    .sort_values('demanda', ascending=False)
+                )
+        except Exception as e:
+            st.warning(f"⚠️ Error loading extracted skills: {str(e)}, falling back to tokenization")
+    
+    # PRIORITY 2: Fallback to naive tokenization (comma/semicolon split)
+    vac = load_vacantes()
     if 'description' in vac.columns and vac['description'].notna().any():
         for desc in vac['description'].dropna():
             # Tokenizar por coma y punto y coma
@@ -412,6 +449,7 @@ def get_habilidades_demandadas() -> pd.DataFrame:
                 if len(skill) > 1:
                     conteo[skill] = conteo.get(skill, 0) + 1
     else:
+        # PRIORITY 3: Static SKILLS_MAP
         st.warning('Columna description ausente o vacía — usando mapa estático de habilidades.')
         for _, row in vac.iterrows():
             skills = SKILLS_MAP.get(row['title'], [])
