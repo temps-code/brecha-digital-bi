@@ -92,6 +92,7 @@ REGEX_PATTERNS: Dict[str, str] = {
     "mongodb": r"\b(mongodb|mongo)\b",
     "postgresql": r"\bpostgres(ql)?\b",
     "mysql": r"\bmysql\b",
+    "redis": r"\bredis\b",
     "sqlserver": r"\b(sqlserver|sql\s+server|mssql)\b",
     "react": r"\breact\b",
     "vue": r"\bvue(\.?js)?\b",
@@ -626,7 +627,8 @@ Normaliza nombres: "Python" no "python", "Node.js" no "nodejs", "C++" no "cpp"."
             self._validate_input(vacantes_df)
             
             # 2. CHECK CACHE
-            if cached := self._load_cache_if_exists():
+            cached = self._load_cache_if_exists()
+            if cached is not None:
                 elapsed = time.time() - start_time
                 logger.info(f"✅ Extraction complete (cache reuse): {elapsed:.1f}s")
                 return cached
@@ -659,6 +661,13 @@ Normaliza nombres: "Python" no "python", "Node.js" no "nodejs", "C++" no "cpp"."
             
             # 4. CREATE DATAFRAME
             result_df = pd.DataFrame(all_results)
+            
+            # Merge back title and description
+            result_df = result_df.merge(
+                vacantes_df[["job_id", "title", "description"]], 
+                on="job_id", 
+                how="left"
+            )
             
             # 5. VALIDATE OUTPUT
             self._validate_output(result_df)

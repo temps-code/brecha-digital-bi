@@ -410,12 +410,14 @@ def get_habilidades_demandadas() -> pd.DataFrame:
         DataFrame with columns [habilidad, demanda] sorted by demand descending
     """
     import json
-    
+    import os
+
     conteo = {}
     skills_csv = PROCESSED / 'empleos' / 'skills_extracted.csv'
-    
-    # PRIORITY 1: Try loading from extracted skills CSV
-    if skills_csv.exists():
+    use_extracted = os.environ.get('USE_EXTRACTED_SKILLS', 'true').lower() == 'true'
+
+    # PRIORITY 1: Try loading from extracted skills CSV if feature flag is enabled
+    if use_extracted and skills_csv.exists():
         try:
             extracted = pd.read_csv(skills_csv)
             # Aggregate skills from JSON column
