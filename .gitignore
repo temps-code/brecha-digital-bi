@@ -17,6 +17,10 @@ data/warehouse/*.db
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/warehouse/.gitkeep
+# Permitir archivos cleaned procesados
+!data/processed/*.csv
+!data/processed/cepalstat/
+!data/processed/empleos/
 
 # Notebooks checkpoints
 .ipynb_checkpoints/
