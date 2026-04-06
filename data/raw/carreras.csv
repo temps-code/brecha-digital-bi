@@ -1,6 +1,6 @@
 CarreraID,NombreCarrera,Facultad
-1,Ingeniería de Sistemas,Ingeniería
-2,Electrónica,Ingeniería
-3,Administración de Empresas,Ciencias Económicas
-4,Diseño Gráfico,Arquitectura y Diseño
-5,Derecho,Ciencias Jurídicas
+1,Ingeniería de Sistemas,Facultad de Ingeniería
+2,Ingeniería de Software,Facultad de Ingeniería
+3,Ciencia de Datos,Ciencias Exactas y Tecnología
+4,Telecomunicaciones y Redes,Facultad de Ingeniería
+5,Ciberseguridad,Ciencias Exactas y Tecnología

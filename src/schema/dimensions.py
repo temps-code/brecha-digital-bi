@@ -121,21 +121,43 @@ def cargar_dim_estudiante():
     _validar_carga(df_estudiante, 'DIM_ESTUDIANTE')
 
 def cargar_dim_mercado_laboral():
-    """Crea la dimensión de mercado laboral a partir de datos de vacantes."""
+    """
+    Crea la dimensión de mercado laboral.
+    
+    CORRECCIÓN (2026-04-05): Ahora incluye TODAS las ciudades únicas de:
+    - Vacantes (ubicaciones de empleos)
+    - Estudiantes (ciudades de residencia)
+    
+    Esto evita que estudiantes en ciudades sin vacantes queden con SK=-1 (unknown).
+    """
     print("Cargando DIM_MERCADO_LABORAL...")
     try:
         df_vacantes = pd.read_csv('data/processed/empleos/vacantes_tecnologicas_cleaned.csv')
-    except FileNotFoundError:
-        raise ValueError("No se encontró el archivo de vacantes. Verifica la ruta y el nombre del archivo.") from None
+        df_estudiantes = pd.read_csv('data/processed/estudiantes_cleaned.csv')
+    except FileNotFoundError as e:
+        raise ValueError(f"No se encontró archivo requerido: {e}") from None
 
     if 'location' not in df_vacantes.columns:
         raise ValueError("El archivo de vacantes debe contener la columna 'location'.")
+    if 'Ciudad' not in df_estudiantes.columns:
+        raise ValueError("El archivo de estudiantes debe contener la columna 'Ciudad'.")
 
-    df_ubicaciones = df_vacantes[['location']].drop_duplicates().reset_index(drop=True)
-    df_mercado = df_ubicaciones
-    df_mercado.rename(columns={'location': 'Ubicacion'}, inplace=True)
-    df_mercado['SK_MercadoLaboral'] = df_mercado.index + 1
-    df_mercado = df_mercado[['SK_MercadoLaboral', 'Ubicacion']]
+    # Recolectar ciudades de AMBAS fuentes
+    ciudades_vacantes = set(df_vacantes['location'].dropna().unique())
+    ciudades_estudiantes = set(df_estudiantes['Ciudad'].dropna().unique())
+    
+    # Unión: todas las ciudades de vacantes + estudiantes
+    todas_ciudades = sorted(ciudades_vacantes | ciudades_estudiantes)
+    
+    print(f"   Ciudades en vacantes: {sorted(ciudades_vacantes)}")
+    print(f"   Ciudades en estudiantes: {sorted(ciudades_estudiantes)}")
+    print(f"   Ciudades totales para DIM: {sorted(todas_ciudades)}")
+    
+    # Crear dataframe de dimensión
+    df_mercado = pd.DataFrame({
+        'SK_MercadoLaboral': range(1, len(todas_ciudades) + 1),
+        'Ubicacion': todas_ciudades
+    })
     
     engine = get_engine()
     df_mercado.to_sql('DIM_MERCADO_LABORAL', con=engine, if_exists='replace', index=False)
@@ -158,7 +180,7 @@ def cargar_dim_categoria_y_habilidad():
             "Ejecutá primero sqlserver.py y luego clean.py."
         ) from None
 
-    required_cols = {'NombreHabilidad', 'NivelRequerido'}
+    required_cols = {'NombreHabilidad', 'NivelRequerido', 'CarreraID'}
     if not required_cols.issubset(df_comp.columns):
         faltantes = required_cols - set(df_comp.columns)
         raise ValueError(f"El archivo de competencias no contiene las columnas: {faltantes}")
@@ -173,16 +195,23 @@ def cargar_dim_categoria_y_habilidad():
     print(f"   ✅ DIM_CATEGORIA_SKILL cargada con {len(df_cat)} registros.")
     _validar_carga(df_cat, 'DIM_CATEGORIA_SKILL')
 
-    # --- DIM_HABILIDAD: una fila por competencia, con FK a su categoría ---
+    # --- DIM_HABILIDAD: una fila por competencia, con FK a su categoría y carrera ---
+    # Obtener el mapa de CarreraID a SK_Carrera
+    df_carrera = pd.read_sql('SELECT SK_Carrera, CarreraID FROM DIM_CARRERA', con=engine)
+    carrera_index = df_carrera.set_index('CarreraID')['SK_Carrera'].to_dict()
+
     cat_index = df_cat.set_index('NombreCategoria')['SK_Categoria'].to_dict()
 
-    df_hab = df_comp[['NombreHabilidad', 'NivelRequerido']].copy()
+    df_hab = df_comp[['NombreHabilidad', 'NivelRequerido', 'CarreraID']].copy()
     df_hab['NombreHabilidad'] = df_hab['NombreHabilidad'].str.strip()
     df_hab['NivelRequerido'] = df_hab['NivelRequerido'].str.strip().str.title()
     df_hab = df_hab.drop_duplicates(subset=['NombreHabilidad']).reset_index(drop=True)
+    
     df_hab['SK_Categoria'] = df_hab['NivelRequerido'].map(cat_index)
+    df_hab['SK_Carrera'] = df_hab['CarreraID'].map(carrera_index)
     df_hab['SK_Habilidad'] = df_hab.index + 1
-    df_hab = df_hab[['SK_Habilidad', 'NombreHabilidad', 'SK_Categoria']]
+    
+    df_hab = df_hab[['SK_Habilidad', 'NombreHabilidad', 'SK_Categoria', 'SK_Carrera']]
     df_hab.to_sql('DIM_HABILIDAD', con=engine, if_exists='replace', index=False)
     print(f"   ✅ DIM_HABILIDAD cargada con {len(df_hab)} registros.")
     _validar_carga(df_hab, 'DIM_HABILIDAD')

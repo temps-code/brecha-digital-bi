@@ -1,23 +1,26 @@
-CompetenciaID,NombreHabilidad,NivelRequerido
-1,Manejo de correo electrónico,Básico
-2,Uso de procesador de texto,Básico
-3,Navegación web y búsqueda,Básico
-4,Hojas de cálculo (Excel básico),Básico
-5,"Videoconferencias (Zoom, Meet)",Básico
-6,Gestión de archivos y carpetas,Básico
-7,Redes sociales profesionales,Básico
-8,SQL y bases de datos relacionales,Intermedio
-9,Python (scripting y análisis),Intermedio
-10,Visualización de datos (Power BI),Intermedio
-11,Excel avanzado y tablas dinámicas,Intermedio
-12,Gestión de proyectos (Jira/Trello),Intermedio
-13,Seguridad informática básica,Intermedio
-14,Control de versiones (Git),Intermedio
-15,Administración de redes LAN,Intermedio
-16,Machine Learning aplicado,Avanzado
-17,Arquitectura de datos en la nube,Avanzado
-18,Desarrollo web fullstack,Avanzado
-19,Ciberseguridad y ethical hacking,Avanzado
-20,DevOps y CI/CD,Avanzado
-21,"Big Data (Spark, Hadoop)",Avanzado
-22,Inteligencia Artificial generativa,Avanzado
+CompetenciaID,CarreraID,NombreHabilidad,NivelRequerido
+1,1,Python y Java,Básico
+2,1,SQL y bases de datos relacionales,Intermedio
+3,1,Arquitectura de Software,Avanzado
+4,1,Gestión de proyectos (Jira/Scrum),Intermedio
+5,1,Administración de servidores Linux,Intermedio
+6,2,Control de versiones (Git),Básico
+7,2,Desarrollo web fullstack (React/Node),Avanzado
+8,2,Testing y QA Automatizado,Intermedio
+9,2,DevOps y CI/CD,Avanzado
+10,2,"Patrones de Diseño (C#, Java)",Intermedio
+11,3,Estadística descriptiva e inferencial,Básico
+12,3,"Python (pandas, numpy, scikit-learn)",Intermedio
+13,3,Machine Learning aplicado,Avanzado
+14,3,"Visualización de datos (Power BI, Tableau)",Intermedio
+15,3,"Big Data (Spark, Hadoop)",Avanzado
+16,4,"Fundamentos de Redes (OSI, TCP/IP)",Básico
+17,4,Configuración de Routers (Cisco),Intermedio
+18,4,Administración de redes LAN/WAN,Intermedio
+19,4,Fibra Óptica y Radioenlaces,Avanzado
+20,4,Seguridad en Redes Perimetrales,Avanzado
+21,5,Seguridad informática básica,Básico
+22,5,Criptografía y Protocolos Seguros,Intermedio
+23,5,Ciberseguridad y Ethical Hacking,Avanzado
+24,5,Análisis de Vulnerabilidades y Pentesting,Avanzado
+25,5,Arquitectura de seguridad en la nube,Avanzado

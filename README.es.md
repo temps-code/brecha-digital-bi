@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white" alt="SQL Server">
   <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
-  <img src="https://img.shields.io/badge/Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini API">
+  <img src="https://img.shields.io/badge/Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Groq API">
   <img src="https://img.shields.io/badge/Adzuna_API-FF6600?style=for-the-badge&logo=briefcase&logoColor=white" alt="Adzuna API">
 </p>
 
@@ -54,10 +54,11 @@ Las instituciones de educación técnica bolivianas generan grandes volúmenes d
 Capacidades principales:
 
 - Pipeline ELT automatizado desde SQL Server (Bronze) pasando por transformación (Silver) hasta un warehouse con esquema copo de nieve (Gold)
+- Foco 100% Tecnológico: Análisis de datos simulados centrados exclusivamente en carreras TIC (Ing. de Software, Ciberseguridad, Ciencia de Datos, etc.)
 - Monitoreo de KPIs: tasa de inserción laboral, predicción de deserción, análisis de brecha de habilidades
 - Benchmarking regional usando indicadores CEPALSTAT (ODS 4 y ODS 8)
-- Análisis de vacantes laborales en tiempo real desde APIs externas de empleo
-- Asistente con IA (Gemini API) para consultas en lenguaje natural sobre los datos
+- Análisis de demanda laboral internacional en tiempo real extrayendo vacantes de EE.UU., España, México y Brasil vía Adzuna API (evaluando oportunidades remotas)
+- Asistente con IA (Groq API) para consultas en lenguaje natural sobre los datos
 
 ---
 
@@ -89,7 +90,7 @@ Los OKRs definen el éxito del proyecto con resultados clave medibles. Para la e
 | Warehouse Gold | SQL Server (T-SQL) — `DW_BrechaDigital` | 2019+ |
 | Dashboard | Streamlit | 1.32+ |
 | Gráficos | Plotly | 5.20+ |
-| Asistente IA | Google Gemini API | 0.5+ |
+| Asistente IA | Groq API | 0.5+ |
 | Datos Macroeconómicos | CEPALSTAT REST API | — |
 | Datos de Empleo | Adzuna REST API | — |
 | Conectividad BD | PyODBC + SQLAlchemy | 5.0+ / 2.0+ |
@@ -315,9 +316,6 @@ DW_NAME=DW_BrechaDigital
 DW_USER=sa
 DW_PASSWORD=tu_contraseña
 
-# Gemini API
-GEMINI_API_KEY=tu_api_key_de_gemini
-
 # Groq API
 GROQ_API_KEY=tu_api_key_de_groq
 
@@ -347,7 +345,7 @@ El dashboard estará disponible en `http://localhost:8501`.
 | KPIs | Indicadores generales de empleabilidad y deserción |
 | Inserción Laboral | Tasa de inserción por carrera y región |
 | Skill Gap | Comparación entre habilidades académicas y demanda del mercado |
-| Asistente IA | Consultas en lenguaje natural con Gemini API |
+| Asistente IA | Consultas en lenguaje natural con Groq API |
 
 ---
 

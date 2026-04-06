@@ -5,3 +5,189 @@ Responsable: Diego Vargas Urzagaste (@temps-code)
 Funciones reutilizables de Plotly para el dashboard.
 Cada función recibe un DataFrame y retorna una figura de Plotly.
 """
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
+
+_BG     = 'rgba(0,0,0,0)'
+_ACCENT = '#6366F1'
+_ORANGE = '#F59E0B'
+_GRID   = '#3F3F46'
+
+
+def _base_layout(fig: go.Figure, title: str = '') -> go.Figure:
+    fig.update_layout(
+        title=title,
+        paper_bgcolor=_BG,
+        plot_bgcolor=_BG,
+        font_color='#FAFAFA',
+        margin=dict(l=10, r=10, t=45, b=10),
+        xaxis=dict(gridcolor=_GRID, zerolinecolor=_GRID),
+        yaxis=dict(gridcolor=_GRID, zerolinecolor=_GRID),
+    )
+    return fig
+
+
+def bar_empleo_por_carrera(df: pd.DataFrame) -> go.Figure:
+    fig = px.bar(
+        df,
+        x='tasa_empleo',
+        y='NombreCarrera',
+        orientation='h',
+        color='tasa_empleo',
+        color_continuous_scale='Blues',
+        text='tasa_empleo',
+        labels={'tasa_empleo': 'Tasa de Empleo (%)', 'NombreCarrera': ''},
+        range_x=[0, 100],
+    )
+    fig.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
+    fig.update_coloraxes(showscale=False)
+    return _base_layout(fig, 'Tasa de Empleo por Carrera')
+
+
+def pie_distribucion_ciudad(df: pd.DataFrame) -> go.Figure:
+    fig = px.pie(
+        df,
+        names='Ciudad',
+        values='total',
+        hole=0.45,
+        color_discrete_sequence=px.colors.sequential.Blues_r,
+    )
+    fig.update_traces(textposition='inside', textinfo='percent+label')
+    return _base_layout(fig, 'Distribución de Egresados por Ciudad')
+
+
+def bar_salario_por_carrera(df: pd.DataFrame) -> go.Figure:
+    max_sal = df['salario_promedio'].max() if not df.empty else 2000
+    fig = px.bar(
+        df,
+        x='salario_promedio',
+        y='NombreCarrera',
+        orientation='h',
+        color='salario_promedio',
+        color_continuous_scale='Greens',
+        text='salario_promedio',
+        labels={'salario_promedio': 'Salario Promedio (USD)', 'NombreCarrera': ''},
+        range_x=[0, max_sal * 1.25],
+    )
+    fig.update_traces(texttemplate='$%{text:.0f}', textposition='outside')
+    fig.update_coloraxes(showscale=False)
+    return _base_layout(fig, 'Salario Promedio por Carrera')
+
+
+def bar_habilidades_demandadas(df: pd.DataFrame) -> go.Figure:
+    fig = px.bar(
+        df,
+        x='demanda',
+        y='habilidad',
+        orientation='h',
+        color='demanda',
+        color_continuous_scale='Blues',
+        text='demanda',
+        labels={'demanda': 'Vacantes que la requieren', 'habilidad': ''},
+    )
+    fig.update_traces(textposition='outside')
+    fig.update_coloraxes(showscale=False)
+    return _base_layout(fig, 'Habilidades más Demandadas en el Mercado')
+
+
+def combo_skill_gap(df: pd.DataFrame) -> go.Figure:
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        name='Demanda (vacantes)',
+        x=df['habilidad'],
+        y=df['demanda'],
+        marker_color=_ACCENT,
+        yaxis='y',
+    ))
+    fig.add_trace(go.Scatter(
+        name='Cobertura académica (%)',
+        x=df['habilidad'],
+        y=df['cobertura'],
+        mode='lines+markers',
+        marker=dict(color=_ORANGE, size=8),
+        line=dict(color=_ORANGE, width=2),
+        yaxis='y2',
+    ))
+    fig.update_layout(
+        title='Brecha: Demanda del Mercado vs Cobertura Académica',
+        yaxis=dict(title='Vacantes que la requieren', gridcolor=_GRID, zerolinecolor=_GRID),
+        yaxis2=dict(
+            title='Cobertura académica (%)',
+            overlaying='y',
+            side='right',
+            range=[0, 120],
+            gridcolor=_GRID,
+        ),
+        legend=dict(orientation='h', y=1.12),
+        paper_bgcolor=_BG,
+        plot_bgcolor=_BG,
+        font_color='#FAFAFA',
+        margin=dict(l=10, r=10, t=70, b=10),
+    )
+    return fig
+
+
+def line_empleo_temporal(df: pd.DataFrame) -> go.Figure:
+    fuentes = df['fuente'].unique().tolist() if 'fuente' in df.columns else []
+    subtitle = f" · Fuente: {', '.join(fuentes)}" if fuentes else ''
+    fig = px.line(
+        df,
+        x='anio',
+        y='tasa_empleo',
+        markers=True,
+        labels={'anio': 'Año', 'tasa_empleo': 'Tasa de Empleo (%)'},
+        color_discrete_sequence=[_ACCENT],
+    )
+    fig.update_traces(line_width=2, marker_size=7)
+    return _base_layout(fig, f'Evolución de Inserción Laboral{subtitle}')
+
+
+def bar_tasa_desercion(data: dict) -> go.Figure:
+    tasa       = data.get('tasa_desercion') or 0
+    total      = data.get('total_estudiantes') or 0
+    en_riesgo  = data.get('en_riesgo') or 0
+    fig = go.Figure(go.Indicator(
+        mode='gauge+number',
+        value=tasa,
+        number={'suffix': '%', 'font': {'color': '#FAFAFA'}},
+        gauge={
+            'axis': {'range': [0, 100], 'tickcolor': '#A1A1AA'},
+            'bar':  {'color': _ORANGE},
+            'bgcolor': _GRID,
+            'steps': [
+                {'range': [0, 20],  'color': 'rgba(34, 197, 94, 0.13)'},
+                {'range': [20, 40], 'color': 'rgba(245, 158, 11, 0.13)'},
+                {'range': [40, 100],'color': 'rgba(239, 68, 68, 0.13)'},
+            ],
+            'threshold': {
+                'line': {'color': '#EF4444', 'width': 3},
+                'thickness': 0.75,
+                'value': tasa,
+            },
+        },
+        title={
+            'text': f'Tasa de Deserción<br><span style="font-size:0.75rem;color:#A1A1AA">{en_riesgo} en riesgo de {total} estudiantes</span>',
+            'font': {'color': '#FAFAFA'},
+        },
+    ))
+    fig.update_layout(
+        paper_bgcolor=_BG,
+        font_color='#FAFAFA',
+        margin=dict(l=10, r=10, t=30, b=10),
+        height=280,
+    )
+    return fig
+
+
+def line_cepal_bolivia(df: pd.DataFrame) -> go.Figure:
+    fig = px.line(
+        df,
+        x='anio',
+        y='value',
+        markers=True,
+        labels={'anio': 'Año', 'value': 'Indicador TIC (%)'},
+        color_discrete_sequence=[_ACCENT],
+    )
+    fig.update_traces(line_width=2, marker_size=7)
+    return _base_layout(fig, 'Indicador TIC Bolivia — CEPALSTAT (ODS 4.4.1)')

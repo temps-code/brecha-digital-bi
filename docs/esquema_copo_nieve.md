@@ -90,7 +90,7 @@ En este proyecto, `DIM_HABILIDAD` contiene registros que comparten la misma `Nom
 | SK_Categoria | INT PK | Surrogate key |
 | NombreCategoria | NVARCHAR | Nivel de competencia: Básico / Intermedio / Avanzado |
 
-> Sub-dimensión de `DIM_HABILIDAD`. Agrupa las 22 competencias digitales por nivel de dificultad.
+> Sub-dimensión de `DIM_HABILIDAD`. Agrupa las 25 competencias digitales por nivel de dificultad.
 
 ### DIM_TIEMPO
 
