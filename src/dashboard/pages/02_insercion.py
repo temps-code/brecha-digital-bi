@@ -14,7 +14,7 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from components.data_loader import load_df, get_empleo_por_carrera, get_salario_por_carrera, get_empleo_temporal
+from components.data_loader import load_df, get_empleo_por_carrera, get_salario_por_carrera, get_empleo_temporal, get_distribucion_ciudad
 from components.charts import bar_empleo_por_carrera, pie_distribucion_ciudad, bar_salario_por_carrera, line_empleo_temporal
 from components.styles import inject_styles
 
@@ -33,9 +33,19 @@ st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
 df = load_df()
 
-# ✅ Career Filter Info
-st.success('Showing: Ingeniería de Sistemas, Software, Data, Telecomunicaciones, Ciberseguridad')
-st.info('📅 Análisis temporal: Muestra la línea de tiempo graduación→empleo (cohortes 2024-2028)')
+ci1, ci2 = st.columns(2)
+ci1.markdown("""
+<div class="kpi-card" style="border-left:3px solid #22C55E">
+  <div class="kpi-label"><i class="ti ti-check"></i>Carreras analizadas</div>
+  <div style="font-size:0.8125rem;color:#D4D4D8">Sistemas · Software · Datos · Telecomunicaciones · Ciberseguridad</div>
+</div>
+""", unsafe_allow_html=True)
+ci2.markdown("""
+<div class="kpi-card" style="border-left:3px solid #6366F1">
+  <div class="kpi-label"><i class="ti ti-calendar"></i>Análisis temporal</div>
+  <div style="font-size:0.8125rem;color:#D4D4D8">Línea de tiempo graduación→empleo · cohortes 2024-2028</div>
+</div>
+""", unsafe_allow_html=True)
 
 # --- Filtros ---
 with st.sidebar:
@@ -63,7 +73,7 @@ if carrera_sel != 'Todas':
 if ciudad_sel != 'Todas':
     df_f = df_f[df_f['Ciudad'] == ciudad_sel]
 if genero_sel != 'Todos':
-    df_f = df_f[df_f['Genero'] == genero_sel]
+    df_f = df_f[df_f['Genero'].str.lower() == genero_sel.lower()]
 
 # Temporal filtering (estimated graduation year)
 # Nota: Si existe columna AñoEgreso, filtrar; si no, usar estimación desde SemestreActual
@@ -90,7 +100,7 @@ pct_area    = round(empleados['TrabajaEnAreaDeEstudio'].mean() * 100, 1) if len(
 
 # Sample size badge color
 sample_size_color = 'green' if len(con_dato) > 1000 else ('orange' if len(con_dato) < 500 else 'blue')
-st.markdown(f'<span style="color: {sample_size_color}; font-weight: 600;">📊 Muestra: {len(con_dato)} egresados</span>', unsafe_allow_html=True)
+st.markdown(f'<span style="color: {sample_size_color}; font-weight: 600;"><i class="ti ti-users" style="margin-right:0.3rem"></i>Muestra: {len(con_dato)} egresados</span>', unsafe_allow_html=True)
 
 m1, m2, m3, m4 = st.columns(4)
 for col, icon, val, lbl in [
@@ -111,27 +121,23 @@ st.markdown('<hr class="divider">', unsafe_allow_html=True)
 # --- Gráficos fila 1 ---
 col_l, col_r = st.columns(2)
 with col_l:
-    st.plotly_chart(bar_empleo_por_carrera(get_empleo_por_carrera()), use_container_width=True)
+    st.plotly_chart(bar_empleo_por_carrera(get_empleo_por_carrera(df_f)), use_container_width=True)
+    st.caption('De cada 100 egresados de esta carrera, cuántos consiguieron empleo formal. Mientras más larga la barra, mejor es la empleabilidad de esa carrera.')
 with col_r:
-    df_ciudad = (
-        con_dato.groupby('Ciudad')['EstudianteID']
-        .count().reset_index()
-        .rename(columns={'EstudianteID': 'total'})
-        .sort_values('total', ascending=False)
-    )
-    st.plotly_chart(pie_distribucion_ciudad(df_ciudad), use_container_width=True)
+    st.plotly_chart(pie_distribucion_ciudad(get_distribucion_ciudad(df_f)), use_container_width=True)
+    st.caption('Cómo se distribuyen los egresados entre las distintas ciudades del país.')
 
 # --- Gráfico fila 2 ---
-st.plotly_chart(bar_salario_por_carrera(get_salario_por_carrera()), use_container_width=True)
-
-st.markdown('<hr class="divider">', unsafe_allow_html=True)
+st.plotly_chart(bar_salario_por_carrera(get_salario_por_carrera(df_f)), use_container_width=True)
+st.caption('Salario mensual promedio que gana un egresado de cada carrera, expresado en dólares. Incluye solo a quienes tienen empleo formal registrado con datos de salario disponibles.')
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
 # --- Evolución Temporal ---
 st.markdown('<p style="font-size:0.9375rem;font-weight:600;color:#FAFAFA;margin-bottom:0.25rem">Evolución Temporal de la Inserción Laboral (Cohorte de Egreso)</p>', unsafe_allow_html=True)
 
-df_temporal = get_empleo_temporal()
+with st.spinner('Calculando evolución temporal...'):
+    df_temporal = get_empleo_temporal(df_f)
 
 # Display errors from temporal analysis
 if not df_temporal.empty and '_errors' in df_temporal.columns:
@@ -139,15 +145,19 @@ if not df_temporal.empty and '_errors' in df_temporal.columns:
     for error_list in df_temporal['_errors'].dropna():
         if isinstance(error_list, list):
             for err in error_list:
-                errors_set.add(err)
+                if isinstance(err, list):
+                    errors_set.add(tuple(err))
+                else:
+                    errors_set.add(err)
     
     for error_msg in sorted(errors_set):
-        if error_msg.startswith('❌'):
-            st.error(error_msg)
-        elif error_msg.startswith('⚠️'):
-            st.warning(error_msg)
+        msg_str = str(error_msg[0]) if isinstance(error_msg, tuple) else str(error_msg)
+        if msg_str.startswith('❌'):
+            st.error(msg_str)
+        elif msg_str.startswith('⚠️'):
+            st.warning(msg_str)
         else:
-            st.info(error_msg)
+            st.info(msg_str)
 
 if df_temporal.empty:
     st.info("Análisis temporal disponible solo con conexión a Gold.")
@@ -155,7 +165,7 @@ else:
     # Remove _errors column for charting
     chart_df = df_temporal.drop(columns=['_errors'], errors='ignore')
     st.plotly_chart(line_empleo_temporal(chart_df), use_container_width=True)
-    st.caption("Año basado en cohorte de egreso estimada (SemestreActual + anio_y)")
+    st.caption('Cómo ha evolucionado la tasa de empleo según el año en que los estudiantes terminaron su carrera. Si la línea sube, las generaciones más recientes tienen mejor inserción laboral que las anteriores.')
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 

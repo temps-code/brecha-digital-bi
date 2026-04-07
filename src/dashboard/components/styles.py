@@ -141,6 +141,15 @@ _CSS = """
     color: var(--muted);
     line-height: 1.5;
   }
+  a.nav-link { text-decoration: none; color: inherit; display: block; }
+  a.nav-link .nav-card {
+    transition: border-color 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+  }
+  a.nav-link:hover .nav-card {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
 
   /* ── Badge ─────────────────────────────────────────── */
   .badge {
