@@ -10,9 +10,9 @@ import plotly.graph_objects as go
 import pandas as pd
 
 _BG     = 'rgba(0,0,0,0)'
-_ACCENT = '#6366F1'
-_ORANGE = '#F59E0B'
-_GRID   = '#3F3F46'
+_ACCENT = '#c0c1ff'   # primary — Digital Cartographer
+_ORANGE = '#ffb783'   # tertiary — warm contrast
+_GRID   = '#353437'   # outline-variant
 
 
 def _base_layout(fig: go.Figure, title: str = '') -> go.Figure:
@@ -176,7 +176,7 @@ def bar_tasa_desercion(data: dict) -> go.Figure:
         value=tasa,
         number={'suffix': '%', 'font': {'color': '#FAFAFA'}},
         gauge={
-            'axis': {'range': [0, 100], 'tickcolor': '#A1A1AA'},
+            'axis': {'range': [0, 100], 'tickcolor': '#c7c4d7'},
             'bar':  {'color': _ORANGE},
             'bgcolor': _GRID,
             'steps': [
@@ -191,7 +191,7 @@ def bar_tasa_desercion(data: dict) -> go.Figure:
             },
         },
         title={
-            'text': f'Tasa de Deserción<br><span style="font-size:0.75rem;color:#A1A1AA">{en_riesgo} en riesgo de {total} estudiantes</span>',
+            'text': f'Tasa de Deserción<br><span style="font-size:0.75rem;color:#c7c4d7">{en_riesgo} en riesgo de {total} estudiantes</span>',
             'font': {'color': '#FAFAFA'},
         },
     ))

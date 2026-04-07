@@ -1,8 +1,18 @@
 import sys
+import os
 from pathlib import Path
 import datetime
 
 import streamlit as st
+
+# Inject Streamlit Cloud secrets into os.environ so os.getenv() calls work
+# throughout the codebase (data_loader, chatbot, ingestion scripts).
+try:
+    for _k, _v in st.secrets.items():
+        if isinstance(_v, str):
+            os.environ.setdefault(_k, _v)
+except Exception:
+    pass  # Running locally with .env — dotenv handles it
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
