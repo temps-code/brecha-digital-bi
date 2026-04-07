@@ -392,8 +392,13 @@ class SkillExtractor:
             for idx, desc in enumerate(descriptions)
         ])
         
-        prompt = f"""De las siguientes descripciones de puestos de trabajo, extrae SOLO habilidades técnicas y herramientas específicas.
-Máximo 8 skills por descripción. NO incluyas skills genéricas (comunicación, trabajo en equipo) ni soft skills.
+        prompt = f"""De las siguientes descripciones de puestos de trabajo, extrae SOLO habilidades técnicas duras y herramientas específicas (lenguajes de programación, frameworks, bases de datos, plataformas cloud, herramientas DevOps).
+Máximo 8 skills por descripción. 
+REGLAS ESTRICTAS:
+1. NO incluyas soft skills (comunicación, liderazgo, trabajo en equipo).
+2. NO incluyas términos genéricos o metodologías (Software Development, Cloud, Digital, AI, Machine Learning, Consultoria, Infrastructure, Agile, Scrum, Project Management).
+3. NO incluyas nombres de empresas o herramientas corporativas internas (Insurancenow, Guidewire, Velocity, SAP, ReconNET).
+4. SOLO incluye tecnologías específicas (ej: Python, Java, React, SQL, AWS, Docker, PostgreSQL, Kubernetes, Node.js).
 
 {desc_text}
 
@@ -404,7 +409,7 @@ Responde en formato JSON exactamente así (sin markdown, sin explicaciones):
   ...
 }}
 
-Si no hay skills técnicas identificables en una descripción, usa array vacío: [].
+Si no hay tecnologías duras específicas identificables en una descripción, usa array vacío: [].
 Normaliza nombres: "Python" no "python", "Node.js" no "nodejs", "C++" no "cpp"."""
         
         return prompt
@@ -723,6 +728,8 @@ def execute_extraction(
         if not vacantes_path.exists():
             raise FileNotFoundError(f"vacantes file not found: {vacantes_path}")
         vacantes_df = pd.read_csv(vacantes_path)
+        if "id" in vacantes_df.columns and "job_id" not in vacantes_df.columns:
+            vacantes_df = vacantes_df.rename(columns={"id": "job_id"})
     
     extractor = SkillExtractor(use_groq=use_groq, cache_path=cache_path)
     return extractor.execute(vacantes_df)

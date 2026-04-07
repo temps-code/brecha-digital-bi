@@ -55,13 +55,13 @@ with st.sidebar:
             st.rerun()
 
 # ── HEADER ────────────────────────────────────────────────────────────────────
-st.html("""
+st.markdown("""
 <div class="page-header">
   <h2><i class="ti ti-robot"></i> Asistente BI</h2>
-  <p>Consultá los datos del proyecto en lenguaje natural — LLaMA 3 via Groq</p>
+  <p>Consultá los datos del proyecto en lenguaje natural — LLaMA 3.1 via Groq</p>
 </div>
-<hr class="divider">
-""")
+""", unsafe_allow_html=True)
+st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
 # ── API KEY ───────────────────────────────────────────────────────────────────
 api_key = os.getenv('GROQ_API_KEY', '').strip()
