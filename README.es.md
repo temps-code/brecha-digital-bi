@@ -1,135 +1,171 @@
 <div align="center">
 
-<h1>Reducción de la Brecha Digital Laboral — Estrategia BI</h1>
+<h1>Brecha Digital Laboral — Estrategia BI</h1>
 
-<p><strong>Pipeline de Business Intelligence que conecta datos académicos con la demanda real del mercado laboral para reducir la brecha de habilidades digitales en la educación técnica superior.</strong></p>
+<p><strong>Pipeline de Business Intelligence que conecta datos académicos con demanda real del mercado laboral para medir y reducir la brecha digital en la educación técnica superior boliviana.</strong></p>
+
+<p>
+  <a href="https://brecha-digital-bolivia-bi.streamlit.app/" target="_blank">
+    <img src="https://img.shields.io/badge/Demo_en_Vivo-Streamlit_Cloud-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Demo en Vivo">
+  </a>
+  &nbsp;
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/Licencia-MIT-blue.svg?style=for-the-badge" alt="Licencia: MIT">
+  </a>
+</p>
 
 <p>
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white" alt="SQL Server">
   <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
-  <img src="https://img.shields.io/badge/Gemini_API-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Groq API">
+  <img src="https://img.shields.io/badge/Groq_API-F55036?style=for-the-badge&logo=groq&logoColor=white" alt="Groq API">
   <img src="https://img.shields.io/badge/Adzuna_API-FF6600?style=for-the-badge&logo=briefcase&logoColor=white" alt="Adzuna API">
+  <img src="https://img.shields.io/badge/CEPALSTAT-009DDD?style=for-the-badge&logo=un&logoColor=white" alt="CEPALSTAT">
 </p>
 
 </div>
 
 ---
 
-📄 Leé esto en: [English](README.md) | **Español**
+📄 Leer en: [English](README.md) | **Español**
 
 ---
 
-**Proyecto Académico**
-Universidad Privada Domingo Savio — Ing. de Sistemas
+**Proyecto Académico**  
+Universidad Privada Domingo Savio — Ingeniería de Sistemas  
 Materia: Inteligencia de Negocios — 2026
 
 ---
 
 ## Tabla de Contenidos
 
-- [Descripción](#descripción)
-- [OKRs](#okrs)
-- [Stack](#stack)
+- [Demo en Vivo](#demo-en-vivo)
+- [Propósito y Resultados](#propósito-y-resultados)
+- [Qué Hace](#qué-hace)
+- [Páginas del Dashboard](#páginas-del-dashboard)
 - [Arquitectura](#arquitectura)
+- [Stack Tecnológico](#stack-tecnológico)
 - [Pipeline de Datos](#pipeline-de-datos)
+- [Diagramas ER de las Bases de Datos](#diagramas-er-de-las-bases-de-datos)
 - [Esquema Copo de Nieve](#esquema-copo-de-nieve)
-- [Cronograma de Sprints](#cronograma-de-sprints)
-- [Equipo y Forma de Trabajo](#equipo-y-forma-de-trabajo)
-- [Tablero Kanban y Flujo de Trabajo](#tablero-kanban-y-flujo-de-trabajo)
+- [Equipo](#equipo)
 - [Instalación](#instalación)
 - [Variables de Entorno](#variables-de-entorno)
-- [Ejecutar el Dashboard](#ejecutar-el-dashboard)
+- [Despliegue en Streamlit Cloud](#despliegue-en-streamlit-cloud)
 
 ---
 
-## Descripción
+## Propósito y Resultados
 
-Las instituciones de educación técnica bolivianas generan grandes volúmenes de datos académicos pero carecen de herramientas para conectarlos con la demanda real del mercado laboral. Este proyecto resuelve esa desconexión.
+**Objetivo:** Construir un sistema BI que haga visible y medible la brecha de habilidades digitales en la educación IT boliviana — dándole a los directores académicos una herramienta basada en evidencia para alinear los planes de estudio con la demanda real del mercado laboral, contribuyendo directamente al ODS 4 (Educación de Calidad) y ODS 8 (Trabajo Decente).
 
-**Antes**: Toma de decisiones basada en intuición, silos de información fragmentados y sin visibilidad sobre la empleabilidad de los egresados.
+**¿Se cumplió?**
 
-**Después**: Un pipeline BI unificado que integra registros académicos internos con datos externos del mercado laboral, exponiendo KPIs accionables a través de un dashboard interactivo.
+| Objetivo | Resultado |
+|----------|-----------|
+| Pipeline de datos de punta a punta (Bronze → Silver → Gold) | Implementado y operacional |
+| 4+ KPIs calculados con datos reales | 9 KPIs en 4 páginas del dashboard |
+| Brecha de habilidades identificada entre academia y mercado | Medida en las 5 carreras IT con fuzzy matching |
+| Benchmark regional contra América Latina | 17 países via CEPALSTAT ODS 4.4.1 |
+| Asistente IA para consultas en lenguaje natural | En vivo via API de Groq (LLaMA 3.1 8B) |
+| Despliegue público accesible para evaluadores | Desplegado en `brecha-digital-bolivia-bi.streamlit.app` |
 
-Capacidades principales:
-
-- Pipeline ELT automatizado desde SQL Server (Bronze) pasando por transformación (Silver) hasta un warehouse con esquema copo de nieve (Gold)
-- Foco 100% Tecnológico: Análisis de datos simulados centrados exclusivamente en carreras TIC (Ing. de Software, Ciberseguridad, Ciencia de Datos, etc.)
-- Monitoreo de KPIs: tasa de inserción laboral, predicción de deserción, análisis de brecha de habilidades
-- Benchmarking regional usando indicadores CEPALSTAT (ODS 4 y ODS 8)
-- Análisis de demanda laboral internacional en tiempo real extrayendo vacantes de EE.UU., España, México y Brasil vía Adzuna API (evaluando oportunidades remotas)
-- Asistente con IA (Groq API) para consultas en lenguaje natural sobre los datos
-
----
-
-## OKRs
-
-Los OKRs definen el éxito del proyecto con resultados clave medibles. Para la explicación completa ver [`docs/guia-del-proyecto.md`](docs/guia-del-proyecto.md).
-
-| Objetivo | Resultado Clave | Métrica |
-|----------|-----------------|---------|
-| **O1: Pipeline funcional de punta a punta** | KR1: Las 3 capas implementadas sin errores | Bronze ✓ Silver ✓ Gold ✓ |
-| | KR2: Silver con 0% nulos o inconsistencias geográficas | `df.isnull().sum() == 0` |
-| | KR3: DW con tabla de hechos y todas las dimensiones cargadas | `DW_BrechaDigital` poblado |
-| **O2: Insights accionables sobre la brecha digital** | KR1: Dashboard con 4+ KPIs con datos reales | 4 páginas funcionales |
-| | KR2: 3+ habilidades con brecha identificadas | Skill Gap analizado |
-| | KR3: Análisis en 2+ ciudades bolivianas | Benchmarking regional |
-| **O3: Dominio de metodología BI demostrado** | KR1: 4 secciones del dashboard funcionando | Demo Day ready |
-| | KR2: Cada integrante explica su capa sin leer notas | Comprensión individual |
-| | KR3: Informe documenta decisiones técnicas clave | PDF final completo |
+**Hallazgo concreto:** El análisis de brecha — usando vacantes reales extraídas por LLM — muestra que las habilidades más demandadas (Docker, plataformas cloud, frameworks modernos de CI/CD) tienen cobertura académica significativamente baja en las 5 carreras IT analizadas. Esto confirma la hipótesis de que la brecha digital es real y medible — exactamente el tipo de evidencia que puede impulsar una reforma curricular.
 
 ---
 
-## Stack
+## Demo en Vivo
 
-| Categoría | Tecnología | Versión |
+**[brecha-digital-bolivia-bi.streamlit.app](https://brecha-digital-bolivia-bi.streamlit.app/)**
+
+La aplicación está desplegada en Streamlit Cloud y se conecta en tiempo real a la API de Groq para el asistente IA. Usa archivos CSV pre-procesados para los datos académicos y del mercado laboral.
+
+---
+
+## Qué Hace
+
+Las instituciones de educación técnica en Bolivia generan grandes volúmenes de datos académicos pero no tienen las herramientas para conectarlos con la demanda real del mercado laboral. Este proyecto construye ese puente.
+
+**Antes:** Decisiones basadas en intuición, silos de datos fragmentados, sin visibilidad sobre la empleabilidad de los egresados.
+
+**Después:** Un pipeline BI unificado que integra registros académicos internos con datos externos del mercado laboral, exponiendo KPIs accionables a través de un dashboard interactivo accesible para cualquier director académico.
+
+**Capacidades principales:**
+
+- **Pipeline ELT de punta a punta:** SQL Server (Bronze) → transformación Python (Silver) → almacén en esquema copo de nieve (Gold)
+- **Análisis enfocado en IT:** Cubre exclusivamente 5 carreras — Ingeniería de Software, Ingeniería de Sistemas, Ciencia de Datos, Telecomunicaciones y Ciberseguridad
+- **Inteligencia del mercado laboral:** Datos reales de vacantes desde la API de Adzuna (EE.UU., España, México, Brasil) con extracción de habilidades mediante LLM de Groq
+- **Monitoreo de KPIs:** Tasa de empleabilidad, predicción de deserción, análisis de brecha de habilidades, benchmarking salarial
+- **Benchmark regional:** Indicador ODS 4.4.1 de CEPALSTAT — competencias digitales en 17 países de América Latina
+- **Asistente IA:** Consultas en lenguaje natural sobre el dataset completo, impulsado por LLaMA 3.1 (API de Groq)
+
+---
+
+## Páginas del Dashboard
+
+| Página | URL | Descripción |
 |---|---|---|
-| Procesamiento de Datos | Python | 3.11+ |
-| Manipulación de Datos | Pandas | 2.0+ |
-| Base de Datos Bronze | SQL Server (T-SQL) — `BrechaDigitalDB` | 2019+ |
-| Warehouse Gold | SQL Server (T-SQL) — `DW_BrechaDigital` | 2019+ |
-| Dashboard | Streamlit | 1.32+ |
-| Gráficos | Plotly | 5.20+ |
-| Asistente IA | Groq API | 0.5+ |
-| Datos Macroeconómicos | CEPALSTAT REST API | — |
-| Datos de Empleo | Adzuna REST API | — |
-| Conectividad BD | PyODBC + SQLAlchemy | 5.0+ / 2.0+ |
-| Entorno | python-dotenv | 1.0+ |
+| Inicio | `/` | KPIs principales, navegación, fuentes de datos |
+| KPIs | `/kpis` | Tasa de empleo, gauge de deserción, benchmark CEPALSTAT regional |
+| Inserción Laboral | `/insercion` | Tasa de inserción por carrera, distribución salarial, tendencias temporales, mapa de calor por ciudad |
+| Brecha de Habilidades | `/skill_gap` | Habilidades del mercado vs currículo académico, análisis de cobertura, habilidades extraídas con LLM |
+| Asistente IA | `/chatbot` | Consultas BI en lenguaje natural — LLaMA 3.1 8B via API de Groq |
 
 ---
 
 ## Arquitectura
 
-El proyecto sigue una arquitectura medallón **Bronze → Silver → Gold**:
+```
+SQL Server BrechaDigitalDB      API CEPALSTAT         API Adzuna
+      [Bronze — Fuente]          [Macro Data]      [Datos de Empleo]
+             │                        │                    │
+             └────────────────────────┴────────────────────┘
+                                      │
+                           src/ingestion/ (Python)
+                           sqlserver.py · cepalstat.py · empleos.py
+                                      │
+                                 data/raw/
+                               [Bronze — CSV]
+                                      │
+                           src/transform/ (Python)
+                           clean.py · normalize.py
+                                      │
+                              data/processed/
+                               [Silver — CSV]
+                                      │
+                         ┌────────────┴────────────┐
+                         │                         │
+              src/ingestion/skill_extraction.py   src/schema/ (Python)
+              LLM Groq → skills_extracted.csv     facts.py · dimensions.py
+                         │                         │
+                         └────────────┬────────────┘
+                                      │
+                        SQL Server DW_BrechaDigital
+                      [Gold — Esquema Copo de Nieve T-SQL]
+                       Fact_InsercionLaboral · Tablas DIM_*
+                                      │
+                             src/dashboard/ (Streamlit)
+               KPIs · Inserción Laboral · Skill Gap · Chatbot IA
+```
 
-```
-SQL Server BrechaDigitalDB    API CEPALSTAT       Adzuna API
-    [Bronze — Fuente]       [Datos Macro]    [Vacantes Laborales]
-            │                     │                   │
-            └─────────────────────┴───────────────────┘
-                                  │
-                       src/ingestion/ (Python)
-                       sqlserver.py · cepalstat.py · empleos.py
-                                  │
-                            data/raw/
-                          [Bronze — CSV]
-                                  │
-                       src/transform/ (Python)
-                       clean.py · normalize.py
-                                  │
-                          data/processed/
-                           [Silver — CSV]
-                                  │
-                         src/schema/ (Python)
-                         facts.py · dimensions.py
-                                  │
-                  SQL Server DW_BrechaDigital
-               [Gold — Esquema Copo de Nieve T-SQL]
-                 Fact_InsercionLaboral · tablas DIM_*
-                                  │
-                       src/dashboard/ (Streamlit)
-                  KPIs · Inserción Laboral · Skill Gap · Chatbot
-```
+---
+
+## Stack Tecnológico
+
+| Categoría | Tecnología | Versión |
+|---|---|---|
+| Lenguaje | Python | 3.11+ |
+| Procesamiento de Datos | Pandas | 2.0+ |
+| Base de Datos Bronze | SQL Server (T-SQL) — `BrechaDigitalDB` | 2019+ |
+| Almacén Gold | SQL Server (T-SQL) — `DW_BrechaDigital` | 2019+ |
+| Dashboard | Streamlit | 1.32+ |
+| Gráficos | Plotly | 5.20+ |
+| Extracción de Skills con IA | API de Groq (LLaMA 3.1 8B) | 0.9+ |
+| Asistente IA | API de Groq (LLaMA 3.1 8B Instant) | 0.9+ |
+| Datos Macroeconómicos | API REST de CEPALSTAT | — |
+| Datos de Empleo | API REST de Adzuna | — |
+| Conectividad BD | PyODBC + SQLAlchemy | 5.0+ / 2.0+ |
+| Variables de Entorno | python-dotenv | 1.0+ |
 
 ---
 
@@ -137,218 +173,276 @@ SQL Server BrechaDigitalDB    API CEPALSTAT       Adzuna API
 
 | Paso | Módulo | Entrada | Salida |
 |---|---|---|---|
-| 1. Extracción | `src/ingestion/sqlserver.py` | `BrechaDigitalDB` (SQL Server) | `data/raw/*.csv` |
-| 2. Extracción | `src/ingestion/cepalstat.py` | CEPALSTAT REST API | `data/raw/cepalstat/*.csv` |
-| 3. Extracción | `src/ingestion/empleos.py` | Adzuna REST API | `data/raw/empleos/*.csv` |
-| 4. Limpieza | `src/transform/clean.py` | `data/raw/*.csv` | `data/processed/*.csv` |
-| 5. Normalización | `src/transform/normalize.py` | `data/processed/*.csv` | `data/processed/*.csv` |
-| 6. Carga Dimensiones | `src/schema/dimensions.py` | `data/processed/*.csv` | `DW_BrechaDigital` — tablas DIM_* |
-| 7. Carga Hechos | `src/schema/facts.py` | `data/processed/*.csv` | `DW_BrechaDigital` — Fact_InsercionLaboral |
+| 1. Extracción Académica | `src/ingestion/sqlserver.py` | `BrechaDigitalDB` (SQL Server) | `data/raw/*.csv` |
+| 2. Extracción Macro | `src/ingestion/cepalstat.py` | API REST de CEPALSTAT | `data/raw/cepalstat/*.csv` |
+| 3. Extracción de Empleos | `src/ingestion/empleos.py` | API de Adzuna | `data/raw/empleos/*.csv` |
+| 4. Extracción de Habilidades | `src/ingestion/skill_extraction.py` | Descripciones de vacantes Adzuna | `data/processed/empleos/skills_extracted.csv` |
+| 5. Limpieza | `src/transform/clean.py` | `data/raw/*.csv` | `data/processed/*.csv` |
+| 6. Normalización | `src/transform/normalize.py` | `data/processed/*.csv` | `data/processed/*.csv` |
+| 7. Carga de Dimensiones | `src/schema/dimensions.py` | `data/processed/*.csv` | `DW_BrechaDigital` — tablas DIM_* |
+| 8. Carga de Hechos | `src/schema/facts.py` | `data/processed/*.csv` | `DW_BrechaDigital` — Fact_InsercionLaboral |
+
+### Pipeline de Extracción de Habilidades con IA
+
+Las descripciones de vacantes de Adzuna son procesadas por `skill_extraction.py` en dos etapas:
+
+1. **LLM de Groq (primario):** Envía descripciones crudas a `llama-3.1-8b-instant` y extrae listas de habilidades estructuradas en formato JSON
+2. **Fallback con regex:** Si el LLM falla o alcanza el límite de tasa, un banco de patrones regex cubre los keywords tecnológicos más comunes
+
+El `skills_extracted.csv` resultante está commiteado al repositorio para reproducibilidad y para evitar costos de LLM en cada carga del dashboard.
+
+---
+
+## Diagramas ER de las Bases de Datos
+
+### Bronze — `BrechaDigitalDB` (Base de datos fuente)
+
+Base de datos operacional con registros académicos crudos. Modelo relacional normalizado.
+
+```
+┌─────────────────┐         ┌──────────────────────┐
+│    Carreras     │         │  CompetenciasDigitales│
+├─────────────────┤         ├──────────────────────┤
+│ PK CarreraID    │◄────────│ FK CarreraID          │
+│    NombreCarrera│         │ PK CompetenciaID      │
+│    Facultad     │         │    NombreHabilidad    │
+└────────┬────────┘         │    NivelRequerido     │
+         │                  └──────────────────────┘
+         │
+         │   ┌──────────────────┐
+         │   │   Estudiantes    │
+         │   ├──────────────────┤
+         └──►│ PK EstudianteID  │
+             │    Nombre        │◄──────────────┐
+             │    FechaIngreso  │               │
+             │    Genero        │               │
+             │    Ciudad        │               │
+             └──────────────────┘               │
+                                                │
+┌──────────────────────────┐    ┌───────────────┴──────────┐
+│     Inscripciones        │    │   SeguimientoEgresados   │
+├──────────────────────────┤    ├──────────────────────────┤
+│ PK InscripcionID         │    │ PK EgresadoID            │
+│ FK EstudianteID ─────────┼───►│ FK EstudianteID          │
+│ FK CarreraID    ─────────┼───►│    TieneEmpleoFormal     │
+│    NotaFinal             │    │    SalarioMensualUSD     │
+│    SemestreActual        │    │    TrabajaEnAreaDeEstudio│
+└──────────────────────────┘    └──────────────────────────┘
+```
+
+**5 tablas — 4 relaciones de clave foránea**  
+`SeguimientoEgresados` es la tabla clave: registra si cada estudiante obtuvo empleo formal post-egreso y si trabaja en su área de estudio.
+
+---
+
+### Gold — `DW_BrechaDigital` (Almacén en Esquema Copo de Nieve)
+
+Almacén analítico optimizado para consultas BI. Cada fila en la tabla de hechos es el evento de empleo de un egresado.
+
+```
+                    ┌───────────────────┐
+                    │   DIM_CARRERA     │
+                    ├───────────────────┤
+                    │ PK SK_Carrera     │
+                    │    CarreraID (BK) │
+                    │    nombrecarrera  │
+                    │    area           │
+                    └────────┬──────────┘
+                             │
+┌──────────────────┐         │         ┌──────────────────────┐
+│  DIM_ESTUDIANTE  │         │         │    DIM_HABILIDAD      │
+├──────────────────┤         │         ├──────────────────────┤
+│ PK SK_Estudiante │         │         │ PK SK_Habilidad       │
+│    EstudianteID  │         │         │    NombreHabilidad    │
+│    nombre        │         │         │ FK SK_Categoria ──►┐  │
+│    Genero        │         │         └──────────┬──────────┘  │
+│    ciudad_       │         │                    │              │
+│    residencia    │         │         ┌──────────▼──────────┐  │
+└────────┬─────────┘         │         │ DIM_CATEGORIA_SKILL │  │
+         │                   │         ├─────────────────────┤  │
+         │         ┌─────────▼──────────────────────────┐    │  │
+         └────────►│       FACT_INSERCION_LABORAL        │    │  │
+                   ├────────────────────────────────────┤    │  │
+                   │ FK SK_Estudiante                    │    │  │
+                   │ FK SK_Carrera                       │    │  │
+                   │ FK SK_Tiempo                        │    │  │
+                   │ FK SK_Region                        │    │  │
+                   │ FK SK_MercadoLaboral                │    │  │
+                   │    EstaEmpleado         (INT)       │    │  │
+                   │    SalarioMensualUSD    (DECIMAL)   │    │  │
+                   │    TrabajaEnAreaEstudio (BIT)       │    │  │
+                   └──────┬──────────────┬───────────────┘    │  │
+                          │              │          SK_Categoria│  │
+                          ▼              ▼          PK──────────┘  │
+              ┌───────────────┐  ┌──────────────────────┐         │
+              │  DIM_TIEMPO   │  │  DIM_MERCADO_LABORAL  │         │
+              ├───────────────┤  ├──────────────────────┤         │
+              │ PK SK_Tiempo  │  │ PK SK_MercadoLaboral  │         │
+              │    anio       │  │    Ubicacion          │         │
+              │    trimestre  │  │ FK SK_Region ──►┐     │         │
+              │    mes        │  └──────────────────┼─────┘         │
+              │    Semestre   │                     │                │
+              └───────────────┘          ┌──────────▼────────┐      │
+                                         │    DIM_REGION     │      │
+                                         ├───────────────────┤      │
+                                         │ PK SK_Region      │      │
+                                         │    Ciudad         │      │
+                                         │    Region         │      │
+                                         └───────────────────┘      │
+                                                                     │
+                              NombreCategoria ◄─────────────────────┘
+                              Básico / Intermedio / Avanzado
+```
+
+**8 tablas — 1 fact + 7 dimensiones (2 sub-dimensiones)**  
+El copo de nieve normaliza `DIM_HABILIDAD → DIM_CATEGORIA_SKILL` y `DIM_MERCADO_LABORAL → DIM_REGION` para eliminar redundancia de datos.
 
 ---
 
 ## Esquema Copo de Nieve
 
-Modelo de dimensiones normalizado: las sub-dimensiones reducen la redundancia de datos y mejoran la integridad referencial. Elegido sobre el esquema estrella por correctitud técnica, a costo de JOINs adicionales en las consultas.
+Modelo normalizado elegido sobre esquema estrella por corrección técnica. Las sub-dimensiones reducen redundancia y mejoran la integridad referencial a costa de JOINs adicionales.
 
 ```
-                       DIM_CARRERA
-                            ▲
-            DIM_CATEGORIA_SKILL   DIM_ESTUDIANTE
-                   ▲                    ▲
-             DIM_HABILIDAD              │
-                   ▲                    │
-                   └── FACT_INSERCION_LABORAL ──► DIM_TIEMPO
-                                        │
-                                        └────────► DIM_MERCADO_LABORAL
-                                                            ▲
-                                                       DIM_REGION
+                         DIM_CARRERA
+                              ▲
+              DIM_CATEGORIA_SKILL   DIM_ESTUDIANTE
+                     ▲                    ▲
+               DIM_HABILIDAD              │
+                     ▲                    │
+                     └── FACT_INSERCION_LABORAL ──► DIM_TIEMPO
+                                          │
+                                          └────────► DIM_MERCADO_LABORAL
+                                                              ▲
+                                                         DIM_REGION
 ```
 
-Documentación completa del esquema: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_nieve.md)
+Documentación completa: [`docs/esquema_copo_nieve.md`](docs/esquema_copo_nieve.md)
 
 ---
 
-## Cronograma de Sprints
+## Equipo
 
-| Día | Fecha | Fase | Capa |
-|---|---|---|---|
-| Día 1 | 1 de abril | Definición, setup GitHub, extracción Bronze | Bronze |
-| Día 2 | 2 de abril | Limpieza, transformación e integración | Silver |
-| Día 3 | 3 de abril | Modelado copo de nieve + construcción del Dashboard | Gold + Viz |
-| Día 4 | 6 de abril | Pruebas finales, storytelling y documentación | Todas |
-| Día 5 | 7 de abril | **DEMO DAY** — presentación final de 10 minutos | — |
-
-El avance se registra en el [Tablero Kanban de GitHub](https://github.com/users/temps-code/projects/3).
-
----
-
-## Equipo y Forma de Trabajo
-
-Todos los integrantes contribuyen en todas las fases del proyecto. Cada persona indicada abajo es el **lead** de su fase — responsable de gestionar, revisar y garantizar la calidad de esa capa.
-
-| Integrante | Fase Lead | GitHub |
+| Integrante | Rol | GitHub |
 |---|---|---|
-| Abraham Flores Barrionuevo | Bronze — Ingesta de Datos | [@AFB-9898](https://github.com/AFB-9898) |
-| Juan Nicolás Flores Delgado | Silver — Transformación | [@Juan7139nf](https://github.com/Juan7139nf) |
-| Micaela Pérez Vásquez | Gold — Diseño del Esquema | [@Sam24p](https://github.com/Sam24p) |
-| Mayra Villca Méndez | Análisis y KPIs — Notebooks | [@MayVillca](https://github.com/MayVillca) |
-| Diego Vargas Urzagaste | Dashboard e Integración | [@temps-code](https://github.com/temps-code) |
+| Abraham Flores Barrionuevo | Lead Bronze — Ingesta de Datos | [@AFB-9898](https://github.com/AFB-9898) |
+| Juan Nicolás Flores Delgado | Lead Silver — Transformación | [@Juan7139nf](https://github.com/Juan7139nf) |
+| Micaela Pérez Vásquez | Lead Gold — Diseño del Esquema | [@Sam24p](https://github.com/Sam24p) |
+| Mayra Villca Méndez | Lead Análisis — Notebooks y KPIs | [@MayVillca](https://github.com/MayVillca) |
+| Diego Vargas Urzagaste | Lead Dashboard — Integración y Despliegue | [@temps-code](https://github.com/temps-code) |
 
----
-
-## Tablero Kanban y Flujo de Trabajo
-
-Todo el avance del equipo se registra en el [Tablero Kanban](https://github.com/users/temps-code/projects/3) — abrí la pestaña **Projects** del repositorio.
-
-### Columnas del tablero
-
-| Columna | Cuándo usarla |
-|---|---|
-| **Todo** | La tarea todavía no fue iniciada |
-| **In Progress** | Estás trabajando activamente en ella |
-| **Testing/Review** | Terminaste — esperando que el Lead revise |
-| **Done** | El Lead aprobó — tarea completa |
-
-> Solo el Lead de cada fase mueve una tarjeta a **Done**. No cierres tu propia tarea — esperá la revisión.
-
-### Flujo de trabajo diario
-
-1. Abrí tu issue desde la [pestaña Issues](https://github.com/temps-code/brecha-digital-bi/issues)
-2. Mové tu tarjeta a **In Progress** en el tablero
-3. Creá tu rama de trabajo:
-
-   ```bash
-   git checkout main
-   git pull origin main
-   git checkout -b feature/tu-fase   # ej: feature/bronze
-   ```
-
-4. Commiteá tu progreso con frecuencia:
-
-   ```bash
-   git add .
-   git commit -m "feat: descripción breve de lo que hiciste"
-   git push origin feature/tu-fase
-   ```
-
-5. Al terminar: mové la tarjeta a **Testing/Review** y avisale a Diego (@temps-code)
-6. Marcá los checkboxes completados dentro de tu issue
-
-### Nombres de ramas
-
-| Fase | Rama |
-|---|---|
-| Bronze — Ingesta de Datos | `feature/bronze` |
-| Silver — Transformación | `feature/silver` |
-| Gold — Esquema | `feature/gold` |
-| Dashboard | `feature/dashboard` |
-| Notebooks y KPIs | `feature/notebooks` |
+Progreso en el [Tablero Kanban de GitHub](https://github.com/users/temps-code/projects/3).
 
 ---
 
 ## Instalación
 
-1. Clonar el repositorio:
+```bash
+# 1. Clonar
+git clone https://github.com/temps-code/brecha-digital-bi.git
+cd brecha-digital-bi
 
-   ```bash
-   git clone https://github.com/temps-code/brecha-digital-bi.git
-   cd brecha-digital-bi
-   ```
+# 2. Entorno virtual
+python -m venv .venv
+source .venv/bin/activate        # Linux / macOS
+.venv\Scripts\activate           # Windows
 
-2. Crear y activar un entorno virtual:
+# 3. Dependencias
+pip install -r requirements.txt
 
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate        # Linux / macOS
-   .venv\Scripts\activate           # Windows
-   ```
+# 4. Configurar variables de entorno (ver abajo)
 
-3. Instalar dependencias:
+# 5. Cargar la base de datos Bronze
+#    Ejecutar database/seed.sql en SQL Server Management Studio
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+# 6. Ejecutar el pipeline completo (un solo comando)
+python -m src.run_pipeline
 
-4. Configurar las variables de entorno (ver [Variables de Entorno](#variables-de-entorno)).
+# Opcional: omitir ingesta si los CSVs raw ya existen
+python -m src.run_pipeline --skip-ingestion
+```
 
-5. Poblar la base de datos Bronze — ejecutar `database/seed.sql` en SQL Server Management Studio (SSMS).
+El orquestador (`src/run_pipeline.py`) ejecuta las 4 etapas en orden:
 
-6. Ejecutar el pipeline completo:
-
-   ```bash
-   python src/ingestion/sqlserver.py
-   python src/ingestion/cepalstat.py
-   python src/ingestion/empleos.py
-   python src/transform/clean.py
-   python src/transform/normalize.py
-   python src/schema/dimensions.py
-   python src/schema/facts.py
-   ```
+| Etapa | Qué hace |
+|-------|----------|
+| **1 — Ingestion** | Extrae desde SQL Server + API Adzuna + API CEPALSTAT + extracción de skills con LLM |
+| **2 — Clean** | Limpia y valida todos los CSVs raw |
+| **3 — Normalize** | Estandariza ciudades, carreras, fechas; crea vista unificada |
+| **4 — Schema** | Carga dimensiones y tabla de hechos en `DW_BrechaDigital` |
 
 ---
 
 ## Variables de Entorno
 
-El repositorio incluye un archivo `.env.example`. Copialo y completá tus valores:
+Copiá `.env.example` y completá tus valores:
 
 ```bash
 cp .env.example .env
 ```
 
 ```env
-# SQL Server — Base de Datos Bronze
-# Docker / Linux / servidor remoto con credenciales:
+# SQL Server — Fuente Bronze
 DB_SERVER=localhost,1433
 DB_NAME=BrechaDigitalDB
 DB_USER=sa
 DB_PASSWORD=tu_contraseña
 
-# Windows con SQL Server local (Windows Auth): dejá DB_USER y DB_PASSWORD vacíos
-# DB_SERVER=localhost\SQLEXPRESS
-# DB_USER=
-# DB_PASSWORD=
-
-# SQL Server — Warehouse Gold
-# Misma regla: dejá DW_USER y DW_PASSWORD vacíos para Windows Auth
+# SQL Server — Almacén Gold
 DW_SERVER=localhost,1433
 DW_NAME=DW_BrechaDigital
 DW_USER=sa
 DW_PASSWORD=tu_contraseña
 
-# Groq API
-GROQ_API_KEY=tu_api_key_de_groq
+# API de Groq — asistente IA + extracción de habilidades con LLM
+GROQ_API_KEY=tu_clave_groq
 
-# CEPALSTAT (no requiere clave — API pública)
+# CEPALSTAT (API pública — sin clave requerida)
 CEPALSTAT_BASE_URL=https://api-cepalstat.cepal.org/cepalstat/api/v1
 
-# Adzuna Employment API
+# API de Empleo Adzuna
 ADZUNA_APP_ID=tu_app_id
 ADZUNA_APP_KEY=tu_app_key
 ```
 
-> Nunca commitear el archivo `.env`. Ya está incluido en el `.gitignore`.
-> El pipeline detecta el modo de autenticación automáticamente: SQL Auth si hay credenciales, Windows Auth si no las hay.
+> El archivo `.env` ya está en `.gitignore`. Nunca lo commitees.  
+> El pipeline detecta el modo de autenticación automáticamente: SQL Auth si hay credenciales, Windows Auth en caso contrario.
 
 ---
 
-## Ejecutar el Dashboard
+## Despliegue en Streamlit Cloud
 
-```bash
-streamlit run src/dashboard/app.py
+La aplicación está desplegada en **[brecha-digital-bolivia-bi.streamlit.app](https://brecha-digital-bolivia-bi.streamlit.app/)**.
+
+Para tu propio despliegue:
+
+1. Hacer fork o push a GitHub
+2. Conectar el repositorio en [share.streamlit.io](https://share.streamlit.io)
+3. Configurar **Main file path** en `src/dashboard/app.py`
+4. Agregar secrets en **Settings → Secrets** (formato TOML):
+
+```toml
+GROQ_API_KEY = "gsk_tu_clave_aqui"
+ADZUNA_APP_ID = "tu_id"
+ADZUNA_APP_KEY = "tu_clave"
+DB_SERVER = "tu_servidor"
+DB_NAME = "BrechaDigitalDB"
+DB_USER = "tu_usuario"
+DB_PASSWORD = "tu_contraseña"
+DW_SERVER = "tu_servidor"
+DW_NAME = "DW_BrechaDigital"
+DW_USER = "tu_usuario"
+DW_PASSWORD = "tu_contraseña"
 ```
 
-El dashboard estará disponible en `http://localhost:8501`.
-
-| Página | Descripción |
-|---|---|
-| KPIs | Indicadores generales de empleabilidad y deserción |
-| Inserción Laboral | Tasa de inserción por carrera y región |
-| Skill Gap | Comparación entre habilidades académicas y demanda del mercado |
-| Asistente IA | Consultas en lenguaje natural con Groq API |
+> Sin acceso a SQL Server, el dashboard cae automáticamente a los CSVs pre-procesados en `data/processed/` — sin pérdida de funcionalidad en la versión desplegada.
 
 ---
 
-<div align="center">
-<img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License: MIT">
-</div>
+<a href="LICENSE">
+  <img src="https://img.shields.io/badge/Licencia-MIT-blue.svg?style=for-the-badge" alt="Licencia: MIT">
+</a>
+&nbsp;
+<a href="https://brecha-digital-bolivia-bi.streamlit.app/">
+  <img src="https://img.shields.io/badge/▶_Abrir_Demo_en_Vivo-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Abrir Demo en Vivo">
+</a>
