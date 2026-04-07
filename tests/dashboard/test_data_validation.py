@@ -27,7 +27,10 @@ from dashboard.components.data_loader import (
     _validate_graduation_year,
     _validate_salary_data,
     _fuzzy_match_skill,
-    IT_CAREERS
+    IT_CAREERS,
+    get_kpis,
+    get_empleo_por_carrera,
+    get_skill_gap
 )
 
 

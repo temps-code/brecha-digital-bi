@@ -59,7 +59,8 @@ class TestGetKpisIntegration:
     
     def test_get_kpis_returns_all_required_keys(self):
         """Test: get_kpis() returns all required KPI keys"""
-        kpis = get_kpis()
+        df = load_df()
+        kpis = get_kpis(df)
         
         required_keys = ['tasa_empleo', 'pct_area', 'salario_prom', 'total_egresados', '_errors']
         for key in required_keys:
@@ -67,7 +68,8 @@ class TestGetKpisIntegration:
     
     def test_get_kpis_tasa_empleo_is_valid_percentage(self):
         """Test: Employment rate is valid percentage (0-100)"""
-        kpis = get_kpis()
+        df = load_df()
+        kpis = get_kpis(df)
         
         if kpis['tasa_empleo'] is not None:
             assert 0 <= kpis['tasa_empleo'] <= 100, \
@@ -75,7 +77,8 @@ class TestGetKpisIntegration:
     
     def test_get_kpis_pct_area_is_valid_percentage(self):
         """Test: Percentage in area is valid (0-100)"""
-        kpis = get_kpis()
+        df = load_df()
+        kpis = get_kpis(df)
         
         if kpis['pct_area'] is not None:
             assert 0 <= kpis['pct_area'] <= 100, \
@@ -83,7 +86,8 @@ class TestGetKpisIntegration:
     
     def test_get_kpis_salario_prom_is_positive(self):
         """Test: Average salary is positive or null"""
-        kpis = get_kpis()
+        df = load_df()
+        kpis = get_kpis(df)
         
         if kpis['salario_prom'] is not None:
             assert kpis['salario_prom'] >= 0, \
@@ -91,14 +95,16 @@ class TestGetKpisIntegration:
     
     def test_get_kpis_total_egresados_is_positive(self):
         """Test: Total graduates count is positive"""
-        kpis = get_kpis()
+        df = load_df()
+        kpis = get_kpis(df)
         
         assert kpis['total_egresados'] > 0, \
             f"Total graduates should be > 0, got {kpis['total_egresados']}"
     
     def test_get_kpis_errors_is_list(self):
         """Test: _errors key is a list"""
-        kpis = get_kpis()
+        df = load_df()
+        kpis = get_kpis(df)
         
         assert isinstance(kpis['_errors'], list), "_errors should be a list"
 
@@ -208,7 +214,7 @@ class TestDataFlowConsistency:
     def test_load_df_and_kpis_consistency(self):
         """Test: KPIs are consistent with loaded data"""
         df = load_df()
-        kpis = get_kpis()
+        kpis = get_kpis(df)
         
         if df is not None and not df.empty:
             # total_egresados should match DataFrame rows (approximately)
@@ -225,7 +231,7 @@ class TestDataFlowConsistency:
                 "load_df should filter to IT careers"
             
             # get_kpis uses load_df output, so should also be IT-only
-            kpis = get_kpis()
+            kpis = get_kpis(df)
             assert kpis['total_egresados'] > 0, "KPIs should have IT data"
 
 
