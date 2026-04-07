@@ -92,45 +92,69 @@ def bar_habilidades_demandadas(df: pd.DataFrame) -> go.Figure:
 
 
 def combo_skill_gap(df: pd.DataFrame) -> go.Figure:
+    # Scale coverage to the same unit as demand: if a skill has 40 vacantes and
+    # 100% coverage, the line sits at 40. 50% → 20. Both axes share the same scale.
+    cobertura_scaled = (df['demanda'] * df['cobertura'] / 100).round(1)
+    n = len(df)
+    x_indices = list(range(n))
+    skill_labels = df['habilidad'].tolist()
+
     fig = go.Figure()
+
+    # Bars: market demand
     fig.add_trace(go.Bar(
-        name='Demanda (vacantes)',
-        x=df['habilidad'],
+        name='Vacantes que la requieren',
+        x=x_indices,
         y=df['demanda'],
         marker_color=_ACCENT,
-        yaxis='y',
     ))
+
+    # Area line: coverage scaled to vacantes units.
+    # Prepend and append a 0 point so the line visually starts and ends at the baseline.
     fig.add_trace(go.Scatter(
-        name='Cobertura académica (%)',
-        x=df['habilidad'],
-        y=df['cobertura'],
-        mode='lines+markers',
-        marker=dict(color=_ORANGE, size=8),
+        name='Cobertura académica (vacantes equiv.)',
+        x=[-0.5] + x_indices + [n - 0.5],
+        y=[0] + cobertura_scaled.tolist() + [0],
+        mode='lines',
         line=dict(color=_ORANGE, width=2),
-        yaxis='y2',
+        fill='tozeroy',
+        fillcolor='rgba(245,158,11,0.18)',
     ))
+
+    # Markers only at actual data points (separate trace, no legend entry)
+    fig.add_trace(go.Scatter(
+        x=x_indices,
+        y=cobertura_scaled,
+        mode='markers',
+        marker=dict(color=_ORANGE, size=7),
+        showlegend=False,
+        hovertemplate='%{y:.1f} vacantes equiv.<extra></extra>',
+    ))
+
     fig.update_layout(
         title='Brecha: Demanda del Mercado vs Cobertura Académica',
-        yaxis=dict(title='Vacantes que la requieren', gridcolor=_GRID, zerolinecolor=_GRID),
-        yaxis2=dict(
-            title='Cobertura académica (%)',
-            overlaying='y',
-            side='right',
-            range=[0, 120],
+        xaxis=dict(
+            tickvals=x_indices,
+            ticktext=skill_labels,
+            tickangle=-35,
             gridcolor=_GRID,
+            zerolinecolor=_GRID,
         ),
+        yaxis=dict(title='Cantidad de vacantes', gridcolor=_GRID, zerolinecolor=_GRID),
         legend=dict(orientation='h', y=1.12),
         paper_bgcolor=_BG,
         plot_bgcolor=_BG,
         font_color='#FAFAFA',
-        margin=dict(l=10, r=10, t=70, b=10),
+        margin=dict(l=10, r=10, t=70, b=90),
     )
     return fig
 
 
 def line_empleo_temporal(df: pd.DataFrame) -> go.Figure:
     fuentes = df['fuente'].unique().tolist() if 'fuente' in df.columns else []
-    subtitle = f" · Fuente: {', '.join(fuentes)}" if fuentes else ''
+    # Ensure all elements in fuentes are strings to avoid TypeError during join
+    fuentes_str = [str(f) for f in fuentes if pd.notna(f)]
+    subtitle = f" · Fuente: {', '.join(fuentes_str)}" if fuentes_str else ''
     fig = px.line(
         df,
         x='anio',
@@ -180,14 +204,85 @@ def bar_tasa_desercion(data: dict) -> go.Figure:
     return fig
 
 
+_ISO3_NAMES = {
+    'arg': 'Argentina',
+    'atg': 'Antigua y Barbuda',
+    'blz': 'Belice',
+    'bol': 'Bolivia',
+    'bra': 'Brasil',
+    'chl': 'Chile',
+    'col': 'Colombia',
+    'cri': 'Costa Rica',
+    'cub': 'Cuba',
+    'dma': 'Dominica',
+    'dom': 'Rep. Dominicana',
+    'ecu': 'Ecuador',
+    'gtm': 'Guatemala',
+    'hnd': 'Honduras',
+    'mex': 'México',
+    'pan': 'Panamá',
+    'per': 'Perú',
+    'pry': 'Paraguay',
+    'ven': 'Venezuela',
+}
+
+
+def bar_cepal_benchmark(df: pd.DataFrame) -> go.Figure:
+    """Vertical bar chart: one bar per country, value = average TIC indicator across years.
+    df must have columns [iso3, value] (already averaged by get_cepal_benchmark).
+    """
+    df = df.copy()
+    df['pais'] = df['iso3'].str.lower().map(_ISO3_NAMES).fillna(df['iso3'].str.upper())
+    df = df.sort_values('value', ascending=False)
+
+    fig = px.bar(
+        df,
+        x='pais',
+        y='value',
+        text='value',
+        labels={'pais': '', 'value': 'Jóvenes con competencias TIC (%)'},
+        color_discrete_sequence=[_ACCENT],
+    )
+    fig.update_traces(texttemplate='%{y:.1f}%', textposition='outside')
+    fig.update_layout(yaxis=dict(range=[0, 105], gridcolor=_GRID, zerolinecolor=_GRID))
+    return _base_layout(fig, 'Jóvenes con competencias TIC · CEPALSTAT (ODS 4.4.1)')
+
+
+def bar_cepal_pais_years(df: pd.DataFrame, pais_nombre: str) -> go.Figure:
+    """Vertical bar chart for a single country, one bar per year.
+    df must have columns [anio, value] from get_cepal_pais_years.
+    """
+    df = df.copy()
+    df['anio_str'] = df['anio'].astype(str)
+
+    fig = px.bar(
+        df,
+        x='anio_str',
+        y='value',
+        text='value',
+        labels={'anio_str': 'Año', 'value': 'Jóvenes con competencias TIC (%)'},
+        color_discrete_sequence=[_ACCENT],
+    )
+    fig.update_traces(texttemplate='%{y:.1f}%', textposition='outside')
+    fig.update_layout(yaxis=dict(range=[0, 105], gridcolor=_GRID, zerolinecolor=_GRID))
+    return _base_layout(fig, f'Jóvenes con competencias TIC — {pais_nombre} · CEPALSTAT (ODS 4.4.1)')
+
+
 def line_cepal_bolivia(df: pd.DataFrame) -> go.Figure:
+    multi_country = 'iso3' in df.columns and df['iso3'].nunique() > 1
+    title = (
+        'Indicador TIC — Región Andina · CEPALSTAT (ODS 4.4.1)'
+        if multi_country
+        else 'Indicador TIC Bolivia — CEPALSTAT (ODS 4.4.1)'
+    )
     fig = px.line(
         df,
         x='anio',
         y='value',
+        color='iso3' if multi_country else None,
         markers=True,
-        labels={'anio': 'Año', 'value': 'Indicador TIC (%)'},
-        color_discrete_sequence=[_ACCENT],
+        labels={'anio': 'Año', 'value': 'Indicador TIC (%)', 'iso3': 'País'},
+        color_discrete_sequence=None if multi_country else [_ACCENT],
     )
     fig.update_traces(line_width=2, marker_size=7)
-    return _base_layout(fig, 'Indicador TIC Bolivia — CEPALSTAT (ODS 4.4.1)')
+    return _base_layout(fig, title)

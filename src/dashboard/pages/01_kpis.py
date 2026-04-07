@@ -14,8 +14,8 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from components.data_loader import get_kpis, get_cepal_bolivia, get_tasa_desercion
-from components.charts import line_cepal_bolivia, bar_tasa_desercion
+from components.data_loader import load_df, get_kpis, get_tasa_desercion, get_cepal_benchmark, get_cepal_paises, get_cepal_pais_years
+from components.charts import bar_tasa_desercion, bar_cepal_benchmark, bar_cepal_pais_years
 from components.styles import inject_styles
 
 st.set_page_config(page_title='KPIs — Brecha Digital BI', page_icon=':material/monitoring:', layout='wide')
@@ -31,13 +31,76 @@ st.markdown("""
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
+df = load_df()
+
+# --- Filtros Interactivos ---
+with st.sidebar:
+    st.markdown('<p style="font-size:0.75rem;font-weight:600;color:#A1A1AA;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem">Filtros</p>', unsafe_allow_html=True)
+    
+    carreras = ['Todas'] + sorted(df['NombreCarrera'].dropna().unique().tolist())
+    ciudades = ['Todas'] + sorted(df['Ciudad'].dropna().unique().tolist())
+
+    carrera_sel = st.selectbox('Carrera', carreras)
+    ciudad_sel  = st.selectbox('Ciudad', ciudades)
+
+    # Year range filter
+    year_range = st.slider(
+        'Rango de Años de Egreso',
+        min_value=2020,
+        max_value=2028,
+        value=(2024, 2028),
+        step=1,
+        help='Filtra KPIs por años de egreso'
+    )
+    
+    # País CEPALSTAT filter — populated dynamically from data
+    _ISO3_DISPLAY = {
+        'arg': 'Argentina', 'atg': 'Antigua y Barbuda', 'blz': 'Belice',
+        'bol': 'Bolivia', 'bra': 'Brasil', 'chl': 'Chile', 'col': 'Colombia',
+        'cri': 'Costa Rica', 'cub': 'Cuba', 'dma': 'Dominica', 'dom': 'Rep. Dominicana',
+        'ecu': 'Ecuador', 'gtm': 'Guatemala', 'hnd': 'Honduras', 'mex': 'México',
+        'pan': 'Panamá', 'per': 'Perú', 'pry': 'Paraguay', 'ven': 'Venezuela',
+    }
+    _paises_disp = get_cepal_paises()
+    _cepal_opciones = ['todos'] + _paises_disp
+    cepal_pais_filter = st.selectbox(
+        'País CEPALSTAT',
+        _cepal_opciones,
+        format_func=lambda x: 'Todos los países' if x == 'todos' else _ISO3_DISPLAY.get(x, x.upper()),
+        help='Filtra el indicador de competencias TIC por país',
+    )
+
+df_f = df.copy()
+if carrera_sel != 'Todas':
+    df_f = df_f[df_f['NombreCarrera'] == carrera_sel]
+if ciudad_sel != 'Todas':
+    df_f = df_f[df_f['Ciudad'] == ciudad_sel]
+
+if 'AñoEgreso' in df_f.columns:
+    df_f = df_f[
+        (df_f['AñoEgreso'] >= year_range[0]) &
+        (df_f['AñoEgreso'] <= year_range[1])
+    ]
+elif 'SemestreActual' in df_f.columns and 'anio_y' in df_f.columns:
+    df_f['AñoEgreso_Est'] = df_f['anio_y'] + (df_f['SemestreActual'] / 6).astype(int)
+    df_f = df_f[
+        (df_f['AñoEgreso_Est'] >= year_range[0]) &
+        (df_f['AñoEgreso_Est'] <= year_range[1])
+    ]
+
 # ✅ Success Badge: IT Careers Detected
-kpis         = get_kpis()
-desercion    = get_tasa_desercion()
+kpis         = get_kpis(df_f)
+filtered_ids = df_f['EstudianteID'].tolist() if 'EstudianteID' in df_f.columns else None
+desercion    = get_tasa_desercion(filtered_ids)
 tasa_deser   = desercion.get('tasa_desercion')
 valor_deser  = f"{tasa_deser:.1f}%" if tasa_deser is not None else "N/D"
 
-st.success(f'✅ 5 IT Carreras | {kpis.get("total_egresados", 0)} Egresados Analizados | Cobertura de salarios: {kpis.get("salary_coverage_pct", 0):.1f}%')
+st.markdown(f"""
+<div style="background:#052e16;border:1px solid #166534;border-radius:6px;padding:0.65rem 1rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem">
+  <i class="ti ti-circle-check" style="color:#22C55E;font-size:1rem"></i>
+  <span style="color:#86efac;font-size:0.875rem;font-weight:500">5 IT Carreras &nbsp;·&nbsp; {kpis.get("total_egresados", 0)} Egresados Analizados &nbsp;·&nbsp; Cobertura de salarios: {kpis.get("salary_coverage_pct", 0):.1f}%</span>
+</div>
+""", unsafe_allow_html=True)
 st.caption(f'Período de análisis: {kpis.get("graduation_year_range", "N/D")}')
 
 # Display errors and warnings from KPIs validation
@@ -76,38 +139,41 @@ st.markdown('<hr class="divider">', unsafe_allow_html=True)
 # --- Gauge de deserción ---
 st.markdown('<p style="font-size:0.9375rem;font-weight:600;color:#FAFAFA;margin-bottom:0.25rem">Riesgo de Deserción Estudiantil</p>', unsafe_allow_html=True)
 st.plotly_chart(bar_tasa_desercion(desercion), use_container_width=True)
+st.caption('Este indicador muestra cuántos estudiantes están en riesgo de abandonar su carrera antes de terminar. Se considera "en riesgo" a quienes tienen nota menor a 51 y todavía no terminaron el último semestre. Verde = bajo riesgo, amarillo = moderado, rojo = alto.')
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 
 # --- CEPALSTAT ---
 st.markdown('<p style="font-size:0.9375rem;font-weight:600;color:#FAFAFA;margin-bottom:0.25rem">Benchmark Regional — CEPALSTAT</p>', unsafe_allow_html=True)
-st.caption('Indicador 4.4.1: Proporción de jóvenes con competencias TIC · Bolivia')
+st.caption('Qué porcentaje de jóvenes en cada país sabe usar tecnología de información y comunicación (TIC). Es un indicador oficial de las Naciones Unidas (ODS 4.4.1) que permite comparar Bolivia con otros países de la región. El valor mostrado es el promedio de todos los años disponibles.')
 
-cepal_bol = get_cepal_bolivia()
-if cepal_bol.empty:
-    st.warning('No se encontraron datos de CEPALSTAT para Bolivia.')
-elif cepal_bol['anio'].nunique() == 1:
-    anio_val = int(cepal_bol['anio'].iloc[0])
-    val_prom = round(float(cepal_bol['value'].mean()), 1)
-    val_max  = round(float(cepal_bol['value'].max()), 1)
-    c1, c2 = st.columns(2)
-    c1.metric(f'Variación promedio TIC ({anio_val})', f'{val_prom:+.1f}%')
-    c2.metric('Indicador más alto', f'{val_max:+.1f}%')
-    st.caption(f'Fuente: CEPALSTAT — {len(cepal_bol)} indicadores TIC para Bolivia · Datos disponibles solo para {anio_val}')
-    with st.expander('Ver todos los indicadores CEPALSTAT'):
-        st.dataframe(
-            cepal_bol.rename(columns={'anio': 'Año', 'value': 'Valor (%)'}),
-            use_container_width=True,
-            hide_index=True,
-        )
+if cepal_pais_filter == 'todos':
+    # General view: one bar per country, averaged across all years
+    cepal_bench = get_cepal_benchmark(paises=None)
+    if cepal_bench.empty:
+        st.warning('No se encontraron datos de CEPALSTAT.')
+    else:
+        st.plotly_chart(bar_cepal_benchmark(cepal_bench), use_container_width=True)
+        with st.expander('Ver tabla de datos CEPALSTAT'):
+            cepal_bench_display = cepal_bench.copy()
+            cepal_bench_display['País'] = cepal_bench_display['iso3'].str.lower().map(_ISO3_DISPLAY).fillna(cepal_bench_display['iso3'].str.upper())
+            st.dataframe(
+                cepal_bench_display[['País', 'value']].rename(columns={'value': 'Promedio TIC (%)'}),
+                use_container_width=True, hide_index=True,
+            )
 else:
-    st.plotly_chart(line_cepal_bolivia(cepal_bol), use_container_width=True)
-    with st.expander('Ver datos crudos CEPALSTAT'):
-        st.dataframe(
-            cepal_bol.rename(columns={'anio': 'Año', 'value': 'Valor (%)'}),
-            use_container_width=True,
-            hide_index=True,
-        )
+    # Drill-down: one bar per year for the selected country
+    pais_nombre = _ISO3_DISPLAY.get(cepal_pais_filter, cepal_pais_filter.upper())
+    cepal_years = get_cepal_pais_years(cepal_pais_filter)
+    if cepal_years.empty:
+        st.warning(f'No se encontraron datos de CEPALSTAT para {pais_nombre}.')
+    else:
+        st.plotly_chart(bar_cepal_pais_years(cepal_years, pais_nombre), use_container_width=True)
+        with st.expander(f'Ver tabla de datos — {pais_nombre}'):
+            st.dataframe(
+                cepal_years.rename(columns={'anio': 'Año', 'value': 'Jóvenes con competencias TIC (%)'}),
+                use_container_width=True, hide_index=True,
+            )
 
 st.markdown('<hr class="divider">', unsafe_allow_html=True)
 

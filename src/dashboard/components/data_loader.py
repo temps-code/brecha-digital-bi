@@ -31,13 +31,188 @@ SKILLS_MAP = {
     'SQL Specialist':   ['SQL', 'Stored Procedures', 'DW Design'],
 }
 
-# Habilidades que ofrece cada carrera (aproximación para el skill gap)
+# Habilidades que ofrece cada carrera — basado en planes de estudio reales
+# Fuentes verificadas (2024-2026):
+#   Ingeniería de Sistemas  → UMSA Informática (pensum oficial), UPB ISC (plan completo),
+#                             UMSS (cs.umss.edu.bo), EMI (malla-sistemas-2024-2028)
+#   Ingeniería de Software  → UPB ISC (semestres 4-9), UCB Ing. Sistemas (áreas SW),
+#                             UMSA Informática (INF-272 Ingeniería de Software)
+#   Ciencia de Datos        → UCB EPC "Negocios y Ciencia de Datos" (malla PDF oficial),
+#                             UMSS Diplomado Ciencia de Datos, UPB Diplomado ML
+#   Telecomunicaciones      → UMSA Electrónica y Telecomunicaciones (plan completo),
+#                             UTEPSA Ing. Redes y Telecomunicaciones (plan completo),
+#                             UCB Ing. Telecomunicaciones (áreas + CCNA/Cisco)
+#   Ciberseguridad          → UTB Ing. Ciberseguridad e Informática (PDF plan oficial)
 CARRERA_SKILLS = {
-    'Ingeniería de Sistemas':     ['Python', 'SQL', 'Estadística', 'ETL'],
-    'Electrónica':                ['ETL'],
-    'Administración de Empresas': ['Excel', 'Estadística'],
-    'Diseño Gráfico':             ['diseño', 'adobe', 'ilustración', 'fotografía', 'video'],
-    'Derecho':                    ['derecho', 'legal', 'jurídico', 'contratos', 'compliance'],
+    # ─── Ingeniería de Sistemas ───────────────────────────────────────────────
+    # UMSA: Algoritmos y Programación, Estructura de Datos, SO, BD, Telemática,
+    #        Ing. Software, Simulación, Taller de Programación, Lenguajes Formales
+    # UPB:  Programación I-III, BD Relacionales, BD Avanzadas, SO I, Patrones de
+    #        Diseño, IA, Sistemas Distribuidos, Compilación, Teleinformática,
+    #        Aplicaciones con Redes, Robótica, Seguridad Informática, Certificación I-III
+    # EMI:  Sistemas de Información, Modelado, Simulación, Redes, Gestión
+    'Ingeniería de Sistemas': [
+        # Programación y lenguajes
+        'Java', 'Python', 'C++', 'SQL', 'Assembler', 'Programación Funcional',
+        # Estructuras y algoritmos
+        'Algoritmos', 'Estructuras de Datos', 'Compiladores', 'Autómatas',
+        # Bases de datos
+        'Bases de Datos', 'PostgreSQL', 'MySQL', 'SQL Server',
+        # Sistemas operativos y arquitectura
+        'Sistemas Operativos', 'Linux', 'Arquitectura de Computadoras',
+        'Sistemas Distribuidos', 'Virtualización',
+        # Redes y comunicaciones
+        'Redes', 'TCP/IP', 'Telemática', 'Protocolos de Comunicación',
+        # Ingeniería de software
+        'Ingeniería de Software', 'Patrones de Diseño', 'UML', 'Git',
+        # Inteligencia y datos
+        'Inteligencia Artificial', 'Machine Learning', 'Estadística',
+        'Investigación de Operaciones', 'Simulación',
+        # Gestión y metodología
+        'Gestión de Proyectos', 'Scrum', 'Análisis y Diseño de Sistemas',
+        # Seguridad
+        'Seguridad Informática',
+    ],
+
+    # ─── Ingeniería de Software ───────────────────────────────────────────────
+    # UPB ISC (sem 4-9): Ingeniería de Software, Patrones de Diseño, Proyecto de
+    #   Ing. Software, BD Avanzadas, IA, Sistemas Distribuidos, Compilación,
+    #   Aplicaciones con Redes, Tópicos Selectos en IS, Robótica, Seguridad Informática,
+    #   Gestión de Proyectos Informáticos, HCI
+    # UCB Ing. Sistemas: Software Engineering, Information Systems, AI, Networks, Security
+    # UMSA Informática: INF-272 Ing. Software, Especificaciones Formales, Taller IS
+    'Ingeniería de Software': [
+        # Lenguajes y paradigmas
+        'Java', 'Python', 'JavaScript', 'TypeScript', 'C#', '.NET',
+        'Programación Funcional', 'Programación Orientada a Objetos',
+        # Frameworks y desarrollo web
+        'React', 'Node.js', 'Angular', 'Spring Boot', 'Django', 'REST API',
+        # Bases de datos
+        'SQL', 'Bases de Datos', 'PostgreSQL', 'MySQL', 'MongoDB',
+        # Ingeniería y arquitectura
+        'Ingeniería de Software', 'Patrones de Diseño', 'UML', 'Microservicios',
+        'Sistemas Distribuidos', 'Arquitectura de Software',
+        # Testing y calidad
+        'Testing', 'Control de Versiones', 'Git', 'GitHub',
+        # DevOps y despliegue
+        'Docker', 'CI/CD', 'DevOps',
+        # Gestión
+        'Gestión de Proyectos', 'Scrum', 'Agile', 'JIRA',
+        # IA y datos
+        'Inteligencia Artificial', 'Machine Learning',
+        # Seguridad y redes
+        'Seguridad Informática', 'Redes', 'Aplicaciones Web',
+    ],
+
+    # ─── Ciencia de Datos ─────────────────────────────────────────────────────
+    # UCB EPC "Negocios y Ciencia de Datos" (malla oficial PDF):
+    #   Programación I y II, Estructura de Datos, Base de Datos I,
+    #   Data Mining I, Machine Learning I y II, Data Warehousing,
+    #   Estadística Descriptiva, Probabilidad I y II, Álgebra Lineal,
+    #   Cálculo I y II, Cloud Computing, ERP y CRM, Inteligencia de Negocios,
+    #   Simulación, Transformación Digital, Big Data & Marketing Predictivo,
+    #   Seguridad Informática Empresarial, Procesos de Negocios
+    # UMSS Diplomado: Visualización de Datos, Python para Ciencia de Datos
+    # UPB Diplomado ML: Estadística aplicada, Pandas, Scikit-learn, Deep Learning
+    'Ciencia de Datos': [
+        # Programación
+        'Python', 'R', 'SQL', 'Programación',
+        # Librerías y herramientas DS
+        'Pandas', 'NumPy', 'Scikit-learn', 'Matplotlib', 'Jupyter',
+        # Machine Learning e IA
+        'Machine Learning', 'Deep Learning', 'TensorFlow', 'PyTorch',
+        'Data Mining', 'Inteligencia Artificial',
+        # Bases de datos y almacenamiento
+        'Bases de Datos', 'MySQL', 'Data Warehousing', 'Big Data',
+        # Estadística y matemáticas
+        'Estadística', 'Estadística Descriptiva', 'Probabilidad',
+        'Álgebra Lineal', 'Cálculo',
+        # Visualización y BI
+        'Visualización de Datos', 'Power BI', 'Inteligencia de Negocios',
+        # Cloud y plataformas
+        'Cloud Computing', 'AWS', 'Spark', 'ERP', 'CRM',
+        # Gestión y negocio
+        'Gestión de Proyectos', 'Transformación Digital',
+        'Seguridad Informática', 'Estructura de Datos',
+    ],
+
+    # ─── Telecomunicaciones y Redes ───────────────────────────────────────────
+    # UMSA Electrónica y Telecomunicaciones (plan completo):
+    #   Telecomunicaciones I y II, Sistemas de Comunicación Móvil, Tráfico Telefónico,
+    #   Procesamiento Digital de Señales, Sistemas Digitales, Microprocesadores I y II,
+    #   Líneas de Transmisión y Antenas, Fibra Óptica, Televisión, Informática Superior
+    # UTEPSA Ing. Redes y Telecomunicaciones (plan completo, 9 semestres):
+    #   Redes I-IV, Diseño de Cableado Estructurado, Comunicación Digital,
+    #   Telefonía IP y Redes Convergentes, Líneas y Medios de Transmisión,
+    #   Comunicación Óptica, Antenas y Sistemas de Radio, Redes Inalámbricas,
+    #   Seguridad de la Información, Comunicación Satelital, Tecnologías Móviles,
+    #   Seguridad y Gestión de Redes, Gestión de Servicios de TI
+    # UCB Telecomunicaciones: Tecnologías Inalámbricas, Ciberseguridad,
+    #   Sistemas de Comunicaciones Satelitales, CCNA/Cisco, Huawei HCIA, Mikrotik
+    'Telecomunicaciones y Redes': [
+        # Redes y protocolos
+        'Redes', 'TCP/IP', 'IPv6', 'MPLS', 'VPN', 'Cisco', 'CCNA',
+        'Routing', 'Switching', 'BGP', 'OSPF',
+        # Telecomunicaciones físicas
+        'Telecomunicaciones', 'Antenas', 'Fibra Óptica',
+        'Procesamiento de Señales', 'Líneas de Transmisión',
+        'Comunicación Satelital', 'Radiofrecuencia',
+        # Redes inalámbricas y móviles
+        'Redes Inalámbricas', 'WiFi', 'LTE', '5G',
+        'Comunicación Móvil', 'Tecnologías Móviles',
+        # VoIP y convergencia
+        'VoIP', 'Telefonía IP', 'Redes Convergentes',
+        # Cableado y diseño
+        'Cableado Estructurado', 'Diseño de Redes',
+        # Sistemas operativos y servidores
+        'Linux', 'Sistemas Operativos',
+        # Seguridad en redes
+        'Seguridad de Redes', 'Firewalls', 'Seguridad Informática',
+        # Gestión
+        'Gestión de Servicios TI', 'ITIL',
+        # Programación básica (plan de estudios)
+        'Algoritmos', 'Programación',
+    ],
+
+    # ─── Ciberseguridad ───────────────────────────────────────────────────────
+    # UTB Ing. Ciberseguridad e Informática (PDF plan oficial, 8 semestres):
+    #   Introducción a la Ciberseguridad, Algoritmos y Programación I y II,
+    #   Introducción a Redes de Computación, Derecho Informático (Delitos),
+    #   Seguridad en Sistemas Contables, Fundamentos de Sistemas Digitales,
+    #   Ingeniería de Software, Sistemas Virtualizados,
+    #   Arquitectura de Sistemas, Interconexión de Redes Locales,
+    #   Seguridad en Base de Datos I y II, Desarrollo de Aplicaciones y Servicio Web,
+    #   Criptografía, Telecomunicaciones Móviles Redes de Datos,
+    #   Seguridad de Redes, Seguridad en Sistemas Operativos,
+    #   Gestión de la Seguridad Informática, Servidores y Servicios,
+    #   Seguridad e Integración de Sistemas, Ciberseguridad,
+    #   Auditoría en Seguridad Informática, Análisis y Explotación de Vulnerabilidades,
+    #   Evaluación y Gestión de Proyectos Informáticos, Hacker Ético,
+    #   Gestión de Incidentes, Ciberseguridad Gubernamental,
+    #   Seguridad Informática Bancaria, Negocios y Comercio Electrónico
+    'Ciberseguridad': [
+        # Fundamentos de ciberseguridad
+        'Ciberseguridad', 'Seguridad Informática', 'Criptografía',
+        'Hacking Ético', 'Penetration Testing',
+        # Redes y sistemas
+        'Seguridad de Redes', 'Firewalls', 'VPN', 'Redes',
+        'Sistemas Operativos', 'Linux', 'Virtualización',
+        # Análisis y respuesta
+        'Análisis de Vulnerabilidades', 'Gestión de Incidentes',
+        'Auditoría de Seguridad', 'Forense Digital', 'Malware',
+        # Bases de datos
+        'Seguridad en Bases de Datos', 'SQL', 'Bases de Datos',
+        # Marcos legales y gestión
+        'Derecho Informático', 'ISO 27001', 'Gestión de Riesgos',
+        'Cumplimiento Normativo', 'Gestión de Proyectos',
+        # Desarrollo seguro
+        'Ingeniería de Software', 'Desarrollo Web Seguro', 'Programación',
+        'Algoritmos',
+        # Comunicaciones
+        'Telecomunicaciones', 'Protocolos de Red', 'Servidores',
+        # Cloud y modernos
+        'Seguridad Cloud', 'SIEM', 'SOC',
+    ],
 }
 
 
@@ -289,18 +464,30 @@ def load_vacantes() -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-@st.cache_data
-def get_kpis() -> dict:
+def get_kpis(df: pd.DataFrame) -> dict:
     """
     Retorna KPIs principales con validaciones de calidad de datos.
+    
+    Args:
+        df: Filtered DataFrame to compute KPIs from.
     
     Returns:
         dict with keys: tasa_empleo, pct_area, salario_prom, total_egresados, 
                        graduation_year_range, _errors
     """
-    df = load_df()
     errors = []
     
+    if df is None or df.empty:
+        return {
+            'tasa_empleo': 0.0,
+            'pct_area': 0.0,
+            'salario_prom': 0.0,
+            'total_egresados': 0,
+            'graduation_year_range': 'N/D',
+            'salary_coverage_pct': 0.0,
+            '_errors': ["⚠️ No hay datos disponibles para el filtro seleccionado"],
+        }
+
     con_dato = df.dropna(subset=['TieneEmpleoFormal'])
     empleados = con_dato[con_dato['TieneEmpleoFormal'] == True]
     
@@ -355,9 +542,10 @@ def get_kpis() -> dict:
     }
 
 
-@st.cache_data
-def get_empleo_por_carrera() -> pd.DataFrame:
-    df = load_df()
+def get_empleo_por_carrera(df: pd.DataFrame) -> pd.DataFrame:
+    if df is None or df.empty:
+        return pd.DataFrame(columns=['NombreCarrera', 'tasa_empleo'])
+        
     con_dato = df.dropna(subset=['TieneEmpleoFormal'])
     return (
         con_dato.groupby('NombreCarrera')['TieneEmpleoFormal']
@@ -370,9 +558,10 @@ def get_empleo_por_carrera() -> pd.DataFrame:
     )
 
 
-@st.cache_data
-def get_distribucion_ciudad() -> pd.DataFrame:
-    df = load_df()
+def get_distribucion_ciudad(df: pd.DataFrame) -> pd.DataFrame:
+    if df is None or df.empty:
+        return pd.DataFrame(columns=['Ciudad', 'total'])
+        
     return (
         df.groupby('Ciudad')['EstudianteID']
         .count()
@@ -382,9 +571,10 @@ def get_distribucion_ciudad() -> pd.DataFrame:
     )
 
 
-@st.cache_data
-def get_salario_por_carrera() -> pd.DataFrame:
-    df = load_df()
+def get_salario_por_carrera(df: pd.DataFrame) -> pd.DataFrame:
+    if df is None or df.empty:
+        return pd.DataFrame(columns=['NombreCarrera', 'salario_promedio'])
+        
     empleados = df[df['TieneEmpleoFormal'] == True].dropna(subset=['SalarioMensualUSD'])
     return (
         empleados.groupby('NombreCarrera')['SalarioMensualUSD']
@@ -396,11 +586,49 @@ def get_salario_por_carrera() -> pd.DataFrame:
     )
 
 
-@st.cache_data
-def get_habilidades_demandadas() -> pd.DataFrame:
-    vac = load_vacantes()
-    conteo = {}
+def get_habilidades_demandadas(ciudad_filter: str = 'Todas') -> pd.DataFrame:
+    """
+    Load demanded skills from extracted skills CSV (Groq LLM).
 
+    Args:
+        ciudad_filter: City to filter jobs by ('Todas' for no filter)
+    """
+    import json
+    import os
+
+    conteo = {}
+    skills_csv = PROCESSED / 'empleos' / 'skills_extracted.csv'
+
+    # PRIORITY 1: Try loading from extracted skills CSV
+    if skills_csv.exists():
+        try:
+            extracted = pd.read_csv(skills_csv)
+
+            # City filter mapping (Adzuna cities are complex strings)
+            if ciudad_filter != 'Todas':
+                # Simple containment check for city filter
+                extracted = extracted[extracted['location'].str.contains(ciudad_filter, case=False, na=False)]
+
+            # Aggregate skills from JSON column
+            for _, row in extracted.iterrows():
+                try:
+                    skills = json.loads(row['skills_json'])
+                    for skill in skills:
+                        if skill and len(skill) > 1:
+                            conteo[skill] = conteo.get(skill, 0) + 1
+                except (json.JSONDecodeError, KeyError):
+                    pass
+            
+            if conteo:
+                return (
+                    pd.DataFrame(list(conteo.items()), columns=['habilidad', 'demanda'])
+                    .sort_values('demanda', ascending=False)
+                )
+        except Exception as e:
+            st.warning(f"⚠️ Error loading extracted skills: {str(e)}, falling back to tokenization")
+    
+    # PRIORITY 2: Fallback to naive tokenization (comma/semicolon split)
+    vac = load_vacantes()
     if 'description' in vac.columns and vac['description'].notna().any():
         for desc in vac['description'].dropna():
             # Tokenizar por coma y punto y coma
@@ -412,6 +640,7 @@ def get_habilidades_demandadas() -> pd.DataFrame:
                 if len(skill) > 1:
                     conteo[skill] = conteo.get(skill, 0) + 1
     else:
+        # PRIORITY 3: Static SKILLS_MAP
         st.warning('Columna description ausente o vacía — usando mapa estático de habilidades.')
         for _, row in vac.iterrows():
             skills = SKILLS_MAP.get(row['title'], [])
@@ -450,25 +679,16 @@ def _fuzzy_match_skill(demand_skill: str, academic_skills: list[str], threshold:
     return max_ratio if max_ratio >= threshold else 0.0
 
 
-@st.cache_data
-def get_skill_gap() -> pd.DataFrame:
+def get_skill_gap(hab_academicas: dict = None, ciudad_filter: str = 'Todas') -> pd.DataFrame:
     """
     Retorna demanda de mercado vs cobertura académica con fuzzy matching.
-    
-    Columnas:
-    - habilidad: Skill demandada en vacantes
-    - demanda: Frecuencia en las vacantes
-    - similarity_score: Fuzzy match score (0.0-1.0) contra skills académicas
-    - cobertura_%: Porcentaje de cobertura académica (0-100%)
-    - carrera: Carrera donde se enseña la habilidad más similar (N/D si no cubierta)
-    - _errors: List of validation errors/warnings
     """
     errors = []
-    
+
     try:
-        dem = get_habilidades_demandadas()
+        dem = get_habilidades_demandadas(ciudad_filter=ciudad_filter)
         if dem.empty:
-            errors.append("⚠️ No se encontraron habilidades demandadas (vacantes vacías)")
+            errors.append("⚠️ No se encontraron habilidades demandadas para la selección")
             return pd.DataFrame(
                 columns=['habilidad', 'demanda', 'similarity_score', 'cobertura_%', 'carrera', '_errors']
             )
@@ -476,16 +696,16 @@ def get_skill_gap() -> pd.DataFrame:
         errors.append(f"❌ Error cargando habilidades demandadas: {str(e)}")
         return pd.DataFrame(
             columns=['habilidad', 'demanda', 'similarity_score', 'cobertura_%', 'carrera', '_errors']
-        )
-    
-    try:
-        hab_academicas = load_habilidades_academicas()
-        if not hab_academicas:
-            errors.append("⚠️ No se cargaron habilidades académicas (usando valores por defecto)")
+        )    
+    if hab_academicas is None:
+        try:
+            hab_academicas = load_habilidades_academicas()
+            if not hab_academicas:
+                errors.append("⚠️ No se cargaron habilidades académicas (usando valores por defecto)")
+                hab_academicas = CARRERA_SKILLS
+        except Exception as e:
+            errors.append(f"⚠️ Error cargando habilidades académicas: {str(e)}")
             hab_academicas = CARRERA_SKILLS
-    except Exception as e:
-        errors.append(f"⚠️ Error cargando habilidades académicas: {str(e)}")
-        hab_academicas = CARRERA_SKILLS
     
     # Flatten academic skills list for fuzzy matching
     all_academic_skills = []
@@ -553,15 +773,12 @@ def get_skill_gap() -> pd.DataFrame:
 
 
 @st.cache_data
-
-
-@st.cache_data
 def load_habilidades_academicas() -> dict[str, list[str]]:
     """
     Retorna dict {carrera: [habilidades]} agrupando habilidades académicas por carrera.
     Estrategia Gold: DIM_HABILIDAD JOIN DIM_CARRERA.
-    Fallback: processed/competenciasdigitales_cleaned.csv.
-    Si ambos fallan → retorna {}.
+    Fallback CSV: processed/competenciasdigitales_cleaned.csv (solo si keys intersectan IT_CAREERS).
+    Fallback final → CARRERA_SKILLS.copy() (currículos bolivianos verificados).
     """
     engine = _gold_engine()
     if engine is not None:
@@ -580,7 +797,7 @@ def load_habilidades_academicas() -> dict[str, list[str]]:
         except Exception:
             pass
 
-    # Fallback: CSV processed
+    # Fallback: CSV processed — solo si las keys coinciden con IT_CAREERS
     try:
         path = PROCESSED / 'competenciasdigitales_cleaned.csv'
         df = pd.read_csv(path)
@@ -591,13 +808,15 @@ def load_habilidades_academicas() -> dict[str, list[str]]:
         else:
             for nivel, grupo in df.groupby('NivelRequerido'):
                 result[str(nivel)] = grupo['NombreHabilidad'].tolist()
-        return result
+        if set(result.keys()) & set(IT_CAREERS):
+            return result
     except Exception:
-        return {}
+        pass
+
+    return {k: list(v) for k, v in CARRERA_SKILLS.items()}
 
 
-@st.cache_data
-def get_tasa_desercion() -> dict:
+def get_tasa_desercion(filtered_ids: list = None) -> dict:
     """
     Retorna dict con tasa_desercion (float), total_estudiantes (int), en_riesgo (int).
     Fuente: data/processed/silver_integrated_data.csv
@@ -606,9 +825,15 @@ def get_tasa_desercion() -> dict:
     try:
         path = PROCESSED / 'silver_integrated_data.csv'
         df = pd.read_csv(path)
+        
+        # Apply filtering if ids provided
+        if filtered_ids is not None:
+            df = df[df['EstudianteID'].isin(filtered_ids)]
+            
         total = len(df)
         if total == 0:
             return {'tasa_desercion': None, 'total_estudiantes': 0, 'en_riesgo': 0}
+            
         en_riesgo_df = df[(df['SemestreActual'] < 8) & (df['NotaFinal'] < 51)]
         en_riesgo = len(en_riesgo_df)
         tasa = round(en_riesgo / total * 100, 1)
@@ -621,8 +846,7 @@ def get_tasa_desercion() -> dict:
         return {'tasa_desercion': None, 'total_estudiantes': 0, 'en_riesgo': 0}
 
 
-@st.cache_data
-def get_empleo_temporal() -> pd.DataFrame:
+def get_empleo_temporal(df: pd.DataFrame = None) -> pd.DataFrame:
     """
     Retorna DataFrame con columnas [anio, tasa_empleo, fuente, _errors].
     Usa graduation_year (cohorte de egreso) en lugar de anio_x (cohorte de ingreso).
@@ -637,8 +861,12 @@ def get_empleo_temporal() -> pd.DataFrame:
     """
     errors = []
     
+    # If df provided, we use it for fallback analysis instead of reloading silver
+    # But Gold query usually doesn't take the filtered df directly unless we refactor it
+    # For now, we'll keep Gold as global and fallback as filtered if df is provided.
+    
     engine = _gold_engine()
-    if engine is not None:
+    if engine is not None and df is None: # Only use Gold for global view
         try:
             sql = """
                 SELECT
@@ -649,47 +877,56 @@ def get_empleo_temporal() -> pd.DataFrame:
                 GROUP BY t.anio
                 ORDER BY t.anio
             """
-            df = pd.read_sql(sql, engine)
-            df['fuente'] = 'Gold'
+            df_gold = pd.read_sql(sql, engine)
+            df_gold['fuente'] = 'Gold'
             if errors:
-                df['_errors'] = [errors] * len(df)
+                df_gold['_errors'] = [errors] * len(df_gold)
             else:
-                df['_errors'] = [[] for _ in range(len(df))]
-            return df[['anio', 'tasa_empleo', 'fuente', '_errors']]
+                df_gold['_errors'] = [[] for _ in range(len(df_gold))]
+            return df_gold[['anio', 'tasa_empleo', 'fuente', '_errors']]
         except Exception as e:
             errors.append(f"ℹ️ Gold layer unavailable: {str(e)}")
     
-    # Fallback: use silver with graduation_year estimation
+    # Fallback: use silver or provided df
     try:
-        silver = pd.read_csv(PROCESSED / 'silver_integrated_data.csv')
-        
-        # Check required columns
-        if 'EstudianteID' not in silver.columns:
-            errors.append("❌ Columna EstudianteID no encontrada en silver_integrated_data.csv")
-            return pd.DataFrame(columns=['anio', 'tasa_empleo', 'fuente', '_errors'])
-        
-        # Estimate graduation_year
-        if 'SemestreActual' not in silver.columns or 'anio_y' not in silver.columns:
-            errors.append("⚠️ Columnas SemestreActual/anio_y no encontradas, usando anio_x")
-            silver['graduation_year'] = silver.get('anio_x', 2020) + 4
+        if df is not None:
+            # df viene de load_df() que ya fusionó seguimientoegresados — no re-mergear
+            merged = df.copy()
         else:
-            silver['graduation_year'] = _validate_graduation_year(silver)
-        
-        seg = pd.read_csv(PROCESSED / 'seguimientoegresados_cleaned.csv')
-        
-        if 'EstudianteID' not in seg.columns or 'TieneEmpleoFormal' not in seg.columns:
-            errors.append("❌ Columnas requeridas no encontradas en seguimientoegresados_cleaned.csv")
+            silver = pd.read_csv(PROCESSED / 'silver_integrated_data.csv')
+            seg = pd.read_csv(PROCESSED / 'seguimientoegresados_cleaned.csv')
+
+            if 'EstudianteID' not in seg.columns or 'TieneEmpleoFormal' not in seg.columns:
+                errors.append("❌ Columnas requeridas no encontradas en seguimientoegresados_cleaned.csv")
+                return pd.DataFrame(columns=['anio', 'tasa_empleo', 'fuente', '_errors'])
+
+            merged = silver.merge(seg, on='EstudianteID', how='inner')
+
+            if merged.empty:
+                errors.append("⚠️ No se encontraron registros comunes para análisis temporal")
+                return pd.DataFrame(columns=['anio', 'tasa_empleo', 'fuente', '_errors'])
+
+        if 'EstudianteID' not in merged.columns:
+            errors.append("❌ Columna EstudianteID no encontrada para análisis temporal")
             return pd.DataFrame(columns=['anio', 'tasa_empleo', 'fuente', '_errors'])
-        
-        merged = silver.merge(seg, on='EstudianteID', how='inner')
-        
-        if merged.empty:
-            errors.append("⚠️ No se encontraron registros comunes entre silver y seguimiento")
+
+        if 'TieneEmpleoFormal' not in merged.columns:
+            errors.append("❌ Columna TieneEmpleoFormal no disponible")
             return pd.DataFrame(columns=['anio', 'tasa_empleo', 'fuente', '_errors'])
-        
+
+        # Calcular graduation_year si no viene ya calculado por load_df()
+        if 'graduation_year' not in merged.columns:
+            if 'SemestreActual' not in merged.columns or 'anio_y' not in merged.columns:
+                errors.append("⚠️ Columnas SemestreActual/anio_y no encontradas, usando anio_x")
+                merged = merged.copy()
+                merged['graduation_year'] = merged.get('anio_x', 2020) + 4
+            else:
+                merged = merged.copy()
+                merged['graduation_year'] = _validate_graduation_year(merged)
+
         merged['TieneEmpleoFormal'] = (
             merged['TieneEmpleoFormal']
-            .map({True: 1, False: 0, 'True': 1, 'False': 0})
+            .map({True: 1, False: 0, 'True': 1, 'False': 0, 1.0: 1, 0.0: 0})
             .fillna(0)
             .astype(float)
         )
@@ -712,101 +949,203 @@ def get_empleo_temporal() -> pd.DataFrame:
     except Exception as e:
         errors.append(f"❌ Error procesando temporal analysis: {str(e)}")
         result_df = pd.DataFrame(columns=['anio', 'tasa_empleo', 'fuente', '_errors'])
-        result_df['_errors'] = [errors]
+        result_df.loc[0, '_errors'] = [errors]
         return result_df
 
 
+
+ANDINOS = ['bol', 'per', 'ecu', 'col']
+
+
 @st.cache_data
-def get_cepal_bolivia() -> pd.DataFrame:
-    """Indicador CEPALSTAT — lee desde processed/cepalstat/."""
+def get_cepal_bolivia(region: str = 'Bolivia') -> pd.DataFrame:
+    """Indicador CEPALSTAT — lee desde processed/cepalstat/.
+
+    Args:
+        region: 'Bolivia' (solo BOL), 'Región Andina' (BOL+PER+ECU+COL), 'Todas' (sin filtro ISO).
+    Returns:
+        DataFrame con columnas [anio, value, iso3].
+    """
     try:
         cep = pd.read_csv(PROCESSED / 'cepalstat' / 'indicadores_tic_region_cleaned.csv')
-        bol = cep[(cep['iso3'].str.lower() == 'bol') & (cep['dim_28619'] == 28620)].copy()
-        return bol[['anio', 'value']].sort_values('anio').reset_index(drop=True)
+        cep['_iso3_lower'] = cep['iso3'].str.lower()
+        base = cep[cep['dim_28619'] == 28620].copy()
+        if region == 'Bolivia':
+            filtered = base[base['_iso3_lower'] == 'bol']
+        elif region == 'Región Andina':
+            filtered = base[base['_iso3_lower'].isin(ANDINOS)]
+        else:
+            filtered = base
+        # Aggregate by year+country to eliminate duplicate sub-indicator rows
+        # (multiple indicator rows per year cause overlapping flat lines in px.line)
+        result = (
+            filtered
+            .groupby(['anio', 'iso3'], as_index=False)['value']
+            .mean()
+            .sort_values('anio')
+            .reset_index(drop=True)
+        )
+        return result
     except Exception:
         st.warning('No se pudo cargar el indicador CEPALSTAT.')
+        return pd.DataFrame(columns=['anio', 'value', 'iso3'])
+
+
+@st.cache_data
+def get_cepal_paises() -> list[str]:
+    """Returns sorted list of available ISO3 country codes in the CEPALSTAT dataset."""
+    try:
+        cep = pd.read_csv(PROCESSED / 'cepalstat' / 'indicadores_tic_region_cleaned.csv')
+        base = cep[cep['dim_28619'] == 28620].copy()
+        return sorted(base['iso3'].str.lower().unique().tolist())
+    except Exception:
+        return ['bol']
+
+
+@st.cache_data
+def get_cepal_pais_years(iso3: str) -> pd.DataFrame:
+    """Returns CEPALSTAT data for a single country, one row per year (averaged across sub-indicators).
+
+    Args:
+        iso3: Country ISO3 code (lowercase), e.g. 'bol'.
+    Returns:
+        DataFrame with columns [anio, value] sorted by year.
+    """
+    try:
+        cep = pd.read_csv(PROCESSED / 'cepalstat' / 'indicadores_tic_region_cleaned.csv')
+        base = cep[cep['dim_28619'] == 28620].copy()
+        filtered = base[base['iso3'].str.lower() == iso3.lower()]
+        result = (
+            filtered
+            .groupby('anio', as_index=False)['value']
+            .mean()
+            .round(1)
+            .sort_values('anio')
+            .reset_index(drop=True)
+        )
+        return result
+    except Exception:
         return pd.DataFrame(columns=['anio', 'value'])
 
 
-def build_groq_context(kpis: dict | None = None) -> str:
-    if kpis is None:
-        kpis = get_kpis()
+@st.cache_data
+def get_cepal_benchmark(paises: tuple | None = None) -> pd.DataFrame:
+    """Returns CEPALSTAT data averaged across all available years, one row per country.
 
-    # Carreras y ciudades dinámicas desde los datos cargados
-    df = load_df()
-    carreras = df['NombreCarrera'].dropna().unique().tolist() if df is not None and not df.empty else ['Ingeniería de Sistemas', 'Diseño Gráfico', 'Administración de Empresas', 'Derecho', 'Electrónica']
-    ciudades = df['Ciudad'].dropna().unique().tolist() if df is not None and not df.empty else ['La Paz', 'Cochabamba', 'Santa Cruz de la Sierra', 'Tarija', 'Sucre', 'Remoto']
-
-    # Top 5 habilidades más demandadas — si falla, se omite el bloque
-    top_skills_bloque = ''
+    Args:
+        paises: Tuple of ISO3 codes (lowercase) to include, or None for all.
+    Returns:
+        DataFrame with columns [iso3, value] sorted by value descending.
+    """
     try:
-        hab_df = get_habilidades_demandadas()
-        if not hab_df.empty:
-            top5 = hab_df.sort_values('demanda', ascending=False).head(5)['habilidad'].tolist()
-            if top5:
-                top_skills_bloque = f'\n- TOP 5 HABILIDADES MÁS DEMANDADAS: {", ".join(top5)}'
+        cep = pd.read_csv(PROCESSED / 'cepalstat' / 'indicadores_tic_region_cleaned.csv')
+        base = cep[cep['dim_28619'] == 28620].copy()
+        base['_iso3_lower'] = base['iso3'].str.lower()
+        if paises:
+            base = base[base['_iso3_lower'].isin(paises)]
+        result = (
+            base.groupby('iso3', as_index=False)['value']
+            .mean()
+            .round(1)
+            .sort_values('value', ascending=False)
+            .reset_index(drop=True)
+        )
+        return result
+    except Exception:
+        return pd.DataFrame(columns=['iso3', 'value'])
+
+
+def build_groq_context(kpis: dict | None = None, gap_df=None) -> str:
+    df = load_df()
+    if kpis is None:
+        kpis = get_kpis(df)
+    if gap_df is None:
+        try:
+            gap_df = get_skill_gap()
+        except Exception:
+            gap_df = None
+
+    # Bloque brechas críticas — top 3 por demanda con cobertura < 50%
+    brechas_bloque = ''
+    try:
+        if gap_df is not None and not gap_df.empty:
+            criticas = (
+                gap_df[gap_df['cobertura_%'] < 50]
+                .sort_values('demanda', ascending=False)
+                .head(3)
+            )
+            if not criticas.empty:
+                lines = []
+                for _, row in criticas.iterrows():
+                    skill = str(row['habilidad'])[:30]
+                    lines.append(f"  {skill}: {row['demanda']} vacantes, {row['cobertura_%']:.0f}% cobertura")
+                brechas_bloque = '\nBRECHAS CRÍTICAS (top 3 por demanda):\n' + '\n'.join(lines)
     except Exception:
         pass
 
-    return f"""Sos un asistente de Business Intelligence para el proyecto "Estrategia para la Reducción de la Brecha Digital Laboral en la Educación Técnica Superior" (UPDS, Bolivia).
+    # Bloque CEPALSTAT — último dato disponible
+    cepalstat_bloque = ''
+    try:
+        cepal = get_cepal_bolivia()
+        if not cepal.empty:
+            ultimo = cepal.iloc[-1]
+            cepalstat_bloque = f'\nCEPALSTAT ODS 4.4.1 ({int(ultimo["anio"])}): {float(ultimo["value"]):.1f}% jóvenes con competencias TIC en Bolivia'
+    except Exception:
+        pass
 
-SCOPE:
-- 5 carreras IT: Ingeniería de Sistemas, Software, Ciencia de Datos, Telecomunicaciones, Ciberseguridad
-- Análisis: Línea de tiempo graduación→empleo (cohortes 2024-2028)
-- Metodología: Fuzzy matching (umbral 0.80) para similitud semántica en habilidades
+    # Bloque deserción
+    desercion_bloque = ''
+    try:
+        des = get_tasa_desercion()
+        if des.get('tasa_desercion') is not None:
+            desercion_bloque = f'\nDESERCIÓN: {des["tasa_desercion"]}% (heurística: semestre<8 y nota<51)'
+    except Exception:
+        pass
 
-DATOS ACTUALES DEL DASHBOARD:
-- Tasa de empleo formal de egresados: {kpis['tasa_empleo']}%
-- Egresados empleados en su área de estudio: {kpis['pct_area']}%
-- Salario promedio de empleados: ${kpis['salario_prom']} USD/mes
-- Total de egresados analizados: {kpis['total_egresados']}
-- Cobertura de datos de salarios: {kpis.get('salary_coverage_pct', 0):.1f}%{top_skills_bloque}
+    return f"""Sos un asistente de BI para "Brecha Digital Laboral en Educación TIC — Bolivia" (UPDS).
 
-ARQUITECTURA:
-- Capa Bronze: SQL Server (BrechaDigitalDB) — datos crudos de estudiantes, carreras, inscripciones
-- Capa Silver: Python/pandas — clean.py + normalize.py
-- Capa Gold: SQL Server (DW_BrechaDigital) — esquema copo de nieve
-- Dashboard: Streamlit + Plotly (esta aplicación)
+SCOPE: 5 carreras IT (Sistemas, Software, Datos, Telecomunicaciones, Ciberseguridad) · cohortes 2024-2028 · fuzzy matching 0.80.
 
-CIUDADES: {", ".join(ciudades)}.
+KPIs:
+- Empleo formal: {kpis['tasa_empleo']}% · En área: {kpis['pct_area']}% · Salario: ${kpis['salario_prom']} USD/mes
+- Egresados: {kpis['total_egresados']} · Cobertura salarios: {kpis.get('salary_coverage_pct', 0):.1f}%{brechas_bloque}{cepalstat_bloque}{desercion_bloque}
 
-Respondé preguntas sobre inserción laboral, brecha de habilidades y tendencias TIC en Bolivia (carreras IT).
-Sé conciso y orientado a insights de negocio. Respondé siempre en español."""
+METODOLOGÍA: Medallion (Bronze SQL→Silver pandas→Gold DW) + LLaMA 3.1 vía Groq.
+Respondé en español, conciso, orientado a insights de negocio."""
 
 
-def get_skill_gap_filtered(top_n: int = 15) -> tuple[pd.DataFrame, int]:
+def get_skill_gap_filtered(hab_academicas: dict = None, top_n: int = 15, ciudad_filter: str = 'Todas') -> tuple[pd.DataFrame, int]:
     """
     Retorna skill gap pero filtrando solo las top N habilidades demandadas.
     Las demás se agrupan en un contador.
-    
+
     Returns:
         (filtered_df, count_other_skills): DataFrame con top N + count de otros
     """
-    full_gap = get_skill_gap()
-    
+    full_gap = get_skill_gap(hab_academicas, ciudad_filter=ciudad_filter)
+
     if full_gap.empty:
         return full_gap, 0
-    
+
     filtered = full_gap.head(top_n).copy()
     other_count = len(full_gap) - len(filtered)
-    
+
     return filtered, other_count
 
 
-def get_habilidades_demandadas_filtered(top_n: int = 10) -> tuple[pd.DataFrame, int]:
+def get_habilidades_demandadas_filtered(top_n: int = 10, ciudad_filter: str = 'Todas') -> tuple[pd.DataFrame, int]:
     """
     Retorna habilidades demandadas filtradas a top N.
-    
+
     Returns:
         (filtered_df, count_other): DataFrame con top N + count de otros
     """
-    full_hab = get_habilidades_demandadas()
-    
+    full_hab = get_habilidades_demandadas(ciudad_filter=ciudad_filter)
+
     if full_hab.empty:
         return full_hab, 0
-    
+
     filtered = full_hab.head(top_n).copy()
     other_count = len(full_hab) - len(filtered)
-    
-    return filtered, other_count
 
+    return filtered, other_count

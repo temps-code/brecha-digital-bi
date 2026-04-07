@@ -29,9 +29,12 @@ def stage_ingestion():
     from ingestion.sqlserver import extract_to_raw
     from ingestion.empleos import fetch_adzuna_jobs
     from ingestion.cepalstat import fetch_cepal_data
+    from ingestion.skill_extraction import execute_extraction
 
     extract_to_raw()
     fetch_adzuna_jobs()
+    # Extract skills from job descriptions using Groq LLM
+    execute_extraction()
     fetch_cepal_data()
 
 
