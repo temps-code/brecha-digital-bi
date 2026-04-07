@@ -355,16 +355,21 @@ pip install -r requirements.txt
 # 5. Cargar la base de datos Bronze
 #    Ejecutar database/seed.sql en SQL Server Management Studio
 
-# 6. Ejecutar el pipeline completo
-python src/ingestion/sqlserver.py
-python src/ingestion/cepalstat.py
-python src/ingestion/empleos.py
-python src/ingestion/skill_extraction.py
-python src/transform/clean.py
-python src/transform/normalize.py
-python src/schema/dimensions.py
-python src/schema/facts.py
+# 6. Ejecutar el pipeline completo (un solo comando)
+python -m src.run_pipeline
+
+# Opcional: omitir ingesta si los CSVs raw ya existen
+python -m src.run_pipeline --skip-ingestion
 ```
+
+El orquestador (`src/run_pipeline.py`) ejecuta las 4 etapas en orden:
+
+| Etapa | Qué hace |
+|-------|----------|
+| **1 — Ingestion** | Extrae desde SQL Server + API Adzuna + API CEPALSTAT + extracción de skills con LLM |
+| **2 — Clean** | Limpia y valida todos los CSVs raw |
+| **3 — Normalize** | Estandariza ciudades, carreras, fechas; crea vista unificada |
+| **4 — Schema** | Carga dimensiones y tabla de hechos en `DW_BrechaDigital` |
 
 ---
 

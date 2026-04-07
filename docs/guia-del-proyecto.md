@@ -227,6 +227,8 @@ Fuentes de datos        Procesamiento            Consumo
 **Responsable:** Abraham Flores  
 **Principio:** los datos se extraen SIN modificar. Si hay errores, valores raros o nombres mal escritos, se dejan como están. La capa Bronze es una copia fiel de la fuente.
 
+> **Ejecución:** Esta etapa corre automáticamente con `python -m src.run_pipeline` (Etapa 1). Los comandos individuales abajo sirven para depuración.
+
 ### 6.1 Base de datos académica (SQL Server)
 
 Fuente: `BrechaDigitalDB` en SQL Server.
@@ -271,6 +273,8 @@ python src/ingestion/cepalstat.py
 **Responsable:** Juan Nicolás Flores  
 **Principio:** datos limpios, estandarizados y listos para análisis. Un dato sucio en Silver contamina todo lo que viene después.
 
+> **Ejecución:** Esta etapa corre automáticamente con `python -m src.run_pipeline` (Etapas 2 y 3). Los comandos individuales abajo sirven para depuración.
+
 ### Qué se hace
 
 - **Normalización de carreras:** Se mapean todas las variantes al nombre canónico de cada una de las 5 carreras IT (`Ingeniería de Sistemas`, `Ingeniería de Software`, `Ciencia de Datos`, `Telecomunicaciones`, `Ciberseguridad`). Carreras no IT son descartadas en este paso.
@@ -291,6 +295,8 @@ python src/transform/normalize.py
 
 **Responsable:** Micaela Pérez  
 **Principio:** el modelo de datos Gold está diseñado para responder preguntas de negocio de manera eficiente, no para almacenar datos crudos.
+
+> **Ejecución:** Esta etapa corre automáticamente con `python -m src.run_pipeline` (Etapa 4).
 
 ### Por qué esquema copo de nieve y no estrella
 
@@ -651,15 +657,21 @@ source .venv/bin/activate          # Linux/macOS
 pip install -r requirements.txt
 cp .env.example .env               # Completar con tus credenciales
 
-# Pipeline completo (en orden)
-python src/ingestion/sqlserver.py      # Bronze: académico
-python src/ingestion/cepalstat.py      # Bronze: macro
-python src/ingestion/empleos.py        # Bronze: vacantes
-python src/ingestion/skill_extraction.py  # Silver+: skills con LLM
-python src/transform/clean.py          # Silver: limpieza
-python src/transform/normalize.py      # Silver: normalización
-python src/schema/dimensions.py        # Gold: dimensiones
-python src/schema/facts.py             # Gold: hechos
+# ─────────────────────────────────────────────
+# Pipeline completo — un solo comando
+# ─────────────────────────────────────────────
+python -m src.run_pipeline
+
+# Saltear la ingesta si los CSVs raw ya existen (más rápido)
+python -m src.run_pipeline --skip-ingestion
+
+# ─────────────────────────────────────────────
+# El orquestador ejecuta en orden:
+#   Etapa 1 — Ingestion  (Bronze): SQL Server + Adzuna + CEPALSTAT + LLM
+#   Etapa 2 — Clean      (Silver): limpieza y validación de CSVs
+#   Etapa 3 — Normalize  (Silver): estandarización + vista unificada
+#   Etapa 4 — Schema     (Gold):   dimensiones + fact table en DW
+# ─────────────────────────────────────────────
 
 # Dashboard local
 streamlit run src/dashboard/app.py
@@ -668,10 +680,12 @@ streamlit run src/dashboard/app.py
 # Tests
 pytest tests/dashboard/ -v
 
-# Ver estado del repo
+# Git
 git status
 git log --oneline -10
 ```
+
+> **Referencia:** el código del orquestador está en `src/run_pipeline.py`. Cada etapa puede lanzarse individualmente si se necesita depurar solo una parte del pipeline.
 
 ---
 

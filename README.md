@@ -355,16 +355,21 @@ pip install -r requirements.txt
 # 5. Seed the Bronze database
 #    Execute database/seed.sql in SQL Server Management Studio
 
-# 6. Run the full pipeline
-python src/ingestion/sqlserver.py
-python src/ingestion/cepalstat.py
-python src/ingestion/empleos.py
-python src/ingestion/skill_extraction.py   # LLM skill extraction
-python src/transform/clean.py
-python src/transform/normalize.py
-python src/schema/dimensions.py
-python src/schema/facts.py
+# 6. Run the full pipeline (single command)
+python -m src.run_pipeline
+
+# Optional: skip ingestion if raw CSVs already exist
+python -m src.run_pipeline --skip-ingestion
 ```
+
+The pipeline orchestrator (`src/run_pipeline.py`) runs all 4 stages in order:
+
+| Stage | What it does |
+|-------|-------------|
+| **1 — Ingestion** | Extracts from SQL Server + Adzuna API + CEPALSTAT API + LLM skill extraction |
+| **2 — Clean** | Cleans and validates all raw CSVs |
+| **3 — Normalize** | Standardizes cities, careers, dates; creates unified view |
+| **4 — Schema** | Loads dimensions and fact table into `DW_BrechaDigital` |
 
 ---
 
