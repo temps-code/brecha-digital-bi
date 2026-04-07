@@ -8,6 +8,10 @@
   <a href="https://brecha-digital-bolivia-bi.streamlit.app/" target="_blank">
     <img src="https://img.shields.io/badge/Live_Demo-Streamlit_Cloud-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Live Demo">
   </a>
+  &nbsp;
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License: MIT">
+  </a>
 </p>
 
 <p>
@@ -36,16 +40,37 @@ Course: Business Intelligence — 2026
 ## Table of Contents
 
 - [Live Demo](#live-demo)
+- [Purpose & Results](#purpose--results)
 - [What It Does](#what-it-does)
 - [Dashboard Pages](#dashboard-pages)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Data Pipeline](#data-pipeline)
+- [Database ER Diagrams](#database-er-diagrams)
 - [Snowflake Schema](#snowflake-schema)
 - [Team](#team)
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
 - [Streamlit Cloud Deployment](#streamlit-cloud-deployment)
+
+---
+
+## Purpose & Results
+
+**Goal:** Build a BI system that makes the digital skills gap in Bolivian IT education visible and measurable — giving academic directors an evidence-based tool to align curricula with real labor market demand, directly contributing to ODS 4 (Quality Education) and ODS 8 (Decent Work).
+
+**Was it achieved?**
+
+| Objective | Result |
+|-----------|--------|
+| End-to-end data pipeline (Bronze → Silver → Gold) | Fully implemented and operational |
+| 4+ KPIs calculated from real data | 9 KPIs across 4 dashboard pages |
+| Skill gap identified between academia and market | Gap measured across all 5 IT careers with fuzzy matching |
+| Regional benchmark against Latin America | 17 countries via CEPALSTAT ODS 4.4.1 |
+| AI assistant for natural language queries | Live via Groq API (LLaMA 3.1 8B) |
+| Public deployment accessible to evaluators | Deployed at `brecha-digital-bolivia-bi.streamlit.app` |
+
+**Concrete finding:** The skill gap analysis — using real job postings extracted by LLM — shows that the most demanded technical skills (Docker, cloud platforms, modern CI/CD frameworks) have significantly low academic coverage across all 5 IT programs, confirming the hypothesis that the digital gap is real and measurable. This is exactly the kind of evidence that can drive curriculum reform.
 
 ---
 
@@ -165,6 +190,112 @@ Job descriptions from Adzuna are processed by `skill_extraction.py` using a two-
 2. **Regex fallback:** If LLM fails or rate-limits, a regex pattern bank covers the most common tech keywords
 
 The output `skills_extracted.csv` is committed to the repository for reproducibility and to avoid runtime LLM costs on every dashboard load.
+
+---
+
+## Database ER Diagrams
+
+### Bronze — `BrechaDigitalDB` (Source Database)
+
+Operational database that stores raw academic records. Normalized relational model.
+
+```
+┌─────────────────┐         ┌──────────────────────┐
+│    Carreras     │         │  CompetenciasDigitales│
+├─────────────────┤         ├──────────────────────┤
+│ PK CarreraID    │◄────────│ FK CarreraID          │
+│    NombreCarrera│         │ PK CompetenciaID      │
+│    Facultad     │         │    NombreHabilidad    │
+└────────┬────────┘         │    NivelRequerido     │
+         │                  └──────────────────────┘
+         │
+         │   ┌──────────────────┐
+         │   │   Estudiantes    │
+         │   ├──────────────────┤
+         └──►│ PK EstudianteID  │
+             │    Nombre        │◄──────────────┐
+             │    FechaIngreso  │               │
+             │    Genero        │               │
+             │    Ciudad        │               │
+             └──────────────────┘               │
+                                                │
+┌──────────────────────────┐    ┌───────────────┴──────────┐
+│     Inscripciones        │    │   SeguimientoEgresados   │
+├──────────────────────────┤    ├──────────────────────────┤
+│ PK InscripcionID         │    │ PK EgresadoID            │
+│ FK EstudianteID ─────────┼───►│ FK EstudianteID          │
+│ FK CarreraID    ─────────┼───►│    TieneEmpleoFormal     │
+│    NotaFinal             │    │    SalarioMensualUSD     │
+│    SemestreActual        │    │    TrabajaEnAreaDeEstudio│
+└──────────────────────────┘    └──────────────────────────┘
+```
+
+**5 tables — 4 foreign key relationships**  
+`SeguimientoEgresados` is the key table: it records whether each student got formal employment after graduation and whether they work in their field of study.
+
+---
+
+### Gold — `DW_BrechaDigital` (Snowflake Schema Warehouse)
+
+Analytical warehouse optimized for BI queries. Each row in the fact table is one graduate's employment event.
+
+```
+                    ┌───────────────────┐
+                    │   DIM_CARRERA     │
+                    ├───────────────────┤
+                    │ PK SK_Carrera     │
+                    │    CarreraID (BK) │
+                    │    nombrecarrera  │
+                    │    area           │
+                    └────────┬──────────┘
+                             │
+┌──────────────────┐         │         ┌──────────────────────┐
+│  DIM_ESTUDIANTE  │         │         │    DIM_HABILIDAD      │
+├──────────────────┤         │         ├──────────────────────┤
+│ PK SK_Estudiante │         │         │ PK SK_Habilidad       │
+│    EstudianteID  │         │         │    NombreHabilidad    │
+│    nombre        │         │         │ FK SK_Categoria ──►┐  │
+│    Genero        │         │         └──────────┬──────────┘  │
+│    ciudad_       │         │                    │              │
+│    residencia    │         │         ┌──────────▼──────────┐  │
+└────────┬─────────┘         │         │ DIM_CATEGORIA_SKILL │  │
+         │                   │         ├─────────────────────┤  │
+         │         ┌─────────▼──────────────────────────┐    │  │
+         └────────►│       FACT_INSERCION_LABORAL        │    │  │
+                   ├────────────────────────────────────┤    │  │
+                   │ FK SK_Estudiante                    │    │  │
+                   │ FK SK_Carrera                       │    │  │
+                   │ FK SK_Tiempo                        │    │  │
+                   │ FK SK_Region                        │    │  │
+                   │ FK SK_MercadoLaboral                │    │  │
+                   │    EstaEmpleado         (INT)       │    │  │
+                   │    SalarioMensualUSD    (DECIMAL)   │    │  │
+                   │    TrabajaEnAreaEstudio (BIT)       │    │  │
+                   └──────┬──────────────┬───────────────┘    │  │
+                          │              │          SK_Categoria│  │
+                          ▼              ▼          PK──────────┘  │
+              ┌───────────────┐  ┌──────────────────────┐         │
+              │  DIM_TIEMPO   │  │  DIM_MERCADO_LABORAL  │         │
+              ├───────────────┤  ├──────────────────────┤         │
+              │ PK SK_Tiempo  │  │ PK SK_MercadoLaboral  │         │
+              │    anio       │  │    Ubicacion          │         │
+              │    trimestre  │  │ FK SK_Region ──►┐     │         │
+              │    mes        │  └──────────────────┼─────┘         │
+              │    Semestre   │                     │                │
+              └───────────────┘          ┌──────────▼────────┐      │
+                                         │    DIM_REGION     │      │
+                                         ├───────────────────┤      │
+                                         │ PK SK_Region      │      │
+                                         │    Ciudad         │      │
+                                         │    Region         │      │
+                                         └───────────────────┘      │
+                                                                     │
+                              NombreCategoria ◄─────────────────────┘
+                              Básico / Intermedio / Avanzado
+```
+
+**8 tables — 1 fact + 7 dimensions (2 sub-dimensions)**  
+The snowflake structure normalizes `DIM_HABILIDAD → DIM_CATEGORIA_SKILL` and `DIM_MERCADO_LABORAL → DIM_REGION` to eliminate data redundancy.
 
 ---
 
@@ -303,10 +434,10 @@ DW_PASSWORD = "your_password"
 
 ---
 
-<div align="center">
-<img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License: MIT">
-<br><br>
+<a href="LICENSE">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License: MIT">
+</a>
+&nbsp;
 <a href="https://brecha-digital-bolivia-bi.streamlit.app/">
   <img src="https://img.shields.io/badge/▶_Open_Live_Demo-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Open Live Demo">
 </a>
-</div>

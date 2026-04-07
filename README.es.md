@@ -8,6 +8,10 @@
   <a href="https://brecha-digital-bolivia-bi.streamlit.app/" target="_blank">
     <img src="https://img.shields.io/badge/Demo_en_Vivo-Streamlit_Cloud-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Demo en Vivo">
   </a>
+  &nbsp;
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/Licencia-MIT-blue.svg?style=for-the-badge" alt="Licencia: MIT">
+  </a>
 </p>
 
 <p>
@@ -36,16 +40,37 @@ Materia: Inteligencia de Negocios — 2026
 ## Tabla de Contenidos
 
 - [Demo en Vivo](#demo-en-vivo)
+- [Propósito y Resultados](#propósito-y-resultados)
 - [Qué Hace](#qué-hace)
 - [Páginas del Dashboard](#páginas-del-dashboard)
 - [Arquitectura](#arquitectura)
 - [Stack Tecnológico](#stack-tecnológico)
 - [Pipeline de Datos](#pipeline-de-datos)
+- [Diagramas ER de las Bases de Datos](#diagramas-er-de-las-bases-de-datos)
 - [Esquema Copo de Nieve](#esquema-copo-de-nieve)
 - [Equipo](#equipo)
 - [Instalación](#instalación)
 - [Variables de Entorno](#variables-de-entorno)
 - [Despliegue en Streamlit Cloud](#despliegue-en-streamlit-cloud)
+
+---
+
+## Propósito y Resultados
+
+**Objetivo:** Construir un sistema BI que haga visible y medible la brecha de habilidades digitales en la educación IT boliviana — dándole a los directores académicos una herramienta basada en evidencia para alinear los planes de estudio con la demanda real del mercado laboral, contribuyendo directamente al ODS 4 (Educación de Calidad) y ODS 8 (Trabajo Decente).
+
+**¿Se cumplió?**
+
+| Objetivo | Resultado |
+|----------|-----------|
+| Pipeline de datos de punta a punta (Bronze → Silver → Gold) | Implementado y operacional |
+| 4+ KPIs calculados con datos reales | 9 KPIs en 4 páginas del dashboard |
+| Brecha de habilidades identificada entre academia y mercado | Medida en las 5 carreras IT con fuzzy matching |
+| Benchmark regional contra América Latina | 17 países via CEPALSTAT ODS 4.4.1 |
+| Asistente IA para consultas en lenguaje natural | En vivo via API de Groq (LLaMA 3.1 8B) |
+| Despliegue público accesible para evaluadores | Desplegado en `brecha-digital-bolivia-bi.streamlit.app` |
+
+**Hallazgo concreto:** El análisis de brecha — usando vacantes reales extraídas por LLM — muestra que las habilidades más demandadas (Docker, plataformas cloud, frameworks modernos de CI/CD) tienen cobertura académica significativamente baja en las 5 carreras IT analizadas. Esto confirma la hipótesis de que la brecha digital es real y medible — exactamente el tipo de evidencia que puede impulsar una reforma curricular.
 
 ---
 
@@ -165,6 +190,112 @@ Las descripciones de vacantes de Adzuna son procesadas por `skill_extraction.py`
 2. **Fallback con regex:** Si el LLM falla o alcanza el límite de tasa, un banco de patrones regex cubre los keywords tecnológicos más comunes
 
 El `skills_extracted.csv` resultante está commiteado al repositorio para reproducibilidad y para evitar costos de LLM en cada carga del dashboard.
+
+---
+
+## Diagramas ER de las Bases de Datos
+
+### Bronze — `BrechaDigitalDB` (Base de datos fuente)
+
+Base de datos operacional con registros académicos crudos. Modelo relacional normalizado.
+
+```
+┌─────────────────┐         ┌──────────────────────┐
+│    Carreras     │         │  CompetenciasDigitales│
+├─────────────────┤         ├──────────────────────┤
+│ PK CarreraID    │◄────────│ FK CarreraID          │
+│    NombreCarrera│         │ PK CompetenciaID      │
+│    Facultad     │         │    NombreHabilidad    │
+└────────┬────────┘         │    NivelRequerido     │
+         │                  └──────────────────────┘
+         │
+         │   ┌──────────────────┐
+         │   │   Estudiantes    │
+         │   ├──────────────────┤
+         └──►│ PK EstudianteID  │
+             │    Nombre        │◄──────────────┐
+             │    FechaIngreso  │               │
+             │    Genero        │               │
+             │    Ciudad        │               │
+             └──────────────────┘               │
+                                                │
+┌──────────────────────────┐    ┌───────────────┴──────────┐
+│     Inscripciones        │    │   SeguimientoEgresados   │
+├──────────────────────────┤    ├──────────────────────────┤
+│ PK InscripcionID         │    │ PK EgresadoID            │
+│ FK EstudianteID ─────────┼───►│ FK EstudianteID          │
+│ FK CarreraID    ─────────┼───►│    TieneEmpleoFormal     │
+│    NotaFinal             │    │    SalarioMensualUSD     │
+│    SemestreActual        │    │    TrabajaEnAreaDeEstudio│
+└──────────────────────────┘    └──────────────────────────┘
+```
+
+**5 tablas — 4 relaciones de clave foránea**  
+`SeguimientoEgresados` es la tabla clave: registra si cada estudiante obtuvo empleo formal post-egreso y si trabaja en su área de estudio.
+
+---
+
+### Gold — `DW_BrechaDigital` (Almacén en Esquema Copo de Nieve)
+
+Almacén analítico optimizado para consultas BI. Cada fila en la tabla de hechos es el evento de empleo de un egresado.
+
+```
+                    ┌───────────────────┐
+                    │   DIM_CARRERA     │
+                    ├───────────────────┤
+                    │ PK SK_Carrera     │
+                    │    CarreraID (BK) │
+                    │    nombrecarrera  │
+                    │    area           │
+                    └────────┬──────────┘
+                             │
+┌──────────────────┐         │         ┌──────────────────────┐
+│  DIM_ESTUDIANTE  │         │         │    DIM_HABILIDAD      │
+├──────────────────┤         │         ├──────────────────────┤
+│ PK SK_Estudiante │         │         │ PK SK_Habilidad       │
+│    EstudianteID  │         │         │    NombreHabilidad    │
+│    nombre        │         │         │ FK SK_Categoria ──►┐  │
+│    Genero        │         │         └──────────┬──────────┘  │
+│    ciudad_       │         │                    │              │
+│    residencia    │         │         ┌──────────▼──────────┐  │
+└────────┬─────────┘         │         │ DIM_CATEGORIA_SKILL │  │
+         │                   │         ├─────────────────────┤  │
+         │         ┌─────────▼──────────────────────────┐    │  │
+         └────────►│       FACT_INSERCION_LABORAL        │    │  │
+                   ├────────────────────────────────────┤    │  │
+                   │ FK SK_Estudiante                    │    │  │
+                   │ FK SK_Carrera                       │    │  │
+                   │ FK SK_Tiempo                        │    │  │
+                   │ FK SK_Region                        │    │  │
+                   │ FK SK_MercadoLaboral                │    │  │
+                   │    EstaEmpleado         (INT)       │    │  │
+                   │    SalarioMensualUSD    (DECIMAL)   │    │  │
+                   │    TrabajaEnAreaEstudio (BIT)       │    │  │
+                   └──────┬──────────────┬───────────────┘    │  │
+                          │              │          SK_Categoria│  │
+                          ▼              ▼          PK──────────┘  │
+              ┌───────────────┐  ┌──────────────────────┐         │
+              │  DIM_TIEMPO   │  │  DIM_MERCADO_LABORAL  │         │
+              ├───────────────┤  ├──────────────────────┤         │
+              │ PK SK_Tiempo  │  │ PK SK_MercadoLaboral  │         │
+              │    anio       │  │    Ubicacion          │         │
+              │    trimestre  │  │ FK SK_Region ──►┐     │         │
+              │    mes        │  └──────────────────┼─────┘         │
+              │    Semestre   │                     │                │
+              └───────────────┘          ┌──────────▼────────┐      │
+                                         │    DIM_REGION     │      │
+                                         ├───────────────────┤      │
+                                         │ PK SK_Region      │      │
+                                         │    Ciudad         │      │
+                                         │    Region         │      │
+                                         └───────────────────┘      │
+                                                                     │
+                              NombreCategoria ◄─────────────────────┘
+                              Básico / Intermedio / Avanzado
+```
+
+**8 tablas — 1 fact + 7 dimensiones (2 sub-dimensiones)**  
+El copo de nieve normaliza `DIM_HABILIDAD → DIM_CATEGORIA_SKILL` y `DIM_MERCADO_LABORAL → DIM_REGION` para eliminar redundancia de datos.
 
 ---
 
@@ -303,10 +434,10 @@ DW_PASSWORD = "tu_contraseña"
 
 ---
 
-<div align="center">
-<img src="https://img.shields.io/badge/Licencia-MIT-blue.svg?style=for-the-badge" alt="Licencia: MIT">
-<br><br>
+<a href="LICENSE">
+  <img src="https://img.shields.io/badge/Licencia-MIT-blue.svg?style=for-the-badge" alt="Licencia: MIT">
+</a>
+&nbsp;
 <a href="https://brecha-digital-bolivia-bi.streamlit.app/">
   <img src="https://img.shields.io/badge/▶_Abrir_Demo_en_Vivo-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Abrir Demo en Vivo">
 </a>
-</div>
