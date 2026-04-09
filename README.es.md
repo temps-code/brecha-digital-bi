@@ -31,6 +31,20 @@
 
 ---
 
+## Vista Previa
+
+<div align="center">
+
+<img src="docs/mockup.png" alt="Brecha Digital — MockUp" width="100%" />
+
+<br /><br />
+
+<img src="docs/screenshot.jpg" alt="Brecha Digital — Dashboard en Vivo" width="100%" />
+
+</div>
+
+---
+
 **Proyecto Académico**  
 Universidad Privada Domingo Savio — Ingeniería de Sistemas  
 Materia: Inteligencia de Negocios — 2026

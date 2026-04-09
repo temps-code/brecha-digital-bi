@@ -31,6 +31,20 @@
 
 ---
 
+## Preview
+
+<div align="center">
+
+<img src="docs/mockup.png" alt="Digital Labor Gap — MockUp" width="100%" />
+
+<br /><br />
+
+<img src="docs/screenshot.jpg" alt="Digital Labor Gap — Live Dashboard" width="100%" />
+
+</div>
+
+---
+
 **Academic Project**  
 Universidad Privada Domingo Savio — Computer Systems Engineering  
 Course: Business Intelligence — 2026
