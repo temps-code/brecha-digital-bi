@@ -167,7 +167,7 @@ for col, icon, title, desc, href in [
     (n1, 'ti-chart-dots-3', 'KPIs Generales',       'Indicadores clave + benchmark CEPALSTAT ODS 4.4.1', '/kpis'),
     (n2, 'ti-briefcase',    'Inserción Laboral',     'Empleo por carrera, ciudad y nivel salarial',       '/insercion'),
     (n3, 'ti-target',       'Brecha de Habilidades', 'Skills extraídas con IA · Brecha académica vs mercado', '/skill_gap'),
-    (n4, 'ti-robot',        'Asistente BI',          'Consultá los datos con lenguaje natural — LLaMA 3.1 (Groq)', '/chatbot'),
+    (n4, 'ti-robot',        'Asistente BI',          'Consultá los datos con lenguaje natural — IA (Groq)', '/chatbot'),
 ]:
     col.markdown(f"""
     <a href="{href}" target="_self" class="nav-link">

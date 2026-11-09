@@ -1,8 +1,8 @@
 """
-Dashboard — Page 4: Asistente IA (Groq + LLaMA)
+Dashboard — Page 4: Asistente IA (Groq)
 Responsable: Diego Vargas Urzagaste (@temps-code)
 
-Chatbot con contexto del warehouse. Usa Groq API (free tier: 30 RPM, sin límite diario).
+Chatbot con contexto del warehouse. Usa Groq API (límites según modelo y plan).
 Requiere GROQ_API_KEY en el archivo .env — obtener en: https://console.groq.com
 """
 import os
@@ -19,7 +19,7 @@ load_dotenv(_ROOT / '.env', override=False)
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from components.styles import inject_styles
 
-_MODEL = 'llama-3.1-8b-instant'
+_MODEL = os.getenv('GROQ_MODEL', '').strip() or 'openai/gpt-oss-20b'
 _SYSTEM_FALLBACK = (
     'Sos un asistente de Business Intelligence para el proyecto '
     '"Brecha Digital Laboral — UPDS Bolivia 2026". '
@@ -43,7 +43,8 @@ with st.sidebar:
     st.markdown('---')
     with st.expander('Estado del chatbot', expanded=False):
         api_key_debug = os.getenv('GROQ_API_KEY', '')
-        st.write(f'GROQ_API_KEY: `{"OK — " + api_key_debug[:8] + "..." if api_key_debug else "NO ENCONTRADA"}`')
+        st.write(f'GROQ_API_KEY: `{"CONFIGURADA" if api_key_debug.strip() else "NO ENCONTRADA"}`')
+        st.write(f'Modelo: `{_MODEL}`')
         st.write(f'.env path: `{_ROOT / ".env"}`')
         st.write(f'.env existe: `{(_ROOT / ".env").exists()}`')
         st.write(f'groq_client en session: `{"groq_client" in st.session_state}`')
@@ -58,7 +59,7 @@ with st.sidebar:
 st.markdown("""
 <div class="page-header">
   <h2><i class="ti ti-robot"></i> Asistente BI</h2>
-  <p>Consultá los datos del proyecto en lenguaje natural — LLaMA 3.1 via Groq</p>
+  <p>Consultá los datos del proyecto en lenguaje natural — IA via Groq</p>
 </div>
 """, unsafe_allow_html=True)
 st.markdown('<hr class="divider">', unsafe_allow_html=True)

@@ -52,7 +52,7 @@ logger.addHandler(ch)
 # CONSTANTS
 # ─────────────────────────────────────────────────────────────────────────────
 
-GROQ_MODEL = "llama-3.1-8b-instant"
+GROQ_MODEL = os.getenv("GROQ_MODEL", "").strip() or "openai/gpt-oss-20b"
 
 # 30+ technical skills (extensible)
 KNOWN_SKILLS: Set[str] = {
