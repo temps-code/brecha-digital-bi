@@ -1,7 +1,7 @@
-import sys
-import os
-from pathlib import Path
 import datetime
+import os
+import sys
+from pathlib import Path
 
 import streamlit as st
 
@@ -11,13 +11,14 @@ try:
     for _k, _v in st.secrets.items():
         if isinstance(_v, str):
             os.environ.setdefault(_k, _v)
-except Exception:
+except Exception:  # noqa: S110 -- local runs may not have Streamlit secrets
     pass  # Running locally with .env — dotenv handles it
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from components.data_loader import get_kpis, load_df
 from components.styles import inject_styles
+from components.version import get_git_revision
 
 st.set_page_config(
     page_title='Brecha Digital BI — UPDS',
@@ -46,11 +47,11 @@ st.markdown("""
     <div>
       <h3 style="margin: 0 0 0.5rem 0; color: var(--text); font-size: 1rem;">Misión: Reducir la Brecha Digital en Habilidades TIC</h3>
       <p style="margin: 0 0 0.75rem 0; color: var(--muted); font-size: 0.9rem;">
-        Este dashboard analiza la alineación entre la oferta educativa en carreras IT y la demanda del mercado laboral boliviano, 
+        Este dashboard analiza la alineación entre la oferta educativa en carreras IT y la demanda del mercado laboral boliviano,
         vinculado directamente a los <strong>ODS 4 (Educación de Calidad)</strong> y <strong>ODS 8 (Trabajo Decente e Innovación)</strong>.
       </p>
       <p style="margin: 0; color: var(--text); font-size: 0.9rem; font-weight: 500;">
-        <i class="ti ti-target" style="color: var(--accent); margin-right: 0.25rem;"></i> 
+        <i class="ti ti-target" style="color: var(--accent); margin-right: 0.25rem;"></i>
         Objetivo 2026: 85% de egresados IT con empleo formal en su área de estudio
       </p>
     </div>
@@ -200,3 +201,6 @@ with right:
     <span class="badge"><i class="ti ti-school"></i> ODS 4</span> Educación de calidad<br><br>
     <span class="badge"><i class="ti ti-building-factory-2"></i> ODS 8</span> Trabajo decente y crecimiento
     """, unsafe_allow_html=True)
+
+# Public version marker: Actions waits for this exact commit after Cloud redeploys.
+st.caption(f'Versión desplegada: {get_git_revision()}')

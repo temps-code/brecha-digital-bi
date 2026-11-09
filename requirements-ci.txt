@@ -1,0 +1,2 @@
+# Browser-based verification only; not needed by the Streamlit application.
+playwright>=1.51.0,<2
