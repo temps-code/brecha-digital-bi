@@ -11,7 +11,8 @@ con el enlace del sitio en **Deployments → production**.
    durante la colección y no es una prueba aislada.
 2. Streamlit Cloud recibe los pushes a su rama conectada y despliega por su cuenta.
 3. Solo en `main`, después de pasar las pruebas, Actions abre el sitio con Chromium
-   y espera hasta 12 minutos a que aparezca **Versión desplegada: SHA completo**.
+   y comprueba cada 3 segundos, durante un máximo de 3 minutos, que aparezca
+   **Versión desplegada: SHA completo**, en la página o en el iframe oficial de la app.
 4. El entorno `production` queda exitoso únicamente si coincide con el commit de
    esa ejecución. Un sitio disponible pero con una versión anterior no pasa.
 
